@@ -51,7 +51,7 @@ export class NewsService {
         id: item.id,
         title: item.title,
         description: item.description,
-        image: item.description,
+        image: item.image,
         publishedAt: item.publishedAt,
       };
     });
