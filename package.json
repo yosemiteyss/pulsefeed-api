@@ -19,7 +19,7 @@
     "test:cov": "jest --config jest.json --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config jest.json --runInBand",
     "migration:run": "npm run typeorm migration:run -- -d ormconfig.ts",
-    "migration:generate": "npm run typeorm -- -d ormconfig.ts migration:generate ./migration/migration",
+    "migration:generate": "nest build && npm run typeorm -- -d ormconfig.ts migration:generate ./migration/migration",
     "migration:create": "npm run typeorm -- migration:create ./migration/migration",
     "migration:revert": "npm run typeorm -- -d ormconfig.ts migration:revert"
   },
