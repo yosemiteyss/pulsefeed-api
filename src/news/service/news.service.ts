@@ -43,7 +43,7 @@ export class NewsService {
         },
       },
       order: {
-        publishedAt: 'DESC',
+        createdAt: 'DESC',
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -56,7 +56,7 @@ export class NewsService {
         title: item.title,
         description: item.description,
         image: item.image,
-        publishedAt: item.publishedAt,
+        publishedAt: item.publishedAt ?? item.createdAt,
       };
     });
 
