@@ -4,6 +4,7 @@ export class Migration1715508279080 implements MigrationInterface {
   name = 'Migration1715508279080';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
     await queryRunner.query(
       `CREATE TYPE "public"."jobs_status_enum" AS ENUM('active', 'success', 'failure')`,
     );
