@@ -4,10 +4,7 @@ FROM node:20
 WORKDIR /app
 
 # Copy project
-RUN git clone https://github.com/yosemiteyss/pulsefeed-aggregate
-
-# Initialize and fetch submodule
-RUN git submodule init && git submodule update --recursive --remote
+COPY . .
 
 COPY .env.development .env
 
