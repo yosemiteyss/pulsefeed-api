@@ -17,7 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
       // No more than 3 calls in a second.
       {
         ttl: 1000,
-        limit: 3,
+        limit: 5,
       },
     ]),
     ConfigModule,

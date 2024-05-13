@@ -18,7 +18,7 @@ function setupApp(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const APP_PORT = 1234;
+  const APP_PORT = 3001;
   const app = await NestFactory.create(AppModule);
   setupApp(app);
 

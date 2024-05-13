@@ -38,12 +38,16 @@ export class NewsService {
       where: {
         publishedAt: LessThan(date),
         image: Not(IsNull()),
+        source: {
+          enabled: true,
+        },
       },
       order: {
         publishedAt: 'DESC',
       },
       skip: (page - 1) * limit,
       take: limit,
+      relations: ['sources'],
     });
 
     const data: NewsDto[] = items.map((item) => {

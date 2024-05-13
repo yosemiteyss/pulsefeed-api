@@ -27,10 +27,8 @@ export class AuthService implements OnModuleInit {
     this.logger.log(AuthService.name, 'Pushed api keys to cache');
   }
 
-  isAdminValid(email: string, password: string): boolean {
-    const validEmail = this.configService.get<string>('ADMIN_EMAIL');
-    const validPassword = this.configService.get<string>('ADMIN_PASSWORD');
-    return email === validEmail && password === validPassword;
+  isAdminValid(key: string): boolean {
+    return key === this.configService.get<string>('ADMIN_SECRET_KEY');
   }
 
   async createApiKey(): Promise<string> {

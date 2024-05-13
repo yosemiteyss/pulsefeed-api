@@ -7,6 +7,13 @@ export class AdminGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    return this.authService.isAdminValid(request.body.email, request.body.password);
+    const authorization = request.headers['authorization'];
+
+    if (authorization && authorization.startsWith('Bearer ')) {
+      const key = authorization.substring(7);
+      return this.authService.isAdminValid(key);
+    }
+
+    return false;
   }
 }
