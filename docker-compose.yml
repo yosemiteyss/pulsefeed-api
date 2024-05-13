@@ -1,6 +1,24 @@
 version: '3'
 
 services:
+  pulsefeed-aggregate:
+    build:
+      context: ../pulsefeed-aggregate
+    ports:
+      - "3124:3000"
+    depends_on:
+      - postgres
+      - redis
+
+  #  pulsefeed-api:
+  #    build:
+  #      context: .
+  #    ports:
+  #      - "3125:3000"
+  #    depends_on:
+  #      - postgres
+  #      - redis
+
   postgres:
     image: postgres:latest
     container_name: postgres
