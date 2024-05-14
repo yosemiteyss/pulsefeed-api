@@ -1,3 +1,5 @@
+import { SourceDto } from '../../source/dto/source.dto';
+
 export class NewsDto {
   readonly id?: string;
   readonly title?: string;
@@ -5,4 +7,5 @@ export class NewsDto {
   readonly description?: string;
   readonly image?: string;
   readonly publishedAt?: Date;
+  readonly source?: SourceDto;
 }

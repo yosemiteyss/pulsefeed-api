@@ -1,5 +1,6 @@
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import { roundDownToNearestHalfHour } from '@common/utils';
+import { SourceDto } from '../../source/dto/source.dto';
 import { PageRequest, PageResponse } from '@common/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsEntity } from '@common/db/entity';
@@ -35,6 +36,9 @@ export class NewsService {
     date: Date,
   ): Promise<[NewsDto[], number]> {
     const [items, total] = await this.newsRepository.findAndCount({
+      relations: {
+        source: true,
+      },
       where: {
         publishedAt: LessThan(date),
         image: Not(IsNull()),
@@ -47,7 +51,6 @@ export class NewsService {
       },
       skip: (page - 1) * limit,
       take: limit,
-      relations: ['sources'],
     });
 
     const data: NewsDto[] = items.map((item) => {
@@ -57,6 +60,7 @@ export class NewsService {
         description: item.description,
         image: item.image,
         publishedAt: item.publishedAt ?? item.createdAt,
+        source: item.source ? SourceDto.fromEntity(item.source) : undefined,
       };
     });
 
