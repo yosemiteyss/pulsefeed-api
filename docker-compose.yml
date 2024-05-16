@@ -20,7 +20,7 @@ services:
       - redis
 
   postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: pf-postgres
     restart: unless-stopped
     ports:
@@ -31,8 +31,20 @@ services:
       POSTGRES_DB: pulsefeed
 
   redis:
-    image: redis:latest
+    image: redis:7
     container_name: pf-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbit
+    container_name: pf-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
