@@ -26,4 +26,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start prod build
-CMD ["npm", "run", "start:prod"]
+ENTRYPOINT ["npm", "run", "start:prod"]
