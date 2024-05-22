@@ -1,11 +1,10 @@
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## Setup
 
 ```bash
 $ npm install
+$ cp .env.local .env
+$ git submodule update --init --recursive
+$ git submodule update --recursive --remote
 ```
 
 ## Running the app
@@ -32,21 +31,4 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
-```
-
-### Git Submodule
-
-```bash
-# Init
-git submodule update --init --recursive
-
-# Update
-git submodule update --recursive --remote
-```
-
-### Docker
-
-```bash
-# up
-docker-compose up -d
 ```
