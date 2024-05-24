@@ -6,10 +6,9 @@ export class SourceDto {
   readonly link?: string;
   readonly image?: string;
   readonly description?: string;
-  readonly enabled?: boolean;
 
   static fromEntity(entity: SourceEntity): SourceDto {
-    const { id, title, link, image, description, enabled } = entity;
-    return { id, title, link, image, description, enabled };
+    const { id, title, link, image, description } = entity;
+    return { id, title, link, image, description };
   }
 }

@@ -1,7 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@common/config/config.module';
+import { CategoryModule } from './category/category.module';
 import { HealthModule } from './health/health.module';
+import { SourceModule } from './source/source.module';
 import { LoggerMiddleware } from 'nestjs-http-logger';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,7 +16,7 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     ThrottlerModule.forRoot([
-      // No more than 3 calls in a second.
+      // No more than 5 calls in a second.
       {
         ttl: 1000,
         limit: 5,
@@ -28,6 +30,8 @@ import { APP_GUARD } from '@nestjs/core';
     AdminModule,
     HealthModule,
     NewsModule,
+    SourceModule,
+    CategoryModule,
   ],
   providers: [
     {

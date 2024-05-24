@@ -1,5 +1,7 @@
+import { EnableSourceDto } from '../../admin/dto/enable-source.dto';
+import { AdminSourceDto } from '../../admin/dto/admin-source.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EnableSourceDto } from '../dto/enable-source.dto';
+import { PageRequest, PageResponse } from '@common/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SourceDto } from '../dto/source.dto';
 import { SourceEntity } from '@common/db';
@@ -11,12 +13,27 @@ export class SourceService {
     @InjectRepository(SourceEntity) private readonly sourceRepository: Repository<SourceEntity>,
   ) {}
 
-  async getSourceList(): Promise<SourceDto[]> {
-    const sourceList = await this.sourceRepository.find({
+  async getSourceList(request: PageRequest): Promise<PageResponse<SourceDto>> {
+    const { page } = request;
+    const limit = 10;
+
+    let [data, total] = await this.sourceRepository.findAndCount({
+      order: { title: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    data = data.map((source) => SourceDto.fromEntity(source));
+
+    return { data, total, page, limit };
+  }
+
+  async getAdminSourceList(): Promise<AdminSourceDto[]> {
+    const sources = await this.sourceRepository.find({
       order: { title: 'ASC' },
     });
 
-    return sourceList.map((source) => SourceDto.fromEntity(source));
+    return sources.map((source) => AdminSourceDto.fromEntity(source));
   }
 
   async setSourceEnabled(request: EnableSourceDto): Promise<SourceDto> {

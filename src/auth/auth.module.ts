@@ -1,5 +1,5 @@
+import { AuthService } from './service/auth.service';
 import { Global, Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { CacheModule } from '@common/cache';
 import { DatabaseModule } from '@common/db';
 
