@@ -29,7 +29,6 @@ function setupSwagger(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const APP_PORT = 3001;
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('bootstrap');
 
@@ -44,7 +43,7 @@ async function bootstrap() {
     process.exit(1); // Exit the process with an error code
   }
 
-  await app.listen(APP_PORT);
+  await app.listen(3000, '0.0.0.0');
 
   logger.log(`Listening on ${await app.getUrl()}`);
   logger.log(`Swagger running on ${await app.getUrl()}/docs`);
