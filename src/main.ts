@@ -44,7 +44,7 @@ async function bootstrap() {
     process.exit(1); // Exit the process with an error code
   }
 
-  await app.listen(APP_PORT, '0.0.0.0');
+  await app.listen(APP_PORT);
 
   logger.log(`Listening on ${await app.getUrl()}`);
   logger.log(`Swagger running on ${await app.getUrl()}/docs`);
