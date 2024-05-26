@@ -1,7 +1,8 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiKeyGuard } from '../../auth/guard/api-key.guard';
-import { PageRequest, PageResponse } from '@common/dto';
+import { NewsRequestDto } from '../dto/news-request.dto';
 import { NewsService } from '../service/news.service';
+import { PageResponse } from '@common/dto';
 import { ApiTags } from '@nestjs/swagger';
 import { NewsDto } from '../dto/news.dto';
 
@@ -11,13 +12,8 @@ import { NewsDto } from '../dto/news.dto';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @Get('/top')
-  async getTopNews(@Query() request: PageRequest): Promise<PageResponse<NewsDto>> {
-    return this.newsService.getTopNews(request);
+  @Get('/list')
+  async getNewsList(@Query() request: NewsRequestDto): Promise<PageResponse<NewsDto>> {
+    return this.newsService.getNews(request);
   }
-
-  // @Get('/')
-  // async getNews(@Query() request: NewsRequestDto): Promise<PageResponse<NewsDto>> {
-  //   return this.newsService.getNews(request);
-  // }
 }

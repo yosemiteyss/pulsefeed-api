@@ -1,12 +1,14 @@
+import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
-import { roundDownToNearestHalfHour } from '@common/utils';
+import { NewsRequestDto } from '../dto/news-request.dto';
 import { SourceDto } from '../../source/dto/source.dto';
-import { PageRequest, PageResponse } from '@common/dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsEntity } from '@common/db/entity';
 import { LoggerService } from '@common/logger';
 import { CacheService } from '@common/cache';
-import { Injectable } from '@nestjs/common';
+import { NewsCategory } from '@common/model';
+import { PageResponse } from '@common/dto';
 import { NewsDto } from '../dto/news.dto';
 
 @Injectable()
@@ -17,34 +19,61 @@ export class NewsService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getTopNews(request: PageRequest): Promise<PageResponse<NewsDto>> {
-    const page = request.page;
-    const limit = 10;
+  private readonly NEWS_PAGE_LIMIT = 10;
 
-    const current = new Date();
-    const [data, total] = await this.getNewsFromCache(page, current, () => {
+  async getNews({ category, page }: NewsRequestDto): Promise<PageResponse<NewsDto>> {
+    const newsCategory = stringToEnum(NewsCategory, category);
+    if (!newsCategory) {
+      throw new NotFoundException('Category is not found');
+    }
+
+    const limit = this.NEWS_PAGE_LIMIT;
+    const currentDate = new Date();
+
+    const [data, total] = await this.getCachedNews(page, currentDate, () => {
       this.logger.log(NewsService.name, 'load top news from db.');
-      return this.getTopNewsFromDB(page, limit, current);
+      return this.getFilteredNewsFromDb(page, limit, currentDate, newsCategory);
     });
 
     return { data, total, page, limit };
   }
 
-  private async getTopNewsFromDB(
+  /**
+   * Get cached news articles.
+   * News articles are cached every half hour.
+   */
+  private async getCachedNews(
+    page: number,
+    beforeDate: Date,
+    fn: () => Promise<[NewsDto[], number]>,
+  ): Promise<[NewsDto[], number]> {
+    const halfHrTime = roundDownToNearestHalfHour(beforeDate).getTime();
+    const key = `news-top-${page}-${halfHrTime}`;
+    const ttl = 4 * 60 * 60 * 1000; // 4 hours
+
+    return this.cacheService.wrap(key, fn, ttl);
+  }
+
+  /**
+   * Get filtered news articles from database.
+   */
+  private async getFilteredNewsFromDb(
     page: number,
     limit: number,
-    date: Date,
+    beforeDate: Date,
+    category: NewsCategory,
   ): Promise<[NewsDto[], number]> {
     const [items, total] = await this.newsRepository.findAndCount({
       relations: {
         source: true,
       },
       where: {
-        publishedAt: LessThan(date),
+        publishedAt: LessThan(beforeDate),
         image: Not(IsNull()),
         source: {
           enabled: true,
         },
+        category: category,
       },
       order: {
         createdAt: 'DESC',
@@ -65,17 +94,5 @@ export class NewsService {
     });
 
     return [data, total];
-  }
-
-  private async getNewsFromCache(
-    page: number,
-    date: Date,
-    fn: () => Promise<[NewsDto[], number]>,
-  ): Promise<[NewsDto[], number]> {
-    const halfHrTime = roundDownToNearestHalfHour(date).getTime();
-    const key = `news-top-${page}-${halfHrTime}`;
-    const ttl = 4 * 60 * 60 * 1000; // 4 hours
-
-    return this.cacheService.wrap(key, fn, ttl);
   }
 }
