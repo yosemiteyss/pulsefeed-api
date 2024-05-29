@@ -1,3 +1,3 @@
 export class CategoryDto {
-  readonly name: string;
+  readonly name?: string;
 }

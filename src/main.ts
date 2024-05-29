@@ -1,11 +1,14 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston/dist/winston.constants';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-function setupApp(app: INestApplication) {
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('bootstrap');
+
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,9 +18,8 @@ function setupApp(app: INestApplication) {
     }),
   );
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
-}
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
 
-function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
     .setTitle('Pulsefeed')
     .setDescription('Pulsefeed API Documentation')
@@ -26,14 +28,6 @@ function setupSwagger(app: INestApplication) {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-}
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const logger = new Logger('bootstrap');
-
-  setupApp(app);
-  setupSwagger(app);
 
   // Check admin secret key is set.
   const configService = app.get(ConfigService);

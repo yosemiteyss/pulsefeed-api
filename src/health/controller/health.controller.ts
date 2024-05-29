@@ -5,25 +5,25 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('health')
+@ApiTags('Health')
 @Controller('health')
 export class HealthController {
   constructor(
     private readonly healthCheckService: HealthCheckService,
-    private readonly db: TypeOrmHealthIndicator,
-    private readonly memory: MemoryHealthIndicator,
+    private readonly dbHealth: TypeOrmHealthIndicator,
+    private readonly memoryHealth: MemoryHealthIndicator,
   ) {}
 
   @Get('/check')
   @HealthCheck()
+  @ApiOperation({ description: 'Services health check' })
   check(): Promise<HealthCheckResult> {
     return this.healthCheckService.check([
-      () => this.db.pingCheck('database'),
-      () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-      // TODO: add redis check.
+      () => this.dbHealth.pingCheck('database'),
+      () => this.memoryHealth.checkHeap('memory_heap', 150 * 1024 * 1024),
     ]);
   }
 }

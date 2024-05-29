@@ -13,11 +13,14 @@ export class SourceService {
     @InjectRepository(SourceEntity) private readonly sourceRepository: Repository<SourceEntity>,
   ) {}
 
-  async getSourceList(request: PageRequest): Promise<PageResponse<SourceDto>> {
+  async getEnabledSourceList(request: PageRequest): Promise<PageResponse<SourceDto>> {
     const { page } = request;
     const limit = 10;
 
     let [data, total] = await this.sourceRepository.findAndCount({
+      where: {
+        enabled: true,
+      },
       order: { title: 'ASC' },
       skip: (page - 1) * limit,
       take: limit,

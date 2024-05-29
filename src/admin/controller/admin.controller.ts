@@ -1,13 +1,14 @@
-import { CreateApiKeyResponseDto } from '../dto/create-api-key-response.dto';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { SourceService } from '../../source/service/source.service';
 import { AuthService } from '../../auth/service/auth.service';
+import { CreateApiKeyDto } from '../dto/create-api-key.dto';
 import { EnableSourceDto } from '../dto/enable-source.dto';
 import { AdminSourceDto } from '../dto/admin-source.dto';
+import { SourceDto } from '../../source/dto/source.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '../guard/admin.guard';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('admin')
+@ApiTags('Admin')
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {
@@ -16,29 +17,22 @@ export class AdminController {
     private readonly sourceService: SourceService,
   ) {}
 
-  /**
-   * Create a new api key.
-   */
   @Post('/create-api-key')
-  async createApiKey(): Promise<CreateApiKeyResponseDto> {
+  @ApiOperation({ description: 'Create a new api key' })
+  async createApiKey(): Promise<CreateApiKeyDto> {
     const key = await this.authService.createApiKey();
     return { key };
   }
 
-  /**
-   * Get all news sources.
-   */
-  @Get('/list-source')
-  async getSourceList(): Promise<AdminSourceDto[]> {
+  @Get('/source-list')
+  @ApiOperation({ description: 'List all supported news sources' })
+  async listSource(): Promise<AdminSourceDto[]> {
     return this.sourceService.getAdminSourceList();
   }
 
-  /**
-   * Enable news source.
-   * @param request
-   */
-  @Post('/enable-source')
-  async enableSource(@Body() request: EnableSourceDto) {
+  @Post('/source-enable')
+  @ApiOperation({ description: 'Enable or disable news source' })
+  async enableSource(@Body() request: EnableSourceDto): Promise<SourceDto> {
     return this.sourceService.setSourceEnabled(request);
   }
 }
