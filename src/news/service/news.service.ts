@@ -30,7 +30,7 @@ export class NewsService {
     const limit = this.NEWS_PAGE_LIMIT;
     const currentDate = new Date();
 
-    const [data, total] = await this.getCachedNews(page, currentDate, () => {
+    const [data, total] = await this.getCachedNews(page, newsCategory, currentDate, () => {
       this.logger.log(NewsService.name, 'load top news from db.');
       return this.getFilteredNewsFromDb(page, limit, currentDate, newsCategory);
     });
@@ -44,11 +44,12 @@ export class NewsService {
    */
   private async getCachedNews(
     page: number,
+    category: NewsCategory,
     beforeDate: Date,
     fn: () => Promise<[NewsDto[], number]>,
   ): Promise<[NewsDto[], number]> {
     const halfHrTime = roundDownToNearestHalfHour(beforeDate).getTime();
-    const key = `news-top-${page}-${halfHrTime}`;
+    const key = `news-${category}-${page}-${halfHrTime}`;
     const ttl = 4 * 60 * 60 * 1000; // 4 hours
 
     return this.cacheService.wrap(key, fn, ttl);
