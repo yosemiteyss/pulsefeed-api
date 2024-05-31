@@ -1,6 +1,7 @@
-import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
+import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
+import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { NewsRequestDto } from '../dto/news-request.dto';
 import { SourceDto } from '../../source/dto/source.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,21 +20,22 @@ export class NewsService {
     private readonly logger: LoggerService,
   ) {}
 
-  private readonly NEWS_PAGE_LIMIT = 10;
-
   async getNews({ category, page }: NewsRequestDto): Promise<PageResponse<NewsDto>> {
     const newsCategory = stringToEnum(NewsCategory, category);
     if (!newsCategory) {
       throw new NotFoundException('Category is not found');
     }
 
-    const limit = this.NEWS_PAGE_LIMIT;
+    const limit = DEFAULT_PAGE_SIZE;
     const currentDate = new Date();
 
     const [data, total] = await this.getCachedNews(page, newsCategory, currentDate, () => {
       this.logger.log(NewsService.name, 'load top news from db.');
       return this.getFilteredNewsFromDb(page, limit, currentDate, newsCategory);
     });
+
+    // Shuffle articles order.
+    shuffle(data);
 
     return { data, total, page, limit };
   }

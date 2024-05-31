@@ -1,8 +1,10 @@
 import { EnableSourceDto } from '../../admin/dto/enable-source.dto';
 import { AdminSourceDto } from '../../admin/dto/admin-source.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { PageRequest, PageResponse } from '@common/dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LoggerService } from '@common/logger';
 import { SourceDto } from '../dto/source.dto';
 import { SourceEntity } from '@common/db';
 import { Repository } from 'typeorm';
@@ -11,13 +13,14 @@ import { Repository } from 'typeorm';
 export class SourceService {
   constructor(
     @InjectRepository(SourceEntity) private readonly sourceRepository: Repository<SourceEntity>,
+    private readonly logger: LoggerService,
   ) {}
 
   async getEnabledSourceList(request: PageRequest): Promise<PageResponse<SourceDto>> {
     const { page } = request;
-    const limit = 10;
+    const limit = DEFAULT_PAGE_SIZE;
 
-    let [data, total] = await this.sourceRepository.findAndCount({
+    const [data, total] = await this.sourceRepository.findAndCount({
       where: {
         enabled: true,
       },
@@ -26,9 +29,10 @@ export class SourceService {
       take: limit,
     });
 
-    data = data.map((source) => SourceDto.fromEntity(source));
+    const sources = data.map((source) => SourceDto.fromEntity(source));
+    this.logger.log(SourceService.name, `getEnabledSourceList: ${sources.length}`);
 
-    return { data, total, page, limit };
+    return { data: sources, total, page, limit };
   }
 
   async getAdminSourceList(): Promise<AdminSourceDto[]> {

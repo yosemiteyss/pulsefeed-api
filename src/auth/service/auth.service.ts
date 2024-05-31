@@ -16,7 +16,7 @@ export class AuthService implements OnModuleInit {
     private readonly logger: LoggerService,
   ) {}
 
-  private readonly apiKeyCachePrefix = 'pulsefeed:api-key';
+  private readonly apiKeyCachePrefix = 'pf:api-key';
 
   async onModuleInit(): Promise<void> {
     // Push all keys to cache.
@@ -24,7 +24,7 @@ export class AuthService implements OnModuleInit {
     for (let i = 0; i < keys.length; i++) {
       await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, i, keys[i].key);
     }
-    this.logger.log(AuthService.name, 'Pushed api keys to cache');
+    this.logger.log(AuthService.name, `Pushed api keys to cache: ${keys.length}`);
   }
 
   isAdminValid(key: string): boolean {
