@@ -34,9 +34,6 @@ export class NewsService {
       return this.getFilteredNewsFromDb(page, limit, currentDate, newsCategory);
     });
 
-    // Shuffle articles order.
-    shuffle(data);
-
     return { data, total, page, limit };
   }
 
