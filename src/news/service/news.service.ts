@@ -87,6 +87,7 @@ export class NewsService {
         title: item.title,
         description: item.description,
         image: item.image,
+        link: item.link,
         publishedAt: item.publishedAt ?? item.createdAt,
         source: item.source ? SourceDto.fromEntity(item.source) : undefined,
       };
