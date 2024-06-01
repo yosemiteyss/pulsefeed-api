@@ -69,7 +69,6 @@ export class NewsService {
       },
       where: {
         publishedAt: LessThan(beforeDate),
-        image: Not(IsNull()),
         source: {
           enabled: true,
         },
