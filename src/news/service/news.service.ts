@@ -1,4 +1,4 @@
-import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
+import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IsNull, LessThan, Not, Repository } from 'typeorm';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
