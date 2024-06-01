@@ -1,7 +1,6 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston/dist/winston.constants';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -19,23 +18,12 @@ async function bootstrap() {
   );
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+  app.enableShutdownHooks();
 
-  const config = new DocumentBuilder()
-    .setTitle('Pulsefeed')
-    .setDescription('Pulsefeed API Documentation')
-    .setVersion('1.0')
-    .build();
-
+  // Setup swagger document.
+  const config = new DocumentBuilder().setTitle('pulsefeed-api').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
-  // Check admin secret key is set.
-  const configService = app.get(ConfigService);
-  const adminKey = configService.get<string>('ADMIN_SECRET_KEY');
-  if (!adminKey) {
-    console.error('REQUIRED_ENV_VAR is not set. Exiting application.');
-    process.exit(1); // Exit the process with an error code
-  }
 
   await app.listen(3000, '0.0.0.0');
 
