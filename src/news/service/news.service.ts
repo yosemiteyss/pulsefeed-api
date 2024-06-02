@@ -1,4 +1,4 @@
-import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
+import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { NewsRequestDto } from '../dto/news-request.dto';
@@ -81,7 +81,7 @@ export class NewsService {
       take: limit,
     });
 
-    const data: NewsDto[] = items.map((item) => {
+    let data: NewsDto[] = items.map((item) => {
       return {
         id: item.id,
         title: item.title,
@@ -93,6 +93,40 @@ export class NewsService {
       };
     });
 
+    data = this.shuffleNewsByAlternatedSource(data);
+
     return [data, total];
+  }
+
+  private shuffleNewsByAlternatedSource(news: NewsDto[]): NewsDto[] {
+    // Group news articles by source
+    const newsBySource: { [key: string]: NewsDto[] } = {};
+
+    news.forEach((article) => {
+      const sourceKey = article.source?.id || 'unknown';
+      if (!newsBySource[sourceKey]) {
+        newsBySource[sourceKey] = [];
+      }
+      newsBySource[sourceKey].push(article);
+    });
+
+    // Shuffle each group using Fisher-Yates algorithm
+    const shuffledGroups = Object.values(newsBySource).map((group) => shuffle(group));
+
+    // Interleave the shuffled groups
+    const result: NewsDto[] = [];
+    let addedAny: boolean;
+
+    do {
+      addedAny = false;
+      for (const group of shuffledGroups) {
+        if (group.length > 0) {
+          result.push(group.shift()!);
+          addedAny = true;
+        }
+      }
+    } while (addedAny);
+
+    return result;
   }
 }
