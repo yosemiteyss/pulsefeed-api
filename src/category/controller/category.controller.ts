@@ -1,5 +1,5 @@
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CategoryService } from '../service/category.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CategoryDto } from '../dto/category.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
@@ -11,6 +11,7 @@ export class CategoryController {
 
   @Get('/list')
   @ApiOperation({ description: 'Get article categories' })
+  @ApiOkResponse({ type: CategoryDto, isArray: true })
   @Cacheable({
     key: 'category:list',
     namespace: 'pf',
