@@ -1,7 +1,7 @@
 import { IsString } from 'class-validator';
 import { PageRequest } from '@common/dto';
 
-export class NewsRequestDto extends PageRequest {
+export class ArticleRequestDto extends PageRequest {
   @IsString()
   readonly category: string;
 }

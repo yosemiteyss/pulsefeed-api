@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LoggerService } from '@common/logger';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from '@common/cache';
-import { ApiKey } from '@common/db/entity';
+import { ApiKeyEntity } from '@common/db';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   constructor(
-    @InjectRepository(ApiKey)
-    private readonly apiKeyRepository: Repository<ApiKey>,
+    @InjectRepository(ApiKeyEntity)
+    private readonly apiKeyRepository: Repository<ApiKeyEntity>,
     private readonly cacheService: CacheService,
     private readonly configService: ConfigService,
     private readonly logger: LoggerService,
@@ -24,6 +24,7 @@ export class AuthService implements OnModuleInit {
     for (let i = 0; i < keys.length; i++) {
       await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, i, keys[i].key);
     }
+
     this.logger.log(AuthService.name, `Pushed api keys to cache: ${keys.length}`);
   }
 

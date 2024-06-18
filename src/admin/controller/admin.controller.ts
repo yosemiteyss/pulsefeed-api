@@ -25,13 +25,13 @@ export class AdminController {
   }
 
   @Get('/source-list')
-  @ApiOperation({ description: 'List all supported news sources' })
+  @ApiOperation({ description: 'List all supported article sources' })
   async listSource(): Promise<AdminSourceDto[]> {
     return this.sourceService.getAdminSourceList();
   }
 
   @Post('/source-enable')
-  @ApiOperation({ description: 'Enable or disable news source' })
+  @ApiOperation({ description: 'Enable or disable article source' })
   async enableSource(@Body() request: EnableSourceDto): Promise<SourceDto> {
     return this.sourceService.setSourceEnabled(request);
   }

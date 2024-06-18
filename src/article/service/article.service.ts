@@ -1,78 +1,81 @@
 import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
+import { ArticleRequestDto } from '../dto/article-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
-import { NewsRequestDto } from '../dto/news-request.dto';
 import { SourceDto } from '../../source/dto/source.dto';
+import { ArticleCategoryEnum } from '@common/model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewsEntity } from '@common/db/entity';
+import { ArticleDto } from '../dto/article.dto';
 import { LoggerService } from '@common/logger';
 import { LessThan, Repository } from 'typeorm';
 import { CacheService } from '@common/cache';
-import { NewsCategory } from '@common/model';
 import { PageResponse } from '@common/dto';
-import { NewsDto } from '../dto/news.dto';
+import { ArticleEntity } from '@common/db';
 
 @Injectable()
-export class NewsService {
+export class ArticleService {
   constructor(
-    @InjectRepository(NewsEntity) private readonly newsRepository: Repository<NewsEntity>,
+    @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>,
     private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
   ) {}
 
-  async getNews({ category, page }: NewsRequestDto): Promise<PageResponse<NewsDto>> {
-    const newsCategory = stringToEnum(NewsCategory, category);
-    if (!newsCategory) {
-      throw new NotFoundException('Category is not found');
+  async getArticles({ category, page }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
+    const categoryEnum = stringToEnum(ArticleCategoryEnum, category);
+    if (!categoryEnum) {
+      throw new NotFoundException('Unsupported category');
     }
 
     const limit = DEFAULT_PAGE_SIZE;
     const currentDate = new Date();
 
-    const [data, total] = await this.getCachedNews(page, newsCategory, currentDate, () => {
-      this.logger.log(NewsService.name, 'load top news from db.');
-      return this.getFilteredNewsFromDb(page, limit, currentDate, newsCategory);
+    const [data, total] = await this.getCachedArticles(page, categoryEnum, currentDate, () => {
+      this.logger.log(ArticleService.name, 'load top articles from db.');
+      return this.getFilteredArticlesFromDb(page, limit, currentDate, categoryEnum);
     });
 
     return { data, total, page, limit };
   }
 
   /**
-   * Get cached news articles.
-   * News articles are cached every half hour.
+   * Get cached articles.
+   * Articles are cached every half hour.
    */
-  private async getCachedNews(
+  private async getCachedArticles(
     page: number,
-    category: NewsCategory,
+    category: ArticleCategoryEnum,
     beforeDate: Date,
-    fn: () => Promise<[NewsDto[], number]>,
-  ): Promise<[NewsDto[], number]> {
+    fn: () => Promise<[ArticleDto[], number]>,
+  ): Promise<[ArticleDto[], number]> {
     const halfHrTime = roundDownToNearestHalfHour(beforeDate).getTime();
-    const key = `news-${category}-${page}-${halfHrTime}`;
+    const key = `articles-${category}-${page}-${halfHrTime}`;
     const ttl = 4 * 60 * 60 * 1000; // 4 hours
 
     return this.cacheService.wrap(key, fn, ttl);
   }
 
   /**
-   * Get filtered news articles from database.
+   * Get filtered articles from database.
    */
-  private async getFilteredNewsFromDb(
+  private async getFilteredArticlesFromDb(
     page: number,
     limit: number,
     beforeDate: Date,
-    category: NewsCategory,
-  ): Promise<[NewsDto[], number]> {
-    const [items, total] = await this.newsRepository.findAndCount({
+    category: ArticleCategoryEnum,
+  ): Promise<[ArticleDto[], number]> {
+    const [items, total] = await this.articleRepository.findAndCount({
       relations: {
         source: true,
+        category: true,
       },
       where: {
         publishedAt: LessThan(beforeDate),
         source: {
           enabled: true,
         },
-        category: category,
+        category: {
+          key: category,
+        },
       },
       order: {
         createdAt: 'DESC',
@@ -81,7 +84,7 @@ export class NewsService {
       take: limit,
     });
 
-    let data: NewsDto[] = items.map((item) => {
+    let data: ArticleDto[] = items.map((item) => {
       return {
         id: item.id,
         title: item.title,
@@ -93,28 +96,28 @@ export class NewsService {
       };
     });
 
-    data = this.shuffleNewsByAlternatedSource(data);
+    data = this.shuffleArticlesByAlternatedSource(data);
 
     return [data, total];
   }
 
-  private shuffleNewsByAlternatedSource(news: NewsDto[]): NewsDto[] {
-    // Group news articles by source
-    const newsBySource: { [key: string]: NewsDto[] } = {};
+  private shuffleArticlesByAlternatedSource(articles: ArticleDto[]): ArticleDto[] {
+    // Group articles by source
+    const articlesBySource: { [key: string]: ArticleDto[] } = {};
 
-    news.forEach((article) => {
+    articles.forEach((article) => {
       const sourceKey = article.source?.id || 'unknown';
-      if (!newsBySource[sourceKey]) {
-        newsBySource[sourceKey] = [];
+      if (!articlesBySource[sourceKey]) {
+        articlesBySource[sourceKey] = [];
       }
-      newsBySource[sourceKey].push(article);
+      articlesBySource[sourceKey].push(article);
     });
 
     // Shuffle each group using Fisher-Yates algorithm
-    const shuffledGroups = Object.values(newsBySource).map((group) => shuffle(group));
+    const shuffledGroups = Object.values(articlesBySource).map((group) => shuffle(group));
 
     // Interleave the shuffled groups
-    const result: NewsDto[] = [];
+    const result: ArticleDto[] = [];
     let addedAny: boolean;
 
     do {

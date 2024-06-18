@@ -15,7 +15,7 @@ export class SourceController {
 
   @Get('/list')
   @ApiOkResponsePaginated(SourceDto)
-  @ApiOperation({ description: 'Get all enabled news sources' })
+  @ApiOperation({ description: 'Get all enabled sources' })
   @Cacheable({
     key: ({ page }: PageRequest) => `source:list:page:${page}`,
     namespace: 'pf',

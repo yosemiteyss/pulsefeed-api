@@ -1,6 +1,6 @@
 import { SourceDto } from '../../source/dto/source.dto';
 
-export class NewsDto {
+export class ArticleDto {
   readonly id?: string;
   readonly title?: string;
   readonly link?: string;
