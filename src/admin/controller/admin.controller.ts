@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { SourceService } from '../../source/service/source.service';
-import { AuthService } from '../../auth/service/auth.service';
+import { ApiKeyService } from '../../auth/service/api-key.service';
 import { CreateApiKeyDto } from '../dto/create-api-key.dto';
 import { EnableSourceDto } from '../dto/enable-source.dto';
 import { AdminSourceDto } from '../dto/admin-source.dto';
@@ -13,14 +13,14 @@ import { AdminGuard } from '../guard/admin.guard';
 @UseGuards(AdminGuard)
 export class AdminController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly apiKeyService: ApiKeyService,
     private readonly sourceService: SourceService,
   ) {}
 
   @Post('/create-api-key')
   @ApiOperation({ description: 'Create a new api key' })
   async createApiKey(): Promise<CreateApiKeyDto> {
-    const key = await this.authService.createApiKey();
+    const key = await this.apiKeyService.createKey();
     return { key };
   }
 

@@ -21,7 +21,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // Setup swagger document.
-  const config = new DocumentBuilder().setTitle('pulsefeed-api').setVersion('1.0').build();
+  const config = new DocumentBuilder().setTitle('pf-api').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 

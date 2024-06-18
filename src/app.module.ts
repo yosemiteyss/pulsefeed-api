@@ -1,7 +1,8 @@
-import { ArticleCategoryModule } from './category/article-category.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { HmacMiddleware } from './auth/middleware/hmac.middleware';
 import { ConfigModule } from '@common/config/config.module';
+import { CategoryModule } from './category/category.module';
 import { ArticleModule } from './article/article.module';
 import { HealthModule } from './health/health.module';
 import { SourceModule } from './source/source.module';
@@ -31,7 +32,7 @@ import { APP_GUARD } from '@nestjs/core';
     HealthModule,
     ArticleModule,
     SourceModule,
-    ArticleCategoryModule,
+    CategoryModule,
   ],
   providers: [
     {
@@ -43,5 +44,6 @@ import { APP_GUARD } from '@nestjs/core';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(HmacMiddleware).forRoutes('*');
   }
 }

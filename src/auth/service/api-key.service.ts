@@ -1,38 +1,47 @@
-import { Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoggerService } from '@common/logger';
-import { ConfigService } from '@nestjs/config';
 import { CacheService } from '@common/cache';
+import { Injectable } from '@nestjs/common';
 import { ApiKeyEntity } from '@common/db';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class ApiKeyService {
   constructor(
     @InjectRepository(ApiKeyEntity)
     private readonly apiKeyRepository: Repository<ApiKeyEntity>,
     private readonly cacheService: CacheService,
-    private readonly configService: ConfigService,
     private readonly logger: LoggerService,
   ) {}
 
   private readonly apiKeyCachePrefix = 'pf:api-key';
 
-  async onModuleInit(): Promise<void> {
-    // Push all keys to cache.
+  async getDefaultKey(): Promise<string | undefined> {
+    // Find in cache.
+    const cachedKeys = await this.cacheService.getByPrefix<string>(this.apiKeyCachePrefix);
+    if (cachedKeys.length > 0) {
+      return cachedKeys[0];
+    }
+
+    // Find in db.
+    const dbKeys = await this.apiKeyRepository.find();
+    if (dbKeys.length > 0) {
+      return cachedKeys[0];
+    }
+
+    return undefined;
+  }
+
+  async pushKeysToCache() {
     const keys = await this.apiKeyRepository.find();
     for (let i = 0; i < keys.length; i++) {
       await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, i, keys[i].key);
     }
 
-    this.logger.log(AuthService.name, `Pushed api keys to cache: ${keys.length}`);
+    this.logger.log(ApiKeyService.name, `Pushed api keys to cache: ${keys.length}`);
   }
 
-  isAdminValid(key: string): boolean {
-    return key === this.configService.get<string>('ADMIN_SECRET_KEY');
-  }
-
-  async createApiKey(): Promise<string> {
+  async createKey(): Promise<string> {
     // Delete api key first.
     await this.apiKeyRepository.clear();
     await this.cacheService.delByPrefix(this.apiKeyCachePrefix);
@@ -42,29 +51,9 @@ export class AuthService implements OnModuleInit {
 
     await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, 0, apiKey.key);
 
-    this.logger.log(AuthService.name, `Created new api key: ${apiKey.key}`);
+    this.logger.log(ApiKeyService.name, `Created new api key: ${apiKey.key}`);
 
     return apiKey.key;
-  }
-
-  async isApiKeyValid(key?: string): Promise<boolean> {
-    if (!key) {
-      return false;
-    }
-
-    // Find by cache.
-    const keys = await this.cacheService.getByPrefix<string>(this.apiKeyCachePrefix);
-    if (keys.includes(key)) {
-      return true;
-    }
-
-    // Find by db.
-    const keyInDb = await this.apiKeyRepository.exists({ where: { key } });
-    if (!keyInDb) {
-      throw new UnauthorizedException('Invalid key');
-    }
-
-    return true;
   }
 
   private generateApiKey(length: number = 64): string {

@@ -1,15 +1,13 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiKeyGuard } from '../../auth/guard/api-key.guard';
 import { SourceService } from '../service/source.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PageRequest, PageResponse } from '@common/dto';
 import { SourceDto } from '../dto/source.dto';
 import { Cacheable } from 'nestjs-cacheable';
 
 @ApiTags('Source')
 @Controller('source')
-@UseGuards(ApiKeyGuard)
 export class SourceController {
   constructor(private readonly sourceService: SourceService) {}
 
