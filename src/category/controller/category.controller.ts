@@ -17,6 +17,6 @@ export class CategoryController {
     namespace: 'pf',
   })
   async listCategory(): Promise<CategoryDto[]> {
-    return this.categoryService.getCategoryList();
+    return this.categoryService.getSupportedCategories();
   }
 }

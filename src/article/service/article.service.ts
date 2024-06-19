@@ -23,7 +23,8 @@ export class ArticleService {
   async getArticles({ category, page }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
     const categoryEnum = stringToEnum(ArticleCategoryEnum, category);
     if (!categoryEnum) {
-      throw new NotFoundException('Unsupported category');
+      this.logger.warn(ArticleService.name, `category: ${category} is not found`);
+      throw new NotFoundException();
     }
 
     const limit = DEFAULT_PAGE_SIZE;

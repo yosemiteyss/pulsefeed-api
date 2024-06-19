@@ -14,11 +14,11 @@ export class ApiKeyService {
     private readonly logger: LoggerService,
   ) {}
 
-  private readonly apiKeyCachePrefix = 'pf:api-key';
+  private readonly CACHE_PREFIX = 'pf:api-key';
 
   async getDefaultKey(): Promise<string | undefined> {
     // Find in cache.
-    const cachedKeys = await this.cacheService.getByPrefix<string>(this.apiKeyCachePrefix);
+    const cachedKeys = await this.cacheService.getByPrefix<string>(this.CACHE_PREFIX);
     if (cachedKeys.length > 0) {
       return cachedKeys[0];
     }
@@ -35,25 +35,26 @@ export class ApiKeyService {
   async pushKeysToCache() {
     const keys = await this.apiKeyRepository.find();
     for (let i = 0; i < keys.length; i++) {
-      await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, i, keys[i].key);
+      await this.cacheService.setByKeyPrefix(this.CACHE_PREFIX, i, keys[i].key);
     }
 
     this.logger.log(ApiKeyService.name, `Pushed api keys to cache: ${keys.length}`);
   }
 
   async createKey(): Promise<string> {
-    // Delete api key first.
+    // Remove existing keys.
+    await this.cacheService.delByPrefix(this.CACHE_PREFIX);
     await this.apiKeyRepository.clear();
-    await this.cacheService.delByPrefix(this.apiKeyCachePrefix);
 
-    const key = this.generateApiKey();
-    const apiKey = await this.apiKeyRepository.save({ key });
+    const apiKey = this.generateApiKey();
+    const entity = await this.apiKeyRepository.save({ key: apiKey });
 
-    await this.cacheService.setByKeyPrefix(this.apiKeyCachePrefix, 0, apiKey.key);
+    // Save key to cache.
+    await this.cacheService.setByKeyPrefix(this.CACHE_PREFIX, 0, entity.key);
 
-    this.logger.log(ApiKeyService.name, `Created new api key: ${apiKey.key}`);
+    this.logger.log(ApiKeyService.name, `Created new api key: ${entity.key}`);
 
-    return apiKey.key;
+    return entity.key;
   }
 
   private generateApiKey(length: number = 64): string {

@@ -3,6 +3,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HmacMiddleware } from './auth/middleware/hmac.middleware';
 import { ConfigModule } from '@common/config/config.module';
 import { CategoryModule } from './category/category.module';
+import { LanguageModule } from './language/language.module';
 import { ArticleModule } from './article/article.module';
 import { HealthModule } from './health/health.module';
 import { SourceModule } from './source/source.module';
@@ -33,6 +34,7 @@ import { APP_GUARD } from '@nestjs/core';
     ArticleModule,
     SourceModule,
     CategoryModule,
+    LanguageModule,
   ],
   providers: [
     {

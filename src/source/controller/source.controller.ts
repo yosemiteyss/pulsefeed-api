@@ -19,6 +19,6 @@ export class SourceController {
     namespace: 'pf',
   })
   async listSource(@Query() request: PageRequest): Promise<PageResponse<SourceDto>> {
-    return this.sourceService.getEnabledSourceList(request);
+    return this.sourceService.getSupportedSources(request);
   }
 }

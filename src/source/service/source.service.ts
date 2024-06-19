@@ -1,6 +1,5 @@
-import { EnableSourceDto } from '../../admin/dto/enable-source.dto';
-import { AdminSourceDto } from '../../admin/dto/admin-source.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EnableSourceDto } from '../dto/enable-source.dto';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { PageRequest, PageResponse } from '@common/dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,7 +15,7 @@ export class SourceService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getEnabledSourceList(request: PageRequest): Promise<PageResponse<SourceDto>> {
+  async getSupportedSources(request: PageRequest): Promise<PageResponse<SourceDto>> {
     const { page } = request;
     const limit = DEFAULT_PAGE_SIZE;
 
@@ -35,25 +34,17 @@ export class SourceService {
     return { data: sources, total, page, limit };
   }
 
-  async getAdminSourceList(): Promise<AdminSourceDto[]> {
-    const sources = await this.sourceRepository.find({
-      order: { title: 'ASC' },
-    });
-
-    return sources.map((source) => AdminSourceDto.fromEntity(source));
-  }
-
-  async setSourceEnabled(request: EnableSourceDto): Promise<SourceDto> {
+  async setSourceEnabled(request: EnableSourceDto) {
     const { sourceId, enabled } = request;
     const source = await this.sourceRepository.findOneBy({ id: sourceId });
 
     if (!source) {
-      throw new NotFoundException(`source: ${sourceId} not found`);
+      this.logger.warn(SourceService.name, `source: ${sourceId} is not found`);
+      throw new NotFoundException();
     }
 
     source.enabled = enabled;
 
-    const result = await this.sourceRepository.save(source);
-    return SourceDto.fromEntity(result);
+    await this.sourceRepository.save(source);
   }
 }
