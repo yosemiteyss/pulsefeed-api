@@ -1,7 +1,7 @@
 import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
 import { ArticleRequestDto } from '../dto/article-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
+import { DEFAULT_PAGE_SIZE } from '../../constant/constants';
 import { SourceDto } from '../../source/dto/source.dto';
 import { ArticleCategoryEnum } from '@common/model';
 import { InjectRepository } from '@nestjs/typeorm';
