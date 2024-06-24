@@ -1,15 +1,12 @@
-import { InjectRepository } from '@nestjs/typeorm';
+import { ApiKeyRepository } from '../repository/api-key.repository';
 import { LoggerService } from '@common/logger';
 import { CacheService } from '@common/cache';
 import { Injectable } from '@nestjs/common';
-import { ApiKeyEntity } from '@common/db';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class ApiKeyService {
   constructor(
-    @InjectRepository(ApiKeyEntity)
-    private readonly apiKeyRepository: Repository<ApiKeyEntity>,
+    private readonly apiKeyRepository: ApiKeyRepository,
     private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
   ) {}

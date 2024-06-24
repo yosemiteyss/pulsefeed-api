@@ -1,21 +1,19 @@
 import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
+import { ArticleRepository } from '../repository/article.repository';
 import { ArticleRequestDto } from '../dto/article-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE } from '../../constant/constants';
 import { SourceDto } from '../../source/dto/source.dto';
 import { ArticleCategoryEnum } from '@common/model';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ArticleDto } from '../dto/article.dto';
 import { LoggerService } from '@common/logger';
-import { LessThan, Repository } from 'typeorm';
 import { CacheService } from '@common/cache';
 import { PageResponse } from '@common/dto';
-import { ArticleEntity } from '@common/db';
 
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>,
+    private readonly articleRepository: ArticleRepository,
     private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
   ) {}
@@ -61,28 +59,14 @@ export class ArticleService {
   private async getFilteredArticlesFromDb(
     page: number,
     limit: number,
-    beforeDate: Date,
+    publishedBefore: Date,
     category: ArticleCategoryEnum,
   ): Promise<[ArticleDto[], number]> {
-    const [items, total] = await this.articleRepository.findAndCount({
-      relations: {
-        source: true,
-        category: true,
-      },
-      where: {
-        publishedAt: LessThan(beforeDate),
-        source: {
-          enabled: true,
-        },
-        category: {
-          key: category,
-        },
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
+    const [items, total] = await this.articleRepository.find({
+      page,
+      limit,
+      category,
+      publishedBefore,
     });
 
     let data: ArticleDto[] = items.map((item) => {
