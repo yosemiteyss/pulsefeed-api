@@ -1,6 +1,6 @@
-import { ApiKeyRepository } from './repository/api-key.repository';
 import { Global, Module, OnModuleInit } from '@nestjs/common';
-import { ApiKeyService } from './service/api-key.service';
+import { ApiKeyRepository } from './api-key.repository';
+import { ApiKeyService } from './api-key.service';
 import { CacheModule } from '@common/cache';
 import { DatabaseModule } from '@common/db';
 

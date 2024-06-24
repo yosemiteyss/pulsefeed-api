@@ -1,8 +1,8 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
 import { ArticleRequestDto } from './dto/article-request.dto';
-import { ArticleService } from './service/article.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query } from '@nestjs/common';
+import { ArticleService } from './article.service';
 import { ArticleDto } from './dto/article.dto';
 import { PageResponse } from '@common/dto';
 

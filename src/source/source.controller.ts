@@ -1,10 +1,10 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
-import { SourceService } from '../service/source.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query } from '@nestjs/common';
 import { PageRequest, PageResponse } from '@common/dto';
-import { SourceDto } from '../dto/source.dto';
+import { SourceService } from './source.service';
 import { Cacheable } from 'nestjs-cacheable';
+import { SourceDto } from './dto/source.dto';
 
 @ApiTags('Source')
 @Controller('source')

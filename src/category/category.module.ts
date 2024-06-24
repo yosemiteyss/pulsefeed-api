@@ -1,6 +1,6 @@
-import { ArticleCategoryRepository } from './repository/article-category.repository';
-import { CategoryController } from './controller/category.controller';
-import { CategoryService } from './service/category.service';
+import { ArticleCategoryRepository } from './article-category.repository';
+import { CategoryController } from './category.controller';
+import { CategoryService } from './category.service';
 import { DatabaseModule } from '@common/db';
 import { Module } from '@nestjs/common';
 

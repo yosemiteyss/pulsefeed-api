@@ -1,6 +1,6 @@
-import { LanguageController } from './controller/language.controller';
-import { LanguageRepository } from './repository/language.repository';
-import { LanguageService } from './service/language.service';
+import { LanguageController } from './language.controller';
+import { LanguageRepository } from './language.repository';
+import { LanguageService } from './language.service';
 import { DatabaseModule } from '@common/db';
 import { Module } from '@nestjs/common';
 

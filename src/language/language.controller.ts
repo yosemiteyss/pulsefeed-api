@@ -1,6 +1,6 @@
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LanguageService } from '../service/language.service';
-import { LanguageDto } from '../dto/language.dto';
+import { LanguageService } from './language.service';
+import { LanguageDto } from './dto/language.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
 

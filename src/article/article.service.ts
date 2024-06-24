@@ -1,11 +1,11 @@
 import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
-import { ArticleRepository } from '../repository/article.repository';
-import { ArticleRequestDto } from '../dto/article-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE } from '../../constant/constants';
-import { SourceDto } from '../../source/dto/source.dto';
+import { ArticleRequestDto } from './dto/article-request.dto';
+import { DEFAULT_PAGE_SIZE } from '../constant/constants';
+import { ArticleRepository } from './article.repository';
+import { SourceDto } from '../source/dto/source.dto';
 import { ArticleCategoryEnum } from '@common/model';
-import { ArticleDto } from '../dto/article.dto';
+import { ArticleDto } from './dto/article.dto';
 import { LoggerService } from '@common/logger';
 import { CacheService } from '@common/cache';
 import { PageResponse } from '@common/dto';
