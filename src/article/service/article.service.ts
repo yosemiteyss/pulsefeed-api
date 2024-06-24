@@ -30,7 +30,7 @@ export class ArticleService {
 
     const [data, total] = await this.getCachedArticles(page, categoryEnum, currentDate, () => {
       this.logger.log(ArticleService.name, 'load top articles from db.');
-      return this.getFilteredArticlesFromDb(page, limit, currentDate, categoryEnum);
+      return this.getFilteredArticlesFromDb(page, limit, categoryEnum, currentDate);
     });
 
     return { data, total, page, limit };
@@ -43,10 +43,10 @@ export class ArticleService {
   private async getCachedArticles(
     page: number,
     category: ArticleCategoryEnum,
-    beforeDate: Date,
+    publishedBefore: Date,
     fn: () => Promise<[ArticleDto[], number]>,
   ): Promise<[ArticleDto[], number]> {
-    const halfHrTime = roundDownToNearestHalfHour(beforeDate).getTime();
+    const halfHrTime = roundDownToNearestHalfHour(publishedBefore).getTime();
     const key = `articles-${category}-${page}-${halfHrTime}`;
     const ttl = 4 * 60 * 60 * 1000; // 4 hours
 
@@ -59,8 +59,8 @@ export class ArticleService {
   private async getFilteredArticlesFromDb(
     page: number,
     limit: number,
-    publishedBefore: Date,
     category: ArticleCategoryEnum,
+    publishedBefore: Date,
   ): Promise<[ArticleDto[], number]> {
     const [items, total] = await this.articleRepository.find({
       page,
