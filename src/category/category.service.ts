@@ -1,7 +1,7 @@
-import { ArticleCategoryRepository } from '../repository/article-category.repository';
+import { ArticleCategoryRepository } from './article-category.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EnableCategoryDto } from './enable-category.dto';
-import { CategoryDto } from '../dto/category.dto';
+import { EnableCategoryDto } from './dto/enable-category.dto';
+import { CategoryDto } from './dto/category.dto';
 import { LoggerService } from '@common/logger';
 
 @Injectable()
