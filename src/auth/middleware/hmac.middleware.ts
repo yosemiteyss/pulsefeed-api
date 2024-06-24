@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
-import { ApiKeyService } from '../service/api-key.service';
+import { ApiKeyService } from '../api-key.service';
 import { LoggerService } from '@common/logger';
 import * as crypto from 'crypto';
 

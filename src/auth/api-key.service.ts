@@ -1,4 +1,4 @@
-import { ApiKeyRepository } from '../repository/api-key.repository';
+import { ApiKeyRepository } from './api-key.repository';
 import { LoggerService } from '@common/logger';
 import { CacheService } from '@common/cache';
 import { Injectable } from '@nestjs/common';
