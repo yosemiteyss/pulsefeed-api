@@ -1,12 +1,12 @@
-import { EnableCategoryDto } from '../category/service/enable-category.dto';
 import { EnableLanguageDto } from '../language/dto/enable-language.dto';
-import { CategoryService } from '../category/service/category.service';
-import { LanguageService } from '../language/service/language.service';
+import { EnableCategoryDto } from '../category/dto/enable-category.dto';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { EnableSourceDto } from '../source/dto/enable-source.dto';
-import { SourceService } from '../source/service/source.service';
 import { CreateApiKeyDto } from '../auth/dto/create-api-key.dto';
-import { ApiKeyService } from '../auth/service/api-key.service';
+import { CategoryService } from '../category/category.service';
+import { LanguageService } from '../language/language.service';
+import { ApiKeyService } from 'src/auth/api-key.service';
+import { SourceService } from '../source/source.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from './admin.guard';
 

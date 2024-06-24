@@ -1,7 +1,7 @@
-import { LanguageRepository } from '../repository/language.repository';
-import { EnableLanguageDto } from '../dto/enable-language.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { LanguageDto } from '../dto/language.dto';
+import { EnableLanguageDto } from './dto/enable-language.dto';
+import { LanguageRepository } from './language.repository';
+import { LanguageDto } from './dto/language.dto';
 import { LoggerService } from '@common/logger';
 
 @Injectable()

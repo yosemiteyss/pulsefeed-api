@@ -1,13 +1,10 @@
+import { mockLoggerService } from '../../../common/mock/logger.service.mock';
 import { UnauthorizedException } from '@nestjs/common';
 import { HmacMiddleware } from '../hmac.middleware';
 import crypto from 'crypto';
 
 const mockApiKeyService = {
   getDefaultKey: jest.fn(),
-};
-
-const mockLoggerService = {
-  warn: jest.fn(),
 };
 
 describe('HmacMiddleware', () => {
