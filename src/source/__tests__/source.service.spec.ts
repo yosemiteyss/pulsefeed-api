@@ -21,7 +21,7 @@ describe('SourceService', () => {
         {
           provide: SourceRepository,
           useValue: {
-            findEnabledOrderByTitle: jest.fn(),
+            findEnabled: jest.fn(),
             find: jest.fn(),
             save: jest.fn(),
           },

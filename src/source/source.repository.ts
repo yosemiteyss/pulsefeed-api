@@ -19,7 +19,6 @@ export class SourceRepository {
       where: {
         enabled: true,
       },
-      order: { title: 'ASC' },
       skip: (page - 1) * limit,
       take: limit,
     });
