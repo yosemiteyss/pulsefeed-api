@@ -14,7 +14,7 @@ export class SourceRepository {
     return this.sourceRepository.findOneBy({ id });
   }
 
-  async findEnabledOrderByTitle(page: number, limit: number): Promise<[SourceEntity[], number]> {
+  async findEnabled(page: number, limit: number): Promise<[SourceEntity[], number]> {
     return this.sourceRepository.findAndCount({
       where: {
         enabled: true,

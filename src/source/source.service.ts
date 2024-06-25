@@ -17,7 +17,7 @@ export class SourceService {
     const { page } = request;
     const limit = DEFAULT_PAGE_SIZE;
 
-    const [data, total] = await this.sourceRepository.findEnabledOrderByTitle(page, limit);
+    const [data, total] = await this.sourceRepository.findEnabled(page, limit);
 
     const sources = data.map((source) => SourceDto.fromEntity(source));
     this.logger.log(SourceService.name, `getEnabledSourceList: ${sources.length}`);

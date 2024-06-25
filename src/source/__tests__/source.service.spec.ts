@@ -46,7 +46,7 @@ describe('SourceService', () => {
       const request: PageRequest = { page: 1 };
       const total = 2;
 
-      sourceRepository.findEnabledOrderByTitle.mockResolvedValue([mockSources, total]);
+      sourceRepository.findEnabled.mockResolvedValue([mockSources, total]);
 
       const result = await sourceService.getSupportedSources(request);
 
@@ -56,7 +56,7 @@ describe('SourceService', () => {
         page: 1,
         limit: DEFAULT_PAGE_SIZE,
       });
-      expect(sourceRepository.findEnabledOrderByTitle).toHaveBeenCalledWith(1, DEFAULT_PAGE_SIZE);
+      expect(sourceRepository.findEnabled).toHaveBeenCalledWith(1, DEFAULT_PAGE_SIZE);
     });
   });
 
