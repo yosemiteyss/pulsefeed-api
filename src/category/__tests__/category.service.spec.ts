@@ -1,5 +1,5 @@
 import { ArticleCategoryRepository } from '../article-category.repository';
-import { mockLoggerService } from '../../common/mock/logger.service.mock';
+import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -31,6 +31,10 @@ describe('CategoryService', () => {
 
     categoryService = module.get<CategoryService>(CategoryService);
     articleCategoryRepository = module.get(ArticleCategoryRepository);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('getSupportedCategories', () => {

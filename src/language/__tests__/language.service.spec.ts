@@ -1,4 +1,4 @@
-import { mockLoggerService } from '../../common/mock/logger.service.mock';
+import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { EnableLanguageDto } from '../dto/enable-language.dto';
 import { LanguageRepository } from '../language.repository';
 import { LanguageService } from '../language.service';
@@ -31,6 +31,10 @@ describe('LanguageService', () => {
 
     languageService = module.get<LanguageService>(LanguageService);
     languageRepository = module.get(LanguageRepository);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('getSupportedLanguages', () => {

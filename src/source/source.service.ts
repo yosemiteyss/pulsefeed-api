@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EnableSourceDto } from './dto/enable-source.dto';
-import { DEFAULT_PAGE_SIZE } from '../constant/constants';
+import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 import { PageRequest, PageResponse } from '@common/dto';
 import { SourceRepository } from './source.repository';
 import { LoggerService } from '@common/logger';

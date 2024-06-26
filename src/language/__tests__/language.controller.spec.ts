@@ -25,6 +25,10 @@ describe('LanguageController', () => {
     languageService = module.get(LanguageService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('listLanguage', () => {
     it('should return a list of languages', async () => {
       const mockLanguages: LanguageDto[] = [{ key: 'en' }, { key: 'cn' }];

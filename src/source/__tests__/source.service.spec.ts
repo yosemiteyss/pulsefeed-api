@@ -1,6 +1,6 @@
-import { mockLoggerService } from '../../common/mock/logger.service.mock';
-import { DEFAULT_PAGE_SIZE } from '../../constant/constants';
+import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { EnableSourceDto } from '../dto/enable-source.dto';
+import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { SourceRepository } from '../source.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
@@ -35,6 +35,10 @@ describe('SourceService', () => {
 
     sourceService = module.get<SourceService>(SourceService);
     sourceRepository = module.get(SourceRepository);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('getSupportedSources', () => {

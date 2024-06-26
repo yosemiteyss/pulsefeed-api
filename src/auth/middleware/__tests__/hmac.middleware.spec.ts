@@ -1,4 +1,4 @@
-import { mockLoggerService } from '../../../common/mock/logger.service.mock';
+import { mockLoggerService } from '../../../shared/mock/logger.service.mock';
 import { UnauthorizedException } from '@nestjs/common';
 import { HmacMiddleware } from '../hmac.middleware';
 import crypto from 'crypto';
@@ -12,6 +12,10 @@ describe('HmacMiddleware', () => {
 
   beforeEach(() => {
     hmacMiddleware = new HmacMiddleware(mockApiKeyService as any, mockLoggerService as any);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should throw UnauthorizedException if signature is missing', async () => {

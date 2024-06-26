@@ -26,6 +26,10 @@ describe('SourceController', () => {
     sourceService = module.get(SourceService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('listSource', () => {
     it('should return a paginated list of sources', async () => {
       const mockSources: SourceEntity[] = [

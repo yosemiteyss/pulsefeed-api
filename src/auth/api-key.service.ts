@@ -23,7 +23,7 @@ export class ApiKeyService {
     // Find in db.
     const dbKeys = await this.apiKeyRepository.find();
     if (dbKeys.length > 0) {
-      return cachedKeys[0];
+      return dbKeys[0].key;
     }
 
     return undefined;

@@ -1,5 +1,5 @@
-import { SourceController } from './controller/source.controller';
-import { SourceService } from './service/source.service';
+import { SourceController } from './source.controller';
+import { SourceService } from './source.service';
 import { DatabaseModule } from '@common/db';
 import { Module } from '@nestjs/common';
 

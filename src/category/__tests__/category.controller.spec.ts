@@ -24,6 +24,10 @@ describe('CategoryController', () => {
     categoryService = module.get(CategoryService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('listCategory', () => {
     it('should return a list of categories', async () => {
       const mockCategories: CategoryDto[] = [

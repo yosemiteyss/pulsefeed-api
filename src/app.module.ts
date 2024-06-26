@@ -5,7 +5,6 @@ import { ConfigModule } from '@common/config/config.module';
 import { CategoryModule } from './category/category.module';
 import { LanguageModule } from './language/language.module';
 import { ArticleModule } from './article/article.module';
-import { HealthModule } from './health/health.module';
 import { SourceModule } from './source/source.module';
 import { LoggerMiddleware } from 'nestjs-http-logger';
 import { AdminModule } from './admin/admin.module';
@@ -30,7 +29,6 @@ import { APP_GUARD } from '@nestjs/core';
     LoggerModule.forRoot({ appName: 'pf-api' }),
     AuthModule,
     AdminModule,
-    HealthModule,
     ArticleModule,
     SourceModule,
     CategoryModule,
