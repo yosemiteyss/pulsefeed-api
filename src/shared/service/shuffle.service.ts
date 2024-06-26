@@ -5,7 +5,7 @@ import { shuffle } from '@common/utils';
 export class ShuffleService {
   /**
    * Shuffles items by interleaving them based on a specified key.
-   * Groups items by the key extracted using the keyExtractor function,
+   * Groups items by the key extracted using the selector function,
    * shuffles each group, and then interleaves the shuffled groups.
    * @param items The items to shuffle.
    * @param selector A function to extract the key from each item.
