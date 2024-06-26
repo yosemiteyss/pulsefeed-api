@@ -1,3 +1,4 @@
+import { ShuffleService } from '../shared/service/shuffle.service';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
 import { CacheModule } from '@common/cache';
@@ -7,6 +8,6 @@ import { Module } from '@nestjs/common';
 @Module({
   imports: [DatabaseModule, CacheModule],
   controllers: [ArticleController],
-  providers: [ArticleService],
+  providers: [ArticleService, ShuffleService],
 })
 export class ArticleModule {}

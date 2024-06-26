@@ -1,4 +1,5 @@
-import { roundDownToNearestHalfHour, shuffle, stringToEnum } from '@common/utils';
+import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
+import { ShuffleService } from '../shared/service/shuffle.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArticleRequestDto } from './dto/article-request.dto';
 import { ArticleRepository } from './article.repository';
@@ -16,6 +17,7 @@ export class ArticleService {
     private readonly articleRepository: ArticleRepository,
     private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
+    private readonly shuffleService: ShuffleService,
   ) {}
 
   async getArticles({ category, page }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
@@ -81,40 +83,8 @@ export class ArticleService {
       };
     });
 
-    data = this.shuffleArticlesByAlternatedSource(data);
+    data = this.shuffleService.shuffleByKey(data, (article) => article.source?.id || 'unknown');
 
     return [data, total];
-  }
-
-  private shuffleArticlesByAlternatedSource(articles: ArticleDto[]): ArticleDto[] {
-    // Group articles by source
-    const articlesBySource: { [key: string]: ArticleDto[] } = {};
-
-    articles.forEach((article) => {
-      const sourceKey = article.source?.id || 'unknown';
-      if (!articlesBySource[sourceKey]) {
-        articlesBySource[sourceKey] = [];
-      }
-      articlesBySource[sourceKey].push(article);
-    });
-
-    // Shuffle each group using Fisher-Yates algorithm
-    const shuffledGroups = Object.values(articlesBySource).map((group) => shuffle(group));
-
-    // Interleave the shuffled groups
-    const result: ArticleDto[] = [];
-    let addedAny: boolean;
-
-    do {
-      addedAny = false;
-      for (const group of shuffledGroups) {
-        if (group.length > 0) {
-          result.push(group.shift()!);
-          addedAny = true;
-        }
-      }
-    } while (addedAny);
-
-    return result;
   }
 }
