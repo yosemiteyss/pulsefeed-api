@@ -7,4 +7,7 @@ export class ArticleRequestDto extends PageRequest {
 
   @IsString()
   readonly language: string;
+
+  @IsString()
+  readonly sourceId?: string;
 }
