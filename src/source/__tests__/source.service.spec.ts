@@ -66,7 +66,7 @@ describe('SourceService', () => {
 
   describe('setSourceEnabled', () => {
     it('should enable a source', async () => {
-      const request: EnableSourceDto = { sourceId: '1', enabled: true };
+      const request: EnableSourceDto = { id: '1', enabled: true };
       const mockSource: SourceEntity = { id: '1', title: 'Source 1', enabled: false };
 
       sourceRepository.find.mockResolvedValue(mockSource);
@@ -79,7 +79,7 @@ describe('SourceService', () => {
     });
 
     it('should throw NotFoundException if source is not found', async () => {
-      const request: EnableSourceDto = { sourceId: '99', enabled: true };
+      const request: EnableSourceDto = { id: '99', enabled: true };
 
       sourceRepository.find.mockResolvedValue(null);
 

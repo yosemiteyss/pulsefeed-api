@@ -26,11 +26,11 @@ export class SourceService {
   }
 
   async setSourceEnabled(request: EnableSourceDto) {
-    const { sourceId, enabled } = request;
-    const source = await this.sourceRepository.find(sourceId);
+    const { id, enabled } = request;
+    const source = await this.sourceRepository.find(id);
 
     if (!source) {
-      this.logger.warn(SourceService.name, `source: ${sourceId} is not found`);
+      this.logger.warn(SourceService.name, `source: ${id} is not found`);
       throw new NotFoundException();
     }
 
