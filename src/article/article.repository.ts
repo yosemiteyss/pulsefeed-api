@@ -7,6 +7,7 @@ export interface ArticleFindOptions {
   readonly page: number;
   readonly limit: number;
   readonly category: string;
+  readonly language: string;
   readonly publishedBefore: Date;
 }
 
@@ -20,12 +21,14 @@ export class ArticleRepository {
     page,
     limit,
     category,
+    language,
     publishedBefore,
   }: ArticleFindOptions): Promise<[ArticleEntity[], number]> {
     return this.articleRepository.findAndCount({
       relations: {
         source: true,
         category: true,
+        languages: true,
       },
       where: {
         publishedAt: LessThan(publishedBefore),
@@ -34,6 +37,9 @@ export class ArticleRepository {
         },
         category: {
           key: category,
+        },
+        languages: {
+          key: language,
         },
       },
       order: {

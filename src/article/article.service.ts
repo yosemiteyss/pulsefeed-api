@@ -1,11 +1,11 @@
 import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
 import { ShuffleService } from '../shared/service/shuffle.service';
+import { ArticleCategoryEnum, LanguageEnum } from '@common/model';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArticleRequestDto } from './dto/article-request.dto';
 import { ArticleRepository } from './article.repository';
 import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
-import { ArticleCategoryEnum } from '@common/model';
 import { ArticleDto } from './dto/article.dto';
 import { LoggerService } from '@common/logger';
 import { CacheService } from '@common/cache';
@@ -20,20 +20,36 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
   ) {}
 
-  async getArticles({ category, page }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
+  async getArticles({
+    category,
+    language,
+    page,
+  }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
     const categoryEnum = stringToEnum(ArticleCategoryEnum, category);
     if (!categoryEnum) {
       this.logger.warn(ArticleService.name, `category: ${category} is not found`);
       throw new NotFoundException();
     }
 
+    const languageEnum = stringToEnum(LanguageEnum, language);
+    if (!languageEnum) {
+      this.logger.warn(ArticleService.name, `language: ${language} is not found`);
+      throw new NotFoundException();
+    }
+
     const limit = DEFAULT_PAGE_SIZE;
     const currentDate = new Date();
 
-    const [data, total] = await this.getCachedArticles(page, categoryEnum, currentDate, () => {
-      this.logger.log(ArticleService.name, 'load top articles from db.');
-      return this.getFilteredArticlesFromDb(page, limit, categoryEnum, currentDate);
-    });
+    const [data, total] = await this.getCachedArticles(
+      page,
+      categoryEnum,
+      languageEnum,
+      currentDate,
+      () => {
+        this.logger.log(ArticleService.name, 'load top articles from db.');
+        return this.getFilteredArticlesFromDb(page, limit, categoryEnum, languageEnum, currentDate);
+      },
+    );
 
     return { data, total, page, limit };
   }
@@ -45,14 +61,15 @@ export class ArticleService {
   private async getCachedArticles(
     page: number,
     category: ArticleCategoryEnum,
+    language: LanguageEnum,
     publishedBefore: Date,
-    fn: () => Promise<[ArticleDto[], number]>,
+    onCacheMissed: () => Promise<[ArticleDto[], number]>,
   ): Promise<[ArticleDto[], number]> {
     const halfHrTime = roundDownToNearestHalfHour(publishedBefore).getTime();
-    const key = `articles-${category}-${page}-${halfHrTime}`;
+    const key = `articles-${category}-${language}-${page}-${halfHrTime}`;
     const ttl = 4 * 60 * 60 * 1000; // 4 hours
 
-    return this.cacheService.wrap(key, fn, ttl);
+    return this.cacheService.wrap(key, onCacheMissed, ttl);
   }
 
   /**
@@ -62,12 +79,14 @@ export class ArticleService {
     page: number,
     limit: number,
     category: ArticleCategoryEnum,
+    language: LanguageEnum,
     publishedBefore: Date,
   ): Promise<[ArticleDto[], number]> {
     const [items, total] = await this.articleRepository.find({
       page,
       limit,
       category,
+      language,
       publishedBefore,
     });
 
