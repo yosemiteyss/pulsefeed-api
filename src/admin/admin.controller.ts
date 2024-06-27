@@ -17,7 +17,7 @@ import { SourceService } from '../source/source.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from './admin.guard';
 
-@ApiTags('Admin')
+@ApiTags('admin')
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {

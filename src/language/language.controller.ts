@@ -4,7 +4,7 @@ import { LanguageDto } from './dto/language.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
 
-@ApiTags('Language')
+@ApiTags('language')
 @Controller('language')
 export class LanguageController {
   constructor(private readonly languageService: LanguageService) {}

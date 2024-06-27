@@ -6,7 +6,7 @@ import { SourceService } from './source.service';
 import { Cacheable } from 'nestjs-cacheable';
 import { SourceDto } from './dto/source.dto';
 
-@ApiTags('Source')
+@ApiTags('source')
 @Controller('source')
 export class SourceController {
   constructor(private readonly sourceService: SourceService) {}

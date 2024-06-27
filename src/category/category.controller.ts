@@ -4,7 +4,7 @@ import { CategoryDto } from './dto/category.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
 
-@ApiTags('Category')
+@ApiTags('category')
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

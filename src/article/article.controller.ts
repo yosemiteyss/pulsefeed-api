@@ -6,7 +6,7 @@ import { ArticleService } from './article.service';
 import { ArticleDto } from './dto/article.dto';
 import { PageResponse } from '@common/dto';
 
-@ApiTags('Article')
+@ApiTags('article')
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
