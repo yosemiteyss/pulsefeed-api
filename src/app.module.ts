@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HmacMiddleware } from './auth/middleware/hmac.middleware';
 import { ConfigModule } from '@common/config/config.module';
@@ -44,6 +44,12 @@ import { APP_GUARD } from '@nestjs/core';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
-    consumer.apply(HmacMiddleware).forRoutes('*');
+    consumer
+      .apply(HmacMiddleware)
+      .exclude({
+        path: '/v1/admin/(.*)',
+        method: RequestMethod.ALL,
+      })
+      .forRoutes('*');
   }
 }

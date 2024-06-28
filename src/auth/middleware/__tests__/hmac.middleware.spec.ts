@@ -54,7 +54,7 @@ describe('HmacMiddleware', () => {
       `${req.originalUrl}\n` +
       `${req.headers['content-type']}\n` +
       `${req.headers['x-timestamp']}\n` +
-      `${JSON.stringify(req.body)}`;
+      `${req.body}`;
 
     req.headers['x-signature'] = crypto
       .createHmac('sha256', secretKey)
@@ -84,7 +84,7 @@ describe('HmacMiddleware', () => {
       `${req.originalUrl}\n` +
       `${req.headers['content-type']}\n` +
       `${req.headers['x-timestamp']}\n` +
-      `${JSON.stringify(req.body)}`;
+      `${req.body}`;
 
     req.headers['x-signature'] = crypto
       .createHmac('sha256', secretKey)

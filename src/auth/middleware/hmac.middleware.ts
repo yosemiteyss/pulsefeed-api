@@ -31,10 +31,10 @@ export class HmacMiddleware implements NestMiddleware {
     }
 
     // Validate timestamp within a reasonable tolerance (e.g. within 5 minutes)
-    const tolerance = 5 * 60 * 1000;
+    const timeDiffMs = 5 * 60 * 1000;
     const reqTimestamp = parseInt(timestamp, 10);
 
-    if (isNaN(reqTimestamp) || Date.now() - reqTimestamp > tolerance) {
+    if (isNaN(reqTimestamp) || Date.now() - reqTimestamp > timeDiffMs) {
       this.logger.warn(HmacMiddleware.name, `Expired timestamp: ${timestamp} > ${reqTimestamp}`);
       throw new UnauthorizedException();
     }
@@ -44,7 +44,9 @@ export class HmacMiddleware implements NestMiddleware {
       `${req.originalUrl}\n` +
       `${contentType}\n` +
       `${timestamp}\n` +
-      `${JSON.stringify(req.body)}`;
+      `${req.body}`;
+
+    this.logger.log(HmacMiddleware.name, `stringToSign: ${stringToSign}`);
 
     const computedSignature = crypto
       .createHmac('sha256', secretKey)
