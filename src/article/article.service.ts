@@ -20,6 +20,8 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
   ) {}
 
+  private useCache = false;
+
   async getArticles({
     category,
     language,
@@ -48,10 +50,18 @@ export class ArticleService {
       publishedBefore: currentDate,
     };
 
-    const [data, total] = await this.getCachedArticles(opts, () => {
-      this.logger.log(ArticleService.name, 'load top articles from db.');
-      return this.getFilteredArticlesFromDb(opts);
-    });
+    let data: ArticleDto[];
+    let total: number;
+
+    if (this.useCache) {
+      [data, total] = await this.getCachedArticles(opts, () => {
+        this.logger.log(ArticleService.name, 'Load articles from db.');
+        return this.getFilteredArticlesFromDb(opts);
+      });
+    } else {
+      this.logger.log(ArticleService.name, 'Load articles from db.');
+      [data, total] = await this.getFilteredArticlesFromDb(opts);
+    }
 
     return { data, total, page, limit };
   }

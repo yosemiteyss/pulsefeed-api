@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { PageRequest } from '@common/dto';
 
 export class ArticleRequestDto extends PageRequest {
@@ -9,5 +9,6 @@ export class ArticleRequestDto extends PageRequest {
   readonly language: string;
 
   @IsString()
+  @IsOptional()
   readonly sourceId?: string;
 }
