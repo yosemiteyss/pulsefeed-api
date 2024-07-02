@@ -11,7 +11,6 @@ export class HmacMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: any, res: any, next: (error?: any) => void) {
-    const contentType = req.headers['content-type'] as string;
     const signature = req.headers['x-signature'] as string;
     const timestamp = req.headers['x-timestamp'] as string;
 
@@ -40,11 +39,7 @@ export class HmacMiddleware implements NestMiddleware {
     }
 
     const stringToSign =
-      `${req.method} ` +
-      `${req.originalUrl}\n` +
-      `${contentType}\n` +
-      `${timestamp}\n` +
-      `${req.body}`;
+      `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
     this.logger.log(HmacMiddleware.name, `stringToSign: ${stringToSign}`);
 
