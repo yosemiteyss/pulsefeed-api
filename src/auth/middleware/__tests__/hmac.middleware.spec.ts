@@ -50,11 +50,7 @@ describe('HmacMiddleware', () => {
 
     // Compute signature
     const stringToSign =
-      `${req.method} ` +
-      `${req.originalUrl}\n` +
-      `${req.headers['content-type']}\n` +
-      `${req.headers['x-timestamp']}\n` +
-      `${req.body}`;
+      `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
     req.headers['x-signature'] = crypto
       .createHmac('sha256', secretKey)
@@ -80,11 +76,7 @@ describe('HmacMiddleware', () => {
 
     // Compute signature
     const stringToSign =
-      `${req.method} ` +
-      `${req.originalUrl}\n` +
-      `${req.headers['content-type']}\n` +
-      `${req.headers['x-timestamp']}\n` +
-      `${req.body}`;
+      `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
     req.headers['x-signature'] = crypto
       .createHmac('sha256', secretKey)

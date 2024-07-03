@@ -1,9 +1,10 @@
 import { ArticleFindOptions, ArticleRepository } from './article.repository';
-import { roundDownToNearestHalfHour, stringToEnum } from '@common/utils';
 import { ShuffleService } from '../shared/service/shuffle.service';
-import { ArticleCategoryEnum, LanguageEnum } from '@common/model';
+import { LanguageService } from '../language/language.service';
+import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArticleRequestDto } from './dto/article-request.dto';
+import { roundDownToNearestHalfHour } from '@common/utils';
 import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
@@ -18,6 +19,8 @@ export class ArticleService {
     private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
     private readonly shuffleService: ShuffleService,
+    private readonly languageService: LanguageService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   private useCache = true;
@@ -28,12 +31,12 @@ export class ArticleService {
     sourceId,
     page,
   }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
-    if (!stringToEnum(ArticleCategoryEnum, category)) {
+    if (!this.categoryService.isSupportedCategory(category)) {
       this.logger.warn(ArticleService.name, `category: ${category} is not found`);
       throw new NotFoundException();
     }
 
-    if (!stringToEnum(LanguageEnum, language)) {
+    if (!this.languageService.isSupportedLanguage(language)) {
       this.logger.warn(ArticleService.name, `language: ${language} is not found`);
       throw new NotFoundException();
     }

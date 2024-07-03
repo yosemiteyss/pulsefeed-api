@@ -1,8 +1,10 @@
 import { ArticleCategoryRepository } from './article-category.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EnableCategoryDto } from './dto/enable-category.dto';
+import { ArticleCategoryEnum } from '@common/model';
 import { CategoryDto } from './dto/category.dto';
 import { LoggerService } from '@common/logger';
+import { stringToEnum } from '@common/utils';
 
 @Injectable()
 export class CategoryService {
@@ -28,5 +30,9 @@ export class CategoryService {
     category.enabled = enabled;
 
     await this.articleCategoryRepository.save(category);
+  }
+
+  isSupportedCategory(category: string): boolean {
+    return stringToEnum(ArticleCategoryEnum, category) !== undefined;
   }
 }

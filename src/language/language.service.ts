@@ -3,6 +3,8 @@ import { EnableLanguageDto } from './dto/enable-language.dto';
 import { LanguageRepository } from './language.repository';
 import { LanguageDto } from './dto/language.dto';
 import { LoggerService } from '@common/logger';
+import { stringToEnum } from '@common/utils';
+import { LanguageEnum } from '@common/model';
 
 @Injectable()
 export class LanguageService {
@@ -28,5 +30,9 @@ export class LanguageService {
     language.enabled = enabled;
 
     await this.languageRepository.save(language);
+  }
+
+  isSupportedLanguage(language: string): boolean {
+    return stringToEnum(LanguageEnum, language) !== undefined;
   }
 }
