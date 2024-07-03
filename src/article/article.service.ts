@@ -20,7 +20,7 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
   ) {}
 
-  private useCache = false;
+  private useCache = true;
 
   async getArticles({
     category,
