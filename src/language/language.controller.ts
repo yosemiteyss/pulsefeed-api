@@ -1,9 +1,9 @@
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LanguageService } from './language.service';
+import { DEFAULT_TTL } from '../shared/constants';
 import { LanguageDto } from './dto/language.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
-import { DEFAULT_TTL } from "../shared/constants";
 
 @ApiTags('language')
 @Controller('language')

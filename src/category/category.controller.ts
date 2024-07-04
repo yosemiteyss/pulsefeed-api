@@ -1,5 +1,5 @@
+import { CategoryListRequestDto } from './dto/category-list-request.dto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CategoryRequestDto } from './dto/category-request.dto';
 import { Body, Controller, Get } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { DEFAULT_TTL } from '../shared/constants';
@@ -15,11 +15,11 @@ export class CategoryController {
   @ApiOperation({ description: 'Get article categories' })
   @ApiOkResponse({ type: CategoryDto, isArray: true })
   @Cacheable({
-    key: ({ language }: CategoryRequestDto) => `category:list:language:${language}`,
+    key: ({ language }: CategoryListRequestDto) => `category:list:language:${language}`,
     namespace: 'pf',
     ttl: DEFAULT_TTL,
   })
-  async listCategory(@Body() request: CategoryRequestDto): Promise<CategoryDto[]> {
+  async listCategory(@Body() request: CategoryListRequestDto): Promise<CategoryDto[]> {
     return this.categoryService.getSupportedCategories(request);
   }
 }

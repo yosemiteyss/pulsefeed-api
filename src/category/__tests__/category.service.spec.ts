@@ -1,6 +1,6 @@
 import { ArticleCategoryRepository } from '../article-category.repository';
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
-import { CategoryRequestDto } from '../dto/category-request.dto';
+import { CategoryListRequestDto } from '../dto/category-list-request.dto';
 import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -47,7 +47,7 @@ describe('CategoryService', () => {
         { categoryKey: 'health', languageKey: 'en', title: 'Health' },
       ];
 
-      const requestDto: CategoryRequestDto = { language: 'en' };
+      const requestDto: CategoryListRequestDto = { language: 'en' };
 
       articleCategoryRepository.findTitlesEnabled.mockResolvedValue(mockCategories);
 

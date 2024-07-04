@@ -1,5 +1,5 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
-import { ArticleRequestDto } from './dto/article-request.dto';
+import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Query } from '@nestjs/common';
 import { ArticleService } from './article.service';
@@ -14,7 +14,7 @@ export class ArticleController {
   @Get('/list')
   @ApiOkResponsePaginated(ArticleDto)
   @ApiOperation({ description: 'Get articles' })
-  async listArticle(@Query() request: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
+  async listArticle(@Query() request: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
     return this.articleService.getArticles(request);
   }
 }

@@ -1,9 +1,9 @@
 import { ArticleFindOptions, ArticleRepository } from './article.repository';
+import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ShuffleService } from '../shared/service/shuffle.service';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ArticleRequestDto } from './dto/article-request.dto';
 import { roundDownToNearestHalfHour } from '@common/utils';
 import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
@@ -30,7 +30,7 @@ export class ArticleService {
     language,
     sourceId,
     page,
-  }: ArticleRequestDto): Promise<PageResponse<ArticleDto>> {
+  }: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
     if (!this.categoryService.isSupportedCategory(category)) {
       this.logger.warn(ArticleService.name, `category: ${category} is not found`);
       throw new NotFoundException();

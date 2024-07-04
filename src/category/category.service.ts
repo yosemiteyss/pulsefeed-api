@@ -1,5 +1,5 @@
 import { ArticleCategoryRepository } from './article-category.repository';
-import { CategoryRequestDto } from './dto/category-request.dto';
+import { CategoryListRequestDto } from './dto/category-list-request.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EnableCategoryDto } from './dto/enable-category.dto';
 import { ArticleCategoryEnum } from '@common/model';
@@ -14,7 +14,7 @@ export class CategoryService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getSupportedCategories({ language }: CategoryRequestDto): Promise<CategoryDto[]> {
+  async getSupportedCategories({ language }: CategoryListRequestDto): Promise<CategoryDto[]> {
     const entities = await this.articleCategoryRepository.findTitlesEnabled(language);
     return entities.map((category) => ({
       key: category.categoryKey,
