@@ -3,6 +3,7 @@ import { LanguageService } from './language.service';
 import { LanguageDto } from './dto/language.dto';
 import { Controller, Get } from '@nestjs/common';
 import { Cacheable } from 'nestjs-cacheable';
+import { DEFAULT_TTL } from "../shared/constants";
 
 @ApiTags('language')
 @Controller('language')
@@ -15,6 +16,7 @@ export class LanguageController {
   @Cacheable({
     key: 'language:list',
     namespace: 'pf',
+    ttl: DEFAULT_TTL,
   })
   async listLanguage(): Promise<LanguageDto[]> {
     return this.languageService.getSupportedLanguages();

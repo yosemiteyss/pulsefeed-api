@@ -1,9 +1,11 @@
 import { ArticleCategoryRepository } from '../article-category.repository';
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
+import { CategoryRequestDto } from '../dto/category-request.dto';
 import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { CategoryDto } from '../dto/category.dto';
 import { LoggerService } from '@common/logger';
 
 describe('CategoryService', () => {
@@ -17,6 +19,7 @@ describe('CategoryService', () => {
         {
           provide: ArticleCategoryRepository,
           useValue: {
+            findTitlesEnabled: jest.fn(),
             findEnabled: jest.fn(),
             find: jest.fn(),
             save: jest.fn(),
@@ -40,16 +43,24 @@ describe('CategoryService', () => {
   describe('getSupportedCategories', () => {
     it('should return a list of supported categories', async () => {
       const mockCategories = [
-        { key: 'tech', enabled: true },
-        { key: 'health', enabled: true },
+        { categoryKey: 'tech', languageKey: 'en', title: 'Tech' },
+        { categoryKey: 'health', languageKey: 'en', title: 'Health' },
       ];
 
-      articleCategoryRepository.findEnabled.mockResolvedValue(mockCategories);
+      const requestDto: CategoryRequestDto = { language: 'en' };
 
-      const result = await categoryService.getSupportedCategories();
+      articleCategoryRepository.findTitlesEnabled.mockResolvedValue(mockCategories);
 
-      expect(result).toEqual([{ name: 'tech' }, { name: 'health' }]);
-      expect(articleCategoryRepository.findEnabled).toHaveBeenCalledTimes(1);
+      const result = await categoryService.getSupportedCategories(requestDto);
+
+      const expected: CategoryDto[] = [
+        { key: 'tech', name: 'Tech' },
+        { key: 'health', name: 'Health' },
+      ];
+
+      expect(result).toEqual(expected);
+      expect(articleCategoryRepository.findTitlesEnabled).toHaveBeenCalledTimes(1);
+      expect(articleCategoryRepository.findTitlesEnabled).toHaveBeenCalledWith('en');
     });
   });
 

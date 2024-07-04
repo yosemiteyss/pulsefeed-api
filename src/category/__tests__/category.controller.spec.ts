@@ -1,3 +1,4 @@
+import { CategoryRequestDto } from '../dto/category-request.dto';
 import { CategoryController } from '../category.controller';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -37,7 +38,8 @@ describe('CategoryController', () => {
 
       categoryService.getSupportedCategories.mockResolvedValue(mockCategories);
 
-      const result = await categoryController.listCategory();
+      const request: CategoryRequestDto = { language: 'en' };
+      const result = await categoryController.listCategory(request);
 
       expect(result).toEqual(mockCategories);
       expect(categoryService.getSupportedCategories).toHaveBeenCalledTimes(1);
