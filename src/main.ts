@@ -3,11 +3,13 @@ import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('bootstrap');
 
+  app.use(helmet());
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(
     new ValidationPipe({
