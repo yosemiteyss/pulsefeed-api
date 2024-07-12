@@ -6,7 +6,6 @@ import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour } from '@common/utils';
-import { SourceService } from '../source/source.service';
 import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
@@ -23,7 +22,6 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
     private readonly languageService: LanguageService,
     private readonly categoryService: CategoryService,
-    private readonly sourceService: SourceService,
   ) {}
 
   private useCache = true;
