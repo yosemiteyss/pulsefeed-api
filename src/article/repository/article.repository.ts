@@ -27,11 +27,11 @@ export class ArticleRepository {
       category: {
         key: category,
       },
-      languages: {
-        some: {
-          key: language,
-        },
-      },
+      // languages: {
+      //   some: {
+      //     key: language,
+      //   },
+      // },
     };
 
     if (sourceId) {

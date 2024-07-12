@@ -14,8 +14,7 @@ export class LanguageController {
   @ApiOperation({ description: 'Get supported languages' })
   @ApiOkResponse({ type: LanguageDto, isArray: true })
   @Cacheable({
-    key: 'language:list',
-    namespace: 'pf',
+    key: 'pf:language:list',
     ttl: DEFAULT_TTL,
   })
   async listLanguage(): Promise<LanguageDto[]> {

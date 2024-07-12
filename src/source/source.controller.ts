@@ -16,8 +16,7 @@ export class SourceController {
   @ApiOkResponsePaginated(SourceDto)
   @ApiOperation({ description: 'Get all enabled sources' })
   @Cacheable({
-    key: ({ page }: PageRequest) => `source:list:page:${page}`,
-    namespace: 'pf',
+    key: ({ page }: PageRequest) => `pf:source:list:page:${page}`,
     ttl: DEFAULT_TTL,
   })
   async listSource(@Query() request: PageRequest): Promise<PageResponse<SourceDto>> {

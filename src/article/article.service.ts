@@ -78,7 +78,7 @@ export class ArticleService {
     { category, language, sourceId, page, publishedBefore }: ArticleFindOptions,
     onCacheMissed: () => Promise<[ArticleDto[], number]>,
   ): Promise<[ArticleDto[], number]> {
-    let baseKey = `articles-${category}-${language}`;
+    let baseKey = `pf:articles:${category}-${language}`;
 
     // Append source id.
     if (sourceId) {

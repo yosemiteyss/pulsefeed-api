@@ -15,8 +15,7 @@ export class CategoryController {
   @ApiOperation({ description: 'Get article categories' })
   @ApiOkResponse({ type: CategoryDto, isArray: true })
   @Cacheable({
-    key: ({ language }: CategoryListRequestDto) => `category:list:language:${language}`,
-    namespace: 'pf',
+    key: ({ language }: CategoryListRequestDto) => `pf:category:list:language:${language}`,
     ttl: DEFAULT_TTL,
   })
   async listCategory(@Body() request: CategoryListRequestDto): Promise<CategoryDto[]> {
