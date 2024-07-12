@@ -21,7 +21,7 @@ export class ApiKeyService {
     }
 
     // Find in db.
-    const dbKeys = await this.apiKeyRepository.find();
+    const dbKeys = await this.apiKeyRepository.getKeys();
     if (dbKeys.length > 0) {
       return dbKeys[0].key;
     }
@@ -30,7 +30,7 @@ export class ApiKeyService {
   }
 
   async pushKeysToCache() {
-    const keys = await this.apiKeyRepository.find();
+    const keys = await this.apiKeyRepository.getKeys();
     for (let i = 0; i < keys.length; i++) {
       await this.cacheService.setByKeyPrefix(this.CACHE_PREFIX, i, keys[i].key);
     }
@@ -41,10 +41,10 @@ export class ApiKeyService {
   async createKey(): Promise<string> {
     // Remove existing keys.
     await this.cacheService.delByPrefix(this.CACHE_PREFIX);
-    await this.apiKeyRepository.clear();
+    await this.apiKeyRepository.removeKeys();
 
     const apiKey = this.generateApiKey();
-    const entity = await this.apiKeyRepository.save({ key: apiKey });
+    const entity = await this.apiKeyRepository.createKey({ key: apiKey });
 
     // Save key to cache.
     await this.cacheService.setByKeyPrefix(this.CACHE_PREFIX, 0, entity.key);

@@ -1,10 +1,12 @@
-import { ArticleFindOptions, ArticleRepository } from './article.repository';
 import { ArticleListRequestDto } from './dto/article-list-request.dto';
+import { ArticleRepository } from './repository/article.repository';
 import { ShuffleService } from '../shared/service/shuffle.service';
+import { ArticleFindOptions } from './type/article-find-options';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour } from '@common/utils';
+import { SourceService } from '../source/source.service';
 import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
@@ -21,6 +23,7 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
     private readonly languageService: LanguageService,
     private readonly categoryService: CategoryService,
+    private readonly sourceService: SourceService,
   ) {}
 
   private useCache = true;
@@ -101,17 +104,17 @@ export class ArticleService {
   private async getFilteredArticlesFromDb(
     opts: ArticleFindOptions,
   ): Promise<[ArticleDto[], number]> {
-    const [items, total] = await this.articleRepository.find(opts);
+    const [items, total] = await this.articleRepository.getArticles(opts);
 
-    let data: ArticleDto[] = items.map((item) => {
+    let data: ArticleDto[] = items.map(({ article, source }) => {
       return {
-        id: item.id,
-        title: item.title,
-        description: item.description,
-        image: item.image,
-        link: item.link,
-        publishedAt: item.publishedAt ?? item.createdAt,
-        source: item.source ? SourceDto.fromEntity(item.source) : undefined,
+        id: article.id,
+        title: article.title,
+        description: article.description,
+        image: article.image,
+        link: article.link,
+        publishedAt: article.publishedAt ?? article.createdAt,
+        source: source ? SourceDto.fromModel(source) : undefined,
       };
     });
 

@@ -1,10 +1,11 @@
+import { SourceRepository } from './repository/source.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EnableSourceDto } from './dto/enable-source.dto';
 import { DEFAULT_PAGE_SIZE } from 'src/shared/constants';
 import { PageRequest, PageResponse } from '@common/dto';
-import { SourceRepository } from './source.repository';
 import { LoggerService } from '@common/logger';
 import { SourceDto } from './dto/source.dto';
+import { Source } from '@common/model';
 
 @Injectable()
 export class SourceService {
@@ -13,13 +14,24 @@ export class SourceService {
     private readonly logger: LoggerService,
   ) {}
 
+  async getSourceById(id: string): Promise<Source> {
+    const source = await this.sourceRepository.getSourceById(id);
+
+    if (!source) {
+      this.logger.warn(SourceService.name, `source not found: ${id}`);
+      throw new NotFoundException();
+    }
+
+    return source;
+  }
+
   async getSupportedSources(request: PageRequest): Promise<PageResponse<SourceDto>> {
     const { page } = request;
     const limit = DEFAULT_PAGE_SIZE;
 
-    const [data, total] = await this.sourceRepository.findEnabled(page, limit);
+    const [data, total] = await this.sourceRepository.getEnabledSources(page, limit);
 
-    const sources = data.map((source) => SourceDto.fromEntity(source));
+    const sources = data.map((source) => SourceDto.fromModel(source));
     this.logger.log(SourceService.name, `getEnabledSourceList: ${sources.length}`);
 
     return { data: sources, total, page, limit };
@@ -27,15 +39,9 @@ export class SourceService {
 
   async setSourceEnabled(request: EnableSourceDto) {
     const { id, enabled } = request;
-    const source = await this.sourceRepository.find(id);
 
-    if (!source) {
-      this.logger.warn(SourceService.name, `source: ${id} is not found`);
-      throw new NotFoundException();
-    }
+    const source = await this.getSourceById(id);
 
-    source.enabled = enabled;
-
-    await this.sourceRepository.save(source);
+    await this.sourceRepository.setSourceEnabled(source.id, enabled);
   }
 }

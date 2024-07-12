@@ -1,25 +1,29 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { ApiKeyEntity } from '@common/db';
+import { PrismaService } from '@common/db';
 import { ApiKey } from '@common/model';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class ApiKeyRepository {
-  constructor(
-    @InjectRepository(ApiKeyEntity)
-    private readonly apiKeyRepository: Repository<ApiKeyEntity>,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async find(): Promise<ApiKeyEntity[]> {
-    return this.apiKeyRepository.find();
+  async getKeys(): Promise<ApiKey[]> {
+    const result = await this.prismaService.apiKey.findMany();
+    return result.map((apikey) => ({
+      key: apikey.key,
+    }));
   }
 
-  async clear() {
-    return this.apiKeyRepository.clear();
+  async removeKeys() {
+    await this.prismaService.apiKey.deleteMany();
   }
 
-  async save(apiKey: ApiKey): Promise<ApiKeyEntity> {
-    return this.apiKeyRepository.save(apiKey);
+  async createKey(apiKey: ApiKey): Promise<ApiKey> {
+    const result = await this.prismaService.apiKey.create({
+      data: {
+        key: apiKey.key,
+      },
+    });
+
+    return { key: result.key };
   }
 }

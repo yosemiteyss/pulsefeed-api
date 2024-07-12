@@ -1,6 +1,7 @@
-import { ArticleCategoryRepository } from '../article-category.repository';
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { CategoryListRequestDto } from '../dto/category-list-request.dto';
+import { CategoryRepository } from '../repository/category.repository';
+import { ArticleCategory, ArticleCategoryTitle } from '@common/model';
 import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -10,19 +11,19 @@ import { LoggerService } from '@common/logger';
 
 describe('CategoryService', () => {
   let categoryService: CategoryService;
-  let articleCategoryRepository: jest.Mocked<ArticleCategoryRepository>;
+  let articleCategoryRepository: jest.Mocked<CategoryRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CategoryService,
         {
-          provide: ArticleCategoryRepository,
+          provide: CategoryRepository,
           useValue: {
-            findTitlesEnabled: jest.fn(),
-            findEnabled: jest.fn(),
-            find: jest.fn(),
-            save: jest.fn(),
+            getCategoryByKey: jest.fn(),
+            getEnabledCategories: jest.fn(),
+            getCategoryTitlesByLang: jest.fn(),
+            setCategoryEnabled: jest.fn(),
           },
         },
         {
@@ -33,7 +34,7 @@ describe('CategoryService', () => {
     }).compile();
 
     categoryService = module.get<CategoryService>(CategoryService);
-    articleCategoryRepository = module.get(ArticleCategoryRepository);
+    articleCategoryRepository = module.get(CategoryRepository);
   });
 
   afterEach(() => {
@@ -42,14 +43,14 @@ describe('CategoryService', () => {
 
   describe('getSupportedCategories', () => {
     it('should return a list of supported categories', async () => {
-      const mockCategories = [
-        { categoryKey: 'tech', languageKey: 'en', title: 'Tech' },
-        { categoryKey: 'health', languageKey: 'en', title: 'Health' },
+      const mockCategories: ArticleCategoryTitle[] = [
+        { categoryKey: 'tech', title: 'Tech' },
+        { categoryKey: 'health', title: 'Health' },
       ];
 
       const requestDto: CategoryListRequestDto = { language: 'en' };
 
-      articleCategoryRepository.findTitlesEnabled.mockResolvedValue(mockCategories);
+      articleCategoryRepository.getCategoryTitlesByLang.mockResolvedValue(mockCategories);
 
       const result = await categoryService.getSupportedCategories(requestDto);
 
@@ -59,32 +60,28 @@ describe('CategoryService', () => {
       ];
 
       expect(result).toEqual(expected);
-      expect(articleCategoryRepository.findTitlesEnabled).toHaveBeenCalledTimes(1);
-      expect(articleCategoryRepository.findTitlesEnabled).toHaveBeenCalledWith('en');
+      expect(articleCategoryRepository.getCategoryTitlesByLang).toHaveBeenCalledTimes(1);
+      expect(articleCategoryRepository.getCategoryTitlesByLang).toHaveBeenCalledWith('en');
     });
   });
 
   describe('setCategoryEnabled', () => {
     it('should enable a category', async () => {
       const request: EnableCategoryDto = { key: 'tech', enabled: true };
-      const mockCategory = { key: 'tech', enabled: false };
+      const mockCategory: ArticleCategory = { key: 'tech' };
 
-      articleCategoryRepository.find.mockResolvedValue(mockCategory);
-      articleCategoryRepository.save.mockResolvedValue(undefined);
+      articleCategoryRepository.getCategoryByKey.mockResolvedValue(mockCategory);
+      articleCategoryRepository.setCategoryEnabled.mockResolvedValue();
 
       await categoryService.setCategoryEnabled(request);
 
-      expect(articleCategoryRepository.find).toHaveBeenCalledWith('tech');
-      expect(articleCategoryRepository.save).toHaveBeenCalledWith({
-        ...mockCategory,
-        enabled: true,
-      });
+      expect(articleCategoryRepository.setCategoryEnabled).toHaveBeenCalledWith('tech', true);
     });
 
     it('should throw NotFoundException if category is not found', async () => {
       const request: EnableCategoryDto = { key: 'nonexistent', enabled: true };
 
-      articleCategoryRepository.find.mockResolvedValue(null);
+      articleCategoryRepository.getCategoryByKey.mockResolvedValue(undefined);
 
       await expect(categoryService.setCategoryEnabled(request)).rejects.toThrow(NotFoundException);
     });

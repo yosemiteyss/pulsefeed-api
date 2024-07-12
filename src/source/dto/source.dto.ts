@@ -1,4 +1,4 @@
-import { SourceEntity } from '@common/db';
+import { Source } from '@common/model';
 
 export class SourceDto {
   readonly id?: string;
@@ -7,8 +7,8 @@ export class SourceDto {
   readonly image?: string;
   readonly description?: string;
 
-  static fromEntity(entity: SourceEntity): SourceDto {
-    const { id, title, link, image, description } = entity;
+  static fromModel(model: Source): SourceDto {
+    const { id, title, link, image, description } = model;
     return { id, title, link, image, description };
   }
 }

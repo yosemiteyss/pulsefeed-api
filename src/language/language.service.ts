@@ -1,6 +1,6 @@
+import { LanguageRepository } from './repository/language.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EnableLanguageDto } from './dto/enable-language.dto';
-import { LanguageRepository } from './language.repository';
 import { LanguageDto } from './dto/language.dto';
 import { LoggerService } from '@common/logger';
 import { stringToEnum } from '@common/utils';
@@ -14,22 +14,20 @@ export class LanguageService {
   ) {}
 
   async getSupportedLanguages(): Promise<LanguageDto[]> {
-    const languages = await this.languageRepository.findEnabled();
-    return languages.map((entity) => ({ key: entity.key }));
+    const languages = await this.languageRepository.getEnabledLanguages();
+    return languages.map((language) => ({ key: language.key }));
   }
 
   async setLanguageEnabled(request: EnableLanguageDto) {
     const { key, enabled } = request;
-    const language = await this.languageRepository.find(key);
+    const language = await this.languageRepository.getLanguageByKey(key);
 
     if (!language) {
-      this.logger.warn(LanguageService.name, `language: ${key} is not found`);
+      this.logger.warn(LanguageService.name, `language not found: ${key}`);
       throw new NotFoundException();
     }
 
-    language.enabled = enabled;
-
-    await this.languageRepository.save(language);
+    await this.languageRepository.setLanguageEnabled(language.key, enabled);
   }
 
   isSupportedLanguage(language: string): boolean {

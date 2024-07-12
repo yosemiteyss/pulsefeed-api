@@ -17,9 +17,9 @@ describe('ApiKeyService', () => {
         {
           provide: ApiKeyRepository,
           useValue: {
-            find: jest.fn(),
-            save: jest.fn(),
-            clear: jest.fn(),
+            getKeys: jest.fn(),
+            removeKeys: jest.fn(),
+            createKey: jest.fn(),
           },
         },
         {
@@ -55,30 +55,30 @@ describe('ApiKeyService', () => {
 
       expect(result).toBe(mockKey);
       expect(cacheService.getByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
-      expect(apiKeyRepository.find).not.toHaveBeenCalled();
+      expect(apiKeyRepository.getKeys).not.toHaveBeenCalled();
     });
 
     it('should return the key from db if not in cache', async () => {
       const mockKey = 'mock-key';
       cacheService.getByPrefix.mockResolvedValue([]);
-      apiKeyRepository.find.mockResolvedValue([{ key: mockKey }]);
+      apiKeyRepository.getKeys.mockResolvedValue([{ key: mockKey }]);
 
       const result = await apiKeyService.getDefaultKey();
 
       expect(result).toBe(mockKey);
       expect(cacheService.getByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
-      expect(apiKeyRepository.find).toHaveBeenCalled();
+      expect(apiKeyRepository.getKeys).toHaveBeenCalled();
     });
   });
 
   describe('pushKeysToCache', () => {
     it('should push all keys to the cache and log the operation', async () => {
       const mockKeys = [{ key: 'key1' }, { key: 'key2' }];
-      apiKeyRepository.find.mockResolvedValue(mockKeys);
+      apiKeyRepository.getKeys.mockResolvedValue(mockKeys);
 
       await apiKeyService.pushKeysToCache();
 
-      expect(apiKeyRepository.find).toHaveBeenCalled();
+      expect(apiKeyRepository.getKeys).toHaveBeenCalled();
       expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith(
         apiKeyService['CACHE_PREFIX'],
         0,
@@ -96,14 +96,14 @@ describe('ApiKeyService', () => {
     it('should create a new API key, clear existing keys, and save the new key to the cache', async () => {
       const mockKey = 'new-api-key';
       jest.spyOn(apiKeyService as any, 'generateApiKey').mockReturnValue(mockKey);
-      apiKeyRepository.save.mockResolvedValue({ key: mockKey });
+      apiKeyRepository.createKey.mockResolvedValue({ key: mockKey });
 
       const result = await apiKeyService.createKey();
 
       expect(result).toBe(mockKey);
       expect(cacheService.delByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
-      expect(apiKeyRepository.clear).toHaveBeenCalled();
-      expect(apiKeyRepository.save).toHaveBeenCalledWith({ key: mockKey });
+      expect(apiKeyRepository.removeKeys).toHaveBeenCalled();
+      expect(apiKeyRepository.createKey).toHaveBeenCalledWith({ key: mockKey });
       expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith(
         apiKeyService['CACHE_PREFIX'],
         0,

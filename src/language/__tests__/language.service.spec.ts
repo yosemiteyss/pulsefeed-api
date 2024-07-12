@@ -1,10 +1,11 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
+import { LanguageRepository } from '../repository/language.repository';
 import { EnableLanguageDto } from '../dto/enable-language.dto';
-import { LanguageRepository } from '../language.repository';
 import { LanguageService } from '../language.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { LoggerService } from '@common/logger';
+import { Language } from '@common/model';
 
 describe('LanguageService', () => {
   let languageService: LanguageService;
@@ -17,9 +18,9 @@ describe('LanguageService', () => {
         {
           provide: LanguageRepository,
           useValue: {
-            find: jest.fn(),
-            findEnabled: jest.fn(),
-            save: jest.fn(),
+            getLanguageByKey: jest.fn(),
+            getEnabledLanguages: jest.fn(),
+            setLanguageEnabled: jest.fn(),
           },
         },
         {
@@ -44,33 +45,33 @@ describe('LanguageService', () => {
         { key: 'fr', enabled: true },
       ];
 
-      languageRepository.findEnabled.mockResolvedValue(mockLanguages);
+      languageRepository.getEnabledLanguages.mockResolvedValue(mockLanguages);
 
       const result = await languageService.getSupportedLanguages();
 
       expect(result).toEqual([{ key: 'en' }, { key: 'fr' }]);
-      expect(languageRepository.findEnabled).toHaveBeenCalledTimes(1);
+      expect(languageRepository.getEnabledLanguages).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('setLanguageEnabled', () => {
     it('should enable a language', async () => {
       const request: EnableLanguageDto = { key: 'en', enabled: true };
-      const mockLanguage = { key: 'en', enabled: false };
+      const mockLanguage: Language = { key: 'en' };
 
-      languageRepository.find.mockResolvedValue(mockLanguage);
-      languageRepository.save.mockResolvedValue(undefined);
+      languageRepository.getLanguageByKey.mockResolvedValue(mockLanguage);
+      languageRepository.setLanguageEnabled.mockResolvedValue();
 
       await languageService.setLanguageEnabled(request);
 
-      expect(languageRepository.find).toHaveBeenCalledWith('en');
-      expect(languageRepository.save).toHaveBeenCalledWith({ ...mockLanguage, enabled: true });
+      expect(languageRepository.getLanguageByKey).toHaveBeenCalledWith('en');
+      expect(languageRepository.setLanguageEnabled).toHaveBeenCalledWith('en', true);
     });
 
     it('should throw NotFoundException if language is not found', async () => {
       const request: EnableLanguageDto = { key: 'nonexistent', enabled: true };
 
-      languageRepository.find.mockResolvedValue(null);
+      languageRepository.getLanguageByKey.mockResolvedValue(undefined);
 
       await expect(languageService.setLanguageEnabled(request)).rejects.toThrow(NotFoundException);
     });
