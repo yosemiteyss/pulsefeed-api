@@ -27,11 +27,11 @@ export class ArticleRepository {
       category: {
         key: category,
       },
-      // languages: {
-      //   some: {
-      //     key: language,
-      //   },
-      // },
+      languages: {
+        some: {
+          key: language,
+        },
+      },
     };
 
     if (sourceId) {
@@ -55,9 +55,6 @@ export class ArticleRepository {
       take: limit,
     });
 
-    return [
-      entities.map((article) => this.articleMapper.articleEntityToModel(article, article.source)),
-      total,
-    ];
+    return [entities.map((article) => this.articleMapper.articleEntityToModel(article)), total];
   }
 }

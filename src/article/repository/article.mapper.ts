@@ -1,29 +1,34 @@
-import { Article as ArticleEntity, Source as SourceEntity } from '@prisma/client';
+import { ArticleCategoryEnum, LanguageEnum } from '@common/model';
 import { ArticleResult } from '../type/article-result';
-import { ArticleCategoryEnum } from '@common/model';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArticleMapper {
-  articleEntityToModel(article: ArticleEntity, source: SourceEntity): ArticleResult {
+  articleEntityToModel(
+    entity: Prisma.ArticleGetPayload<{
+      include: { source: true; category: true; languages: true };
+    }>,
+  ): ArticleResult {
     return {
       article: {
-        id: article.id,
-        title: article.title,
-        link: article.link,
-        description: article.description ?? undefined,
-        image: article.image ?? undefined,
-        keywords: article.keywords,
-        publishedAt: article.publishedAt ?? undefined,
-        category: article.categoryKey as ArticleCategoryEnum,
-        sourceId: article.sourceId,
+        id: entity.id,
+        title: entity.title,
+        link: entity.link,
+        description: entity.description ?? undefined,
+        image: entity.image ?? undefined,
+        keywords: entity.keywords,
+        publishedAt: entity.publishedAt ?? undefined,
+        category: entity.categoryKey as ArticleCategoryEnum,
+        sourceId: entity.sourceId,
+        languages: entity.languages.map((language) => language.key as LanguageEnum),
       },
       source: {
-        id: source.id,
-        title: source.title,
-        link: source.link,
-        image: source.image ?? undefined,
-        description: source.description ?? undefined,
+        id: entity.source.id,
+        title: entity.source.title,
+        link: entity.source.link,
+        image: entity.source.image ?? undefined,
+        description: entity.source.description ?? undefined,
         languages: [],
       },
     };

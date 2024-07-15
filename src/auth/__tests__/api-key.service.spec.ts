@@ -54,7 +54,7 @@ describe('ApiKeyService', () => {
       const result = await apiKeyService.getDefaultKey();
 
       expect(result).toBe(mockKey);
-      expect(cacheService.getByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
+      expect(cacheService.getByPrefix).toHaveBeenCalledWith('pf:api-key');
       expect(apiKeyRepository.getKeys).not.toHaveBeenCalled();
     });
 
@@ -66,7 +66,7 @@ describe('ApiKeyService', () => {
       const result = await apiKeyService.getDefaultKey();
 
       expect(result).toBe(mockKey);
-      expect(cacheService.getByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
+      expect(cacheService.getByPrefix).toHaveBeenCalledWith('pf:api-key');
       expect(apiKeyRepository.getKeys).toHaveBeenCalled();
     });
   });
@@ -79,16 +79,8 @@ describe('ApiKeyService', () => {
       await apiKeyService.pushKeysToCache();
 
       expect(apiKeyRepository.getKeys).toHaveBeenCalled();
-      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith(
-        apiKeyService['CACHE_PREFIX'],
-        0,
-        'key1',
-      );
-      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith(
-        apiKeyService['CACHE_PREFIX'],
-        1,
-        'key2',
-      );
+      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith('pf:api-key', 0, 'key1');
+      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith('pf:api-key', 1, 'key2');
     });
   });
 
@@ -101,14 +93,10 @@ describe('ApiKeyService', () => {
       const result = await apiKeyService.createKey();
 
       expect(result).toBe(mockKey);
-      expect(cacheService.delByPrefix).toHaveBeenCalledWith(apiKeyService['CACHE_PREFIX']);
+      expect(cacheService.delByPrefix).toHaveBeenCalledWith('pf:api-key');
       expect(apiKeyRepository.removeKeys).toHaveBeenCalled();
       expect(apiKeyRepository.createKey).toHaveBeenCalledWith({ key: mockKey });
-      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith(
-        apiKeyService['CACHE_PREFIX'],
-        0,
-        mockKey,
-      );
+      expect(cacheService.setByKeyPrefix).toHaveBeenCalledWith('pf:api-key', 0, mockKey);
     });
   });
 });
