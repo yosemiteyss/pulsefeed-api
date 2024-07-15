@@ -29,7 +29,7 @@ export class ArticleRepository {
       },
       languages: {
         some: {
-          key: language,
+          languageKey: language,
         },
       },
     };

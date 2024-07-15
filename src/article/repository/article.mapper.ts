@@ -21,7 +21,7 @@ export class ArticleMapper {
         publishedAt: entity.publishedAt ?? undefined,
         category: entity.categoryKey as ArticleCategoryEnum,
         sourceId: entity.sourceId,
-        languages: entity.languages.map((language) => language.key as LanguageEnum),
+        languages: entity.languages.map((language) => language.languageKey as LanguageEnum),
       },
       source: {
         id: entity.source.id,

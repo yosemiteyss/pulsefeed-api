@@ -112,7 +112,7 @@ export class ArticleService {
         image: article.image,
         link: article.link,
         publishedAt: article.publishedAt ?? article.createdAt,
-        source: source ? SourceDto.fromModel(source) : undefined,
+        source: SourceDto.fromModel(source),
       };
     });
 
