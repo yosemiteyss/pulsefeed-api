@@ -10,6 +10,7 @@ export class CategoryMapper {
   categoryEntityToModel(entity: CategoryEntity): ArticleCategory {
     return {
       key: entity.key,
+      priority: entity.priority.toNumber(),
     };
   }
 

@@ -1,5 +1,5 @@
-import { ArticleCategory, ArticleCategoryTitle } from '@common/model';
 import { CategoryMapper } from './category.mapper';
+import { ArticleCategory } from '@common/model';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@common/db';
 
@@ -34,17 +34,36 @@ export class CategoryRepository {
     return result.map((category) => this.categoryMapper.categoryEntityToModel(category));
   }
 
-  async getCategoryTitlesByLang(languageKey: string): Promise<ArticleCategoryTitle[]> {
+  async getCategoryWithTitleByLang(
+    languageKey: string,
+  ): Promise<{ key: string; title: string; priority: number }[]> {
     const result = await this.prismaService.articleCategoryTitle.findMany({
+      include: {
+        category: true,
+        language: true,
+      },
       where: {
         category: {
           enabled: true,
         },
-        languageKey: languageKey,
+        language: {
+          key: languageKey,
+        },
+      },
+      orderBy: {
+        category: {
+          priority: 'desc',
+        },
       },
     });
 
-    return result.map((title) => this.categoryMapper.categoryTitleEntityToModel(title));
+    return result.map((title) => {
+      return {
+        key: title.category.key,
+        title: title.title,
+        priority: title.category.priority.toNumber(),
+      };
+    });
   }
 
   async setCategoryEnabled(key: string, enabled: boolean) {

@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 import { PageRequest } from '@common/dto';
 
 export class ArticleListRequestDto extends PageRequest {
@@ -11,4 +11,9 @@ export class ArticleListRequestDto extends PageRequest {
   @IsString()
   @IsOptional()
   readonly sourceId?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  readonly excludeIds?: string[];
 }

@@ -1,12 +1,12 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { CategoryListRequestDto } from '../dto/category-list-request.dto';
 import { CategoryRepository } from '../repository/category.repository';
-import { ArticleCategory, ArticleCategoryTitle } from '@common/model';
 import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { CategoryDto } from '../dto/category.dto';
+import { ArticleCategory } from '@common/model';
 import { LoggerService } from '@common/logger';
 
 describe('CategoryService', () => {
@@ -22,7 +22,7 @@ describe('CategoryService', () => {
           useValue: {
             getCategoryByKey: jest.fn(),
             getEnabledCategories: jest.fn(),
-            getCategoryTitlesByLang: jest.fn(),
+            getCategoryWithTitleByLang: jest.fn(),
             setCategoryEnabled: jest.fn(),
           },
         },
@@ -43,32 +43,32 @@ describe('CategoryService', () => {
 
   describe('getSupportedCategories', () => {
     it('should return a list of supported categories', async () => {
-      const mockCategories: ArticleCategoryTitle[] = [
-        { categoryKey: 'tech', title: 'Tech' },
-        { categoryKey: 'health', title: 'Health' },
+      const mockCategories: { key: string; title: string; priority: number }[] = [
+        { key: 'tech', title: 'Tech', priority: 1 },
+        { key: 'health', title: 'Health', priority: 1 },
       ];
 
       const requestDto: CategoryListRequestDto = { language: 'en' };
 
-      articleCategoryRepository.getCategoryTitlesByLang.mockResolvedValue(mockCategories);
+      articleCategoryRepository.getCategoryWithTitleByLang.mockResolvedValue(mockCategories);
 
       const result = await categoryService.getSupportedCategories(requestDto);
 
       const expected: CategoryDto[] = [
-        { key: 'tech', name: 'Tech' },
-        { key: 'health', name: 'Health' },
+        { key: 'tech', name: 'Tech', priority: 1 },
+        { key: 'health', name: 'Health', priority: 1 },
       ];
 
       expect(result).toEqual(expected);
-      expect(articleCategoryRepository.getCategoryTitlesByLang).toHaveBeenCalledTimes(1);
-      expect(articleCategoryRepository.getCategoryTitlesByLang).toHaveBeenCalledWith('en');
+      expect(articleCategoryRepository.getCategoryWithTitleByLang).toHaveBeenCalledTimes(1);
+      expect(articleCategoryRepository.getCategoryWithTitleByLang).toHaveBeenCalledWith('en');
     });
   });
 
   describe('setCategoryEnabled', () => {
     it('should enable a category', async () => {
       const request: EnableCategoryDto = { key: 'tech', enabled: true };
-      const mockCategory: ArticleCategory = { key: 'tech' };
+      const mockCategory: ArticleCategory = { key: 'tech', priority: 1 };
 
       articleCategoryRepository.getCategoryByKey.mockResolvedValue(mockCategory);
       articleCategoryRepository.setCategoryEnabled.mockResolvedValue();

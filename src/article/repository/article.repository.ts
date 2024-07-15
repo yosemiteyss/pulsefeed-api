@@ -19,6 +19,7 @@ export class ArticleRepository {
     language,
     sourceId,
     publishedBefore,
+    excludeIds,
   }: ArticleFindOptions): Promise<[ArticleResult[], number]> {
     const whereClause: Prisma.ArticleWhereInput = {
       publishedAt: {
@@ -38,6 +39,12 @@ export class ArticleRepository {
       whereClause.source = {
         id: sourceId,
         enabled: true,
+      };
+    }
+
+    if (excludeIds) {
+      whereClause.id = {
+        notIn: excludeIds,
       };
     }
 

@@ -1,99 +1,72 @@
-import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ArticleRepository } from './repository/article.repository';
 import { ShuffleService } from '../shared/service/shuffle.service';
 import { ArticleFindOptions } from './type/article-find-options';
+import { HomeFeedRequestDto } from './dto/home-feed-request-dto';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
+import { HomeFeedDto, HomeFeedSection } from './dto/home-feed';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour } from '@common/utils';
-import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
 import { LoggerService } from '@common/logger';
-import { CacheService } from '@common/cache';
 import { PageResponse } from '@common/dto';
 
 @Injectable()
 export class ArticleService {
   constructor(
     private readonly articleRepository: ArticleRepository,
-    private readonly cacheService: CacheService,
     private readonly logger: LoggerService,
     private readonly shuffleService: ShuffleService,
     private readonly languageService: LanguageService,
     private readonly categoryService: CategoryService,
   ) {}
 
-  private useCache = true;
+  async getHomeFeed({ language }: HomeFeedRequestDto): Promise<HomeFeedDto> {
+    const sections: HomeFeedSection[] = [];
+    const excludeArticleIds: string[] = [];
 
-  async getArticles({
-    category,
-    language,
-    sourceId,
-    page,
-  }: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
-    if (!this.categoryService.isSupportedCategory(category)) {
-      this.logger.warn(ArticleService.name, `category: ${category} is not found`);
-      throw new NotFoundException();
-    }
+    const categories = await this.categoryService.getSupportedCategories({ language });
+    const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
-    if (!this.languageService.isSupportedLanguage(language)) {
-      this.logger.warn(ArticleService.name, `language: ${language} is not found`);
-      throw new NotFoundException();
-    }
-
-    const limit = DEFAULT_PAGE_SIZE;
-    const currentDate = new Date();
-
-    const opts: ArticleFindOptions = {
-      page,
-      limit,
-      category,
-      language,
-      sourceId,
-      publishedBefore: currentDate,
-    };
-
-    let data: ArticleDto[];
-    let total: number;
-
-    if (this.useCache) {
-      [data, total] = await this.getCachedArticles(opts, () => {
-        this.logger.log(ArticleService.name, 'Load articles from db.');
-        return this.getFilteredArticlesFromDb(opts);
+    for (const category of topCategories) {
+      const { data } = await this.getArticlesByOpts({
+        page: 1,
+        limit: 10,
+        category: category.key!,
+        language: language,
+        publishedBefore: ArticleService.getArticleRequestPublishedTime(),
       });
-    } else {
-      this.logger.log(ArticleService.name, 'Load articles from db.');
-      [data, total] = await this.getFilteredArticlesFromDb(opts);
+
+      sections.push({
+        category: category,
+        articles: data,
+      });
+
+      excludeArticleIds.push(...data.map((article) => article.id!));
     }
 
-    return { data, total, page, limit };
+    return {
+      sections,
+      excludeArticleIds,
+    };
   }
 
-  /**
-   * Get cached articles.
-   * Articles are cached every half hour.
-   */
-  private async getCachedArticles(
-    { category, language, sourceId, page, publishedBefore }: ArticleFindOptions,
-    onCacheMissed: () => Promise<[ArticleDto[], number]>,
-  ): Promise<[ArticleDto[], number]> {
-    let baseKey = `pf:articles:${category}-${language}`;
-
-    // Append source id.
-    if (sourceId) {
-      baseKey = `${baseKey}-${sourceId}`;
+  async getArticlesByOpts(opts: ArticleFindOptions): Promise<PageResponse<ArticleDto>> {
+    if (!this.categoryService.isSupportedCategory(opts.category)) {
+      this.logger.warn(ArticleService.name, `category: ${opts.category} is not found`);
+      throw new NotFoundException();
     }
 
-    // Append page
-    baseKey = `${baseKey}-${page}`;
+    if (!this.languageService.isSupportedLanguage(opts.language)) {
+      this.logger.warn(ArticleService.name, `language: ${opts.language} is not found`);
+      throw new NotFoundException();
+    }
 
-    // Append published before
-    const nearestHalfHr = roundDownToNearestHalfHour(publishedBefore).getTime();
-    baseKey = `${baseKey}-${nearestHalfHr}`;
+    const [data, total] = await this.getFilteredArticlesFromDb(opts);
+    this.logger.log(ArticleService.name, 'Load articles from db.');
 
-    const ttl = 4 * 60 * 60 * 1000; // 4 hours
-    return this.cacheService.wrap(baseKey, onCacheMissed, ttl);
+    return { data, total, page: opts.page, limit: opts.limit };
   }
 
   /**
@@ -119,5 +92,9 @@ export class ArticleService {
     data = this.shuffleService.shuffleByKey(data, (article) => article.source?.id || 'unknown');
 
     return [data, total];
+  }
+
+  static getArticleRequestPublishedTime(): Date {
+    return roundDownToNearestHalfHour(new Date());
   }
 }

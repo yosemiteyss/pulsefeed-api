@@ -5,4 +5,5 @@ export interface ArticleFindOptions {
   readonly language: string;
   readonly sourceId?: string;
   readonly publishedBefore: Date;
+  readonly excludeIds?: string[];
 }
