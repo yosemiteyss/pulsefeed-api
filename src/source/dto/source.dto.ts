@@ -1,9 +1,9 @@
 import { Source } from '@common/model';
 
 export class SourceDto {
-  readonly id?: string;
-  readonly title?: string;
-  readonly link?: string;
+  readonly id: string;
+  readonly title: string;
+  readonly link: string;
   readonly image?: string;
   readonly description?: string;
 

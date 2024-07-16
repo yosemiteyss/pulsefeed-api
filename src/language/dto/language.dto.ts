@@ -1,3 +1,3 @@
 export class LanguageDto {
-  readonly key?: string;
+  readonly key: string;
 }

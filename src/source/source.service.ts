@@ -34,7 +34,7 @@ export class SourceService {
     const sources = data.map((source) => SourceDto.fromModel(source));
     this.logger.log(SourceService.name, `getEnabledSourceList: ${sources.length}`);
 
-    return { data: sources, total, page, limit };
+    return new PageResponse<SourceDto>(data, total, page, limit);
   }
 
   async setSourceEnabled(request: EnableSourceDto) {

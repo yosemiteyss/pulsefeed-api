@@ -4,12 +4,12 @@ import { ArticleFindOptions } from './type/article-find-options';
 import { HomeFeedRequestDto } from './dto/home-feed-request-dto';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
-import { HomeFeedDto, HomeFeedSection } from './dto/home-feed';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour } from '@common/utils';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
 import { LoggerService } from '@common/logger';
+import { HomeFeedDto } from './dto/home-feed';
 import { PageResponse } from '@common/dto';
 
 @Injectable()
@@ -22,33 +22,36 @@ export class ArticleService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  async getHomeFeed({ language }: HomeFeedRequestDto): Promise<HomeFeedDto> {
-    const sections: HomeFeedSection[] = [];
-    const excludeArticleIds: string[] = [];
-
+  async getHomeFeed({ language, sectionKey }: HomeFeedRequestDto): Promise<HomeFeedDto> {
     const categories = await this.categoryService.getSupportedCategories({ language });
     const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
-    for (const category of topCategories) {
-      const { data } = await this.getArticlesByOpts({
-        page: 1,
-        limit: 10,
-        category: category.key!,
-        language: language,
-        publishedBefore: ArticleService.getArticleRequestPublishedTime(),
-      });
-
-      sections.push({
-        category: category,
-        articles: data,
-      });
-
-      excludeArticleIds.push(...data.map((article) => article.id!));
+    // Find category section index.
+    let index: number;
+    if (!sectionKey) {
+      index = 0;
+    } else {
+      index = topCategories.findIndex((category) => category.key === sectionKey);
     }
 
+    const category = topCategories[index];
+
+    const { data } = await this.getArticlesByOpts({
+      page: 1,
+      limit: 10,
+      category: category.key!,
+      language: language,
+      publishedBefore: ArticleService.getArticleRequestPublishedTime(),
+    });
+
+    const nextSection = index + 1 >= topCategories.length ? undefined : topCategories[index + 1];
+
     return {
-      sections,
-      excludeArticleIds,
+      section: {
+        category: category,
+        articles: data,
+      },
+      nextSectionKey: nextSection?.key,
     };
   }
 
@@ -66,7 +69,7 @@ export class ArticleService {
     const [data, total] = await this.getFilteredArticlesFromDb(opts);
     this.logger.log(ArticleService.name, 'Load articles from db.');
 
-    return { data, total, page: opts.page, limit: opts.limit };
+    return new PageResponse<ArticleDto>(data, total, opts.page, opts.limit);
   }
 
   /**

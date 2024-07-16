@@ -1,11 +1,11 @@
 import { SourceDto } from '../../source/dto/source.dto';
 
 export class ArticleDto {
-  readonly id?: string;
-  readonly title?: string;
-  readonly link?: string;
+  readonly id: string;
+  readonly title: string;
+  readonly link: string;
   readonly description?: string;
   readonly image?: string;
   readonly publishedAt?: Date;
-  readonly source?: SourceDto;
+  readonly source: SourceDto;
 }
