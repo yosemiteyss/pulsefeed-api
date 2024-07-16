@@ -22,7 +22,7 @@ describe('CategoryService', () => {
           useValue: {
             getCategoryByKey: jest.fn(),
             getEnabledCategories: jest.fn(),
-            getCategoryWithTitleByLang: jest.fn(),
+            getCategoryByLang: jest.fn(),
             setCategoryEnabled: jest.fn(),
           },
         },
@@ -50,7 +50,7 @@ describe('CategoryService', () => {
 
       const requestDto: CategoryListRequestDto = { language: 'en' };
 
-      articleCategoryRepository.getCategoryWithTitleByLang.mockResolvedValue(mockCategories);
+      articleCategoryRepository.getCategoryByLang.mockResolvedValue(mockCategories);
 
       const result = await categoryService.getSupportedCategories(requestDto);
 
@@ -60,8 +60,8 @@ describe('CategoryService', () => {
       ];
 
       expect(result).toEqual(expected);
-      expect(articleCategoryRepository.getCategoryWithTitleByLang).toHaveBeenCalledTimes(1);
-      expect(articleCategoryRepository.getCategoryWithTitleByLang).toHaveBeenCalledWith('en');
+      expect(articleCategoryRepository.getCategoryByLang).toHaveBeenCalledTimes(1);
+      expect(articleCategoryRepository.getCategoryByLang).toHaveBeenCalledWith('en');
     });
   });
 

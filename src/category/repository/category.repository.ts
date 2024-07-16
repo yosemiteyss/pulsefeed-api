@@ -34,7 +34,7 @@ export class CategoryRepository {
     return result.map((category) => this.categoryMapper.categoryEntityToModel(category));
   }
 
-  async getCategoryWithTitleByLang(
+  async getCategoryByLang(
     languageKey: string,
   ): Promise<{ key: string; title: string; priority: number }[]> {
     const result = await this.prismaService.articleCategoryTitle.findMany({
@@ -45,6 +45,9 @@ export class CategoryRepository {
       where: {
         category: {
           enabled: true,
+          articles: {
+            some: {},
+          },
         },
         language: {
           key: languageKey,

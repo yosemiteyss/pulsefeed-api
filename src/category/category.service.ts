@@ -15,7 +15,7 @@ export class CategoryService {
   ) {}
 
   async getSupportedCategories({ language }: CategoryListRequestDto): Promise<CategoryDto[]> {
-    const categoryTitles = await this.categoryRepository.getCategoryWithTitleByLang(language);
+    const categoryTitles = await this.categoryRepository.getCategoryByLang(language);
     return categoryTitles.map((title) => ({
       key: title.key,
       name: title.title,
