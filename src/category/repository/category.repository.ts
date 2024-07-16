@@ -45,9 +45,6 @@ export class CategoryRepository {
       where: {
         category: {
           enabled: true,
-          articles: {
-            some: {},
-          },
         },
         language: {
           key: languageKey,
