@@ -56,6 +56,7 @@ export class ArticleRepository {
       },
       where: whereClause,
       orderBy: {
+        publishedAt: 'desc',
         createdAt: 'desc',
       },
       skip: (page - 1) * limit,
