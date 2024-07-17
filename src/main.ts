@@ -16,6 +16,7 @@ async function bootstrap() {
       transform: true, // Set transform to true to allow default value in dto.
       transformOptions: { enableImplicitConversion: true }, // Convert query params to target type.
       forbidNonWhitelisted: true,
+      whitelist: true,
     }),
   );
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));

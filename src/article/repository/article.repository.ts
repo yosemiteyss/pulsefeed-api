@@ -25,15 +25,19 @@ export class ArticleRepository {
       publishedAt: {
         lt: publishedBefore,
       },
-      category: {
-        key: category,
-      },
+
       languages: {
         some: {
           languageKey: language,
         },
       },
     };
+
+    if (category) {
+      whereClause.category = {
+        key: category,
+      };
+    }
 
     if (sourceId) {
       whereClause.source = {

@@ -46,6 +46,11 @@ export class ArticleService {
 
     const nextSection = index + 1 >= topCategories.length ? undefined : topCategories[index + 1];
 
+    this.logger.log(
+      ArticleService.name,
+      `current index: ${index}, nextSection: ${nextSection?.key}`,
+    );
+
     return {
       section: {
         category: category,
@@ -56,7 +61,7 @@ export class ArticleService {
   }
 
   async getArticlesByOpts(opts: ArticleFindOptions): Promise<PageResponse<ArticleDto>> {
-    if (!this.categoryService.isSupportedCategory(opts.category)) {
+    if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
       this.logger.warn(ArticleService.name, `category: ${opts.category} is not found`);
       throw new NotFoundException();
     }
