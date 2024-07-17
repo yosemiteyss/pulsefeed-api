@@ -1,3 +1,4 @@
+import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ArticleRepository } from './repository/article.repository';
 import { ShuffleService } from '../shared/service/shuffle.service';
 import { ArticleFindOptions } from './type/article-find-options';
@@ -6,10 +7,12 @@ import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour } from '@common/utils';
+import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { SourceDto } from '../source/dto/source.dto';
 import { ArticleDto } from './dto/article.dto';
 import { LoggerService } from '@common/logger';
 import { HomeFeedDto } from './dto/home-feed';
+import { CacheService } from '@common/cache';
 import { PageResponse } from '@common/dto';
 
 @Injectable()
@@ -20,6 +23,7 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
     private readonly languageService: LanguageService,
     private readonly categoryService: CategoryService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async getHomeFeed({ language, sectionKey }: HomeFeedRequestDto): Promise<HomeFeedDto> {
@@ -60,7 +64,32 @@ export class ArticleService {
     };
   }
 
-  async getArticlesByOpts(opts: ArticleFindOptions): Promise<PageResponse<ArticleDto>> {
+  async getArticleList(
+    request: ArticleListRequestDto,
+    publishedBefore: Date,
+  ): Promise<PageResponse<ArticleDto>> {
+    let opts: ArticleFindOptions = {
+      page: request.page,
+      limit: DEFAULT_PAGE_SIZE,
+      category: request.category,
+      language: request.language,
+      sourceId: request.sourceId,
+      publishedBefore: publishedBefore,
+    };
+
+    if (request.excludeHomeArticles) {
+      const homeFeeds = await this.cacheService.getByPrefix<HomeFeedDto>('pf:article:home:request');
+      const articleIds = homeFeeds
+        .flatMap((feed) => feed.section.articles)
+        .map((article) => article.id);
+
+      opts = { ...opts, excludeIds: articleIds };
+    }
+
+    return this.getArticlesByOpts(opts);
+  }
+
+  private async getArticlesByOpts(opts: ArticleFindOptions): Promise<PageResponse<ArticleDto>> {
     if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
       this.logger.warn(ArticleService.name, `category: ${opts.category} is not found`);
       throw new NotFoundException();

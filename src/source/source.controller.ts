@@ -1,7 +1,7 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Query } from '@nestjs/common';
 import { PageRequest, PageResponse } from '@common/dto';
+import { Body, Controller, Get } from '@nestjs/common';
 import { DEFAULT_TTL } from '../shared/constants';
 import { SourceService } from './source.service';
 import { Cacheable } from 'nestjs-cacheable';
@@ -19,7 +19,7 @@ export class SourceController {
     key: ({ page }: PageRequest) => `pf:source:list:page:${page}`,
     ttl: DEFAULT_TTL,
   })
-  async listSource(@Query() request: PageRequest): Promise<PageResponse<SourceDto>> {
+  async listSource(@Body() request: PageRequest): Promise<PageResponse<SourceDto>> {
     return this.sourceService.getSupportedSources(request);
   }
 }

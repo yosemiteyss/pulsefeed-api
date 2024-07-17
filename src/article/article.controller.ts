@@ -1,9 +1,8 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
 import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { HomeFeedRequestDto } from './dto/home-feed-request-dto';
-import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleDto } from './dto/article.dto';
 import { HomeFeedDto } from './dto/home-feed';
@@ -25,16 +24,9 @@ export class ArticleController {
     },
     ttl: 2 * 60 * 60 * 1000, // 4 hours
   })
-  async listArticle(@Query() request: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
+  async listArticle(@Body() request: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
     const publishedBefore = ArticleService.getArticleRequestPublishedTime();
-    return this.articleService.getArticlesByOpts({
-      page: request.page,
-      limit: DEFAULT_PAGE_SIZE,
-      category: request.category,
-      language: request.language,
-      sourceId: request.sourceId,
-      publishedBefore: publishedBefore,
-    });
+    return this.articleService.getArticleList(request, publishedBefore);
   }
 
   @Get('/home')
@@ -46,7 +38,7 @@ export class ArticleController {
     },
     ttl: 2 * 60 * 60 * 1000, // 4 hours
   })
-  async getHomeFeed(@Query() request: HomeFeedRequestDto): Promise<HomeFeedDto> {
+  async getHomeFeed(@Body() request: HomeFeedRequestDto): Promise<HomeFeedDto> {
     return this.articleService.getHomeFeed(request);
   }
 }
