@@ -41,7 +41,7 @@ export class HmacMiddleware implements NestMiddleware {
     const stringToSign =
       `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
-    this.logger.log(HmacMiddleware.name, `stringToSign: ${stringToSign}`);
+    //this.logger.log(HmacMiddleware.name, `stringToSign: ${stringToSign}`);
 
     const computedSignature = crypto
       .createHmac('sha256', secretKey)
