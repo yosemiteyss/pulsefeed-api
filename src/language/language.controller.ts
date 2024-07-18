@@ -18,6 +18,7 @@ export class LanguageController {
     ttl: DEFAULT_TTL,
   })
   async listLanguage(): Promise<LanguageDto[]> {
-    return this.languageService.getSupportedLanguages();
+    const languages = await this.languageService.getSupportedLanguages();
+    return languages.map((language) => LanguageDto.fromModel(language));
   }
 }

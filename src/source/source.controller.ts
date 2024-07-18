@@ -1,8 +1,8 @@
 import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
+import { DEFAULT_PAGE_SIZE, DEFAULT_TTL } from '../shared/constants';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PageRequest, PageResponse } from '@common/dto';
 import { Body, Controller, Get } from '@nestjs/common';
-import { DEFAULT_TTL } from '../shared/constants';
 import { SourceService } from './source.service';
 import { Cacheable } from 'nestjs-cacheable';
 import { SourceDto } from './dto/source.dto';
@@ -19,7 +19,11 @@ export class SourceController {
     key: ({ page }: PageRequest) => `pf:source:list:page:${page}`,
     ttl: DEFAULT_TTL,
   })
-  async listSource(@Body() request: PageRequest): Promise<PageResponse<SourceDto>> {
-    return this.sourceService.getSupportedSources(request);
+  async listSource(@Body() { page }: PageRequest): Promise<PageResponse<SourceDto>> {
+    const limit = DEFAULT_PAGE_SIZE;
+    const [data, total] = await this.sourceService.getSupportedSources(page, DEFAULT_PAGE_SIZE);
+
+    const response = data.map((source) => SourceDto.fromModel(source));
+    return new PageResponse<SourceDto>(response, total, page, limit);
   }
 }

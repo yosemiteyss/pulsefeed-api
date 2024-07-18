@@ -18,7 +18,8 @@ export class CategoryController {
     key: ({ language }: CategoryListRequestDto) => `pf:category:list:language:${language}`,
     ttl: DEFAULT_TTL,
   })
-  async listCategory(@Body() request: CategoryListRequestDto): Promise<CategoryDto[]> {
-    return this.categoryService.getSupportedCategories(request);
+  async listCategory(@Body() { language }: CategoryListRequestDto): Promise<CategoryDto[]> {
+    const categories = await this.categoryService.getSupportedCategories(language);
+    return categories.map((category) => CategoryDto.fromModel(category));
   }
 }

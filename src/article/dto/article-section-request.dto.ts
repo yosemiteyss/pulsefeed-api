@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class HomeFeedRequestDto {
+export class ArticleSectionRequestDto {
   @IsString()
   readonly language: string;
 

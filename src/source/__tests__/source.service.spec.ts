@@ -1,14 +1,12 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { SourceRepository } from '../repository/source.repository';
-import { EnableSourceDto } from '../dto/enable-source.dto';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LanguageEnum, Source } from '@common/model';
 import { NotFoundException } from '@nestjs/common';
 import { SourceService } from '../source.service';
 import { LoggerService } from '@common/logger';
-import { SourceDto } from '../dto/source.dto';
-import { PageRequest } from '@common/dto';
+import mock = jest.mock;
 
 describe('SourceService', () => {
   let sourceService: SourceService;
@@ -69,26 +67,19 @@ describe('SourceService', () => {
         { id: '1', title: 'Source 1', link: 'Link 1', languages: [LanguageEnum.en_us] },
         { id: '2', title: 'Source 2', link: 'Link 2', languages: [LanguageEnum.en_us] },
       ];
-      const request: PageRequest = { page: 1 };
       const total = 2;
 
       sourceRepository.getEnabledSources.mockResolvedValue([mockSources, total]);
 
-      const result = await sourceService.getSupportedSources(request);
+      const result = await sourceService.getSupportedSources(1, DEFAULT_PAGE_SIZE);
 
-      expect(result).toEqual({
-        data: mockSources.map((source) => SourceDto.fromModel(source)),
-        total,
-        page: 1,
-        limit: DEFAULT_PAGE_SIZE,
-      });
+      expect(result).toEqual([mockSources, 2]);
       expect(sourceRepository.getEnabledSources).toHaveBeenCalledWith(1, DEFAULT_PAGE_SIZE);
     });
   });
 
   describe('setSourceEnabled', () => {
     it('should enable a source', async () => {
-      const request: EnableSourceDto = { id: '1', enabled: true };
       const mockSource: Source = {
         id: '1',
         title: 'Source 1',
@@ -99,18 +90,15 @@ describe('SourceService', () => {
       sourceRepository.getSourceById.mockResolvedValue(mockSource);
       sourceRepository.setSourceEnabled.mockResolvedValue();
 
-      await sourceService.setSourceEnabled(request);
+      await sourceService.setSourceEnabled('1', true);
 
       expect(sourceRepository.getSourceById).toHaveBeenCalledWith('1');
       expect(sourceRepository.setSourceEnabled).toHaveBeenCalledWith('1', true);
     });
 
     it('should throw NotFoundException if source is not found', async () => {
-      const request: EnableSourceDto = { id: '99', enabled: true };
-
       sourceRepository.getSourceById.mockResolvedValue(undefined);
-
-      await expect(sourceService.setSourceEnabled(request)).rejects.toThrow(NotFoundException);
+      await expect(sourceService.setSourceEnabled('1', true)).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -40,20 +40,20 @@ export class AdminController {
 
   @Post('/source-enable')
   @ApiOperation({ description: 'Enable or disable article source' })
-  async enableSource(@Body() request: EnableSourceDto) {
-    await this.sourceService.setSourceEnabled(request);
+  async enableSource(@Body() { id, enabled }: EnableSourceDto) {
+    await this.sourceService.setSourceEnabled(id, enabled);
   }
 
   @Post('/category-enable')
   @ApiOperation({ description: 'Enable or disable article category' })
-  async enableCategory(@Body() request: EnableCategoryDto) {
-    await this.categoryService.setCategoryEnabled(request);
+  async enableCategory(@Body() { key, enabled }: EnableCategoryDto) {
+    await this.categoryService.setCategoryEnabled(key, enabled);
   }
 
   @Post('/language-enable')
   @ApiOperation({ description: 'Enable or disable language' })
-  async enableLanguage(@Body() request: EnableLanguageDto) {
-    await this.languageService.setLanguageEnabled(request);
+  async enableLanguage(@Body() { key, enabled }: EnableLanguageDto) {
+    await this.languageService.setLanguageEnabled(key, enabled);
   }
 
   @Get('/health-check')

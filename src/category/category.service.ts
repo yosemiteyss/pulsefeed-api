@@ -1,9 +1,7 @@
-import { CategoryListRequestDto } from './dto/category-list-request.dto';
 import { CategoryRepository } from './repository/category.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EnableCategoryDto } from './dto/enable-category.dto';
+import { CategoryResult } from './type/category-result';
 import { ArticleCategoryEnum } from '@common/model';
-import { CategoryDto } from './dto/category.dto';
 import { LoggerService } from '@common/logger';
 import { stringToEnum } from '@common/utils';
 
@@ -14,17 +12,11 @@ export class CategoryService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getSupportedCategories({ language }: CategoryListRequestDto): Promise<CategoryDto[]> {
-    const categoryTitles = await this.categoryRepository.getCategoryByLang(language);
-    return categoryTitles.map((title) => ({
-      key: title.key,
-      name: title.title,
-      priority: title.priority,
-    }));
+  async getSupportedCategories(langKey: string): Promise<CategoryResult[]> {
+    return await this.categoryRepository.getCategoryByLang(langKey);
   }
 
-  async setCategoryEnabled(request: EnableCategoryDto) {
-    const { key, enabled } = request;
+  async setCategoryEnabled(key: string, enabled: boolean) {
     const category = await this.categoryRepository.getCategoryByKey(key);
 
     if (!category) {
@@ -35,7 +27,7 @@ export class CategoryService {
     await this.categoryRepository.setCategoryEnabled(category.key, enabled);
   }
 
-  isSupportedCategory(category: string): boolean {
-    return stringToEnum(ArticleCategoryEnum, category) !== undefined;
+  isSupportedCategory(key: string): boolean {
+    return stringToEnum(ArticleCategoryEnum, key) !== undefined;
   }
 }

@@ -1,11 +1,8 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
-import { CategoryListRequestDto } from '../dto/category-list-request.dto';
 import { CategoryRepository } from '../repository/category.repository';
-import { EnableCategoryDto } from '../dto/enable-category.dto';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { CategoryDto } from '../dto/category.dto';
 import { ArticleCategory } from '@common/model';
 import { LoggerService } from '@common/logger';
 
@@ -48,18 +45,11 @@ describe('CategoryService', () => {
         { key: 'health', title: 'Health', priority: 1 },
       ];
 
-      const requestDto: CategoryListRequestDto = { language: 'en' };
-
       articleCategoryRepository.getCategoryByLang.mockResolvedValue(mockCategories);
 
-      const result = await categoryService.getSupportedCategories(requestDto);
+      const result = await categoryService.getSupportedCategories('en');
 
-      const expected: CategoryDto[] = [
-        { key: 'tech', name: 'Tech', priority: 1 },
-        { key: 'health', name: 'Health', priority: 1 },
-      ];
-
-      expect(result).toEqual(expected);
+      expect(result).toEqual(mockCategories);
       expect(articleCategoryRepository.getCategoryByLang).toHaveBeenCalledTimes(1);
       expect(articleCategoryRepository.getCategoryByLang).toHaveBeenCalledWith('en');
     });
@@ -67,23 +57,22 @@ describe('CategoryService', () => {
 
   describe('setCategoryEnabled', () => {
     it('should enable a category', async () => {
-      const request: EnableCategoryDto = { key: 'tech', enabled: true };
       const mockCategory: ArticleCategory = { key: 'tech', priority: 1 };
 
       articleCategoryRepository.getCategoryByKey.mockResolvedValue(mockCategory);
       articleCategoryRepository.setCategoryEnabled.mockResolvedValue();
 
-      await categoryService.setCategoryEnabled(request);
+      await categoryService.setCategoryEnabled('tech', true);
 
       expect(articleCategoryRepository.setCategoryEnabled).toHaveBeenCalledWith('tech', true);
     });
 
     it('should throw NotFoundException if category is not found', async () => {
-      const request: EnableCategoryDto = { key: 'nonexistent', enabled: true };
-
       articleCategoryRepository.getCategoryByKey.mockResolvedValue(undefined);
 
-      await expect(categoryService.setCategoryEnabled(request)).rejects.toThrow(NotFoundException);
+      await expect(categoryService.setCategoryEnabled('invalid', true)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

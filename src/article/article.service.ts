@@ -1,19 +1,15 @@
-import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ArticleRepository } from './repository/article.repository';
 import { ShuffleService } from '../shared/service/shuffle.service';
+import { CategoryResult } from '../category/type/category-result';
 import { ArticleFindOptions } from './type/article-find-options';
-import { HomeFeedRequestDto } from './dto/home-feed-request-dto';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ArticleSectionDto } from './dto/article-section.dto';
 import { roundDownToNearestHalfHour } from '@common/utils';
-import { DEFAULT_PAGE_SIZE } from '../shared/constants';
-import { SourceDto } from '../source/dto/source.dto';
-import { ArticleDto } from './dto/article.dto';
+import { ArticleResult } from './type/article-result';
 import { LoggerService } from '@common/logger';
-import { HomeFeedDto } from './dto/home-feed';
 import { CacheService } from '@common/cache';
-import { PageResponse } from '@common/dto';
 
 @Injectable()
 export class ArticleService {
@@ -26,8 +22,15 @@ export class ArticleService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async getHomeFeed({ language, sectionKey }: HomeFeedRequestDto): Promise<HomeFeedDto> {
-    const categories = await this.categoryService.getSupportedCategories({ language });
+  async getHomeFeed(
+    langKey: string,
+    sectionKey?: string,
+  ): Promise<{
+    category: CategoryResult;
+    articles: ArticleResult[];
+    nextSectionKey?: string;
+  }> {
+    const categories = await this.categoryService.getSupportedCategories(langKey);
     const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
     // Find category section index.
@@ -40,11 +43,11 @@ export class ArticleService {
 
     const category = topCategories[index];
 
-    const { data } = await this.getArticlesByOpts({
+    const [data] = await this.getArticlesByOpts({
       page: 1,
       limit: 10,
       category: category.key!,
-      language: language,
+      language: langKey,
       publishedBefore: ArticleService.getArticleRequestPublishedTime(),
     });
 
@@ -56,32 +59,20 @@ export class ArticleService {
     );
 
     return {
-      section: {
-        category: category,
-        articles: data,
-      },
+      category: category,
+      articles: data,
       nextSectionKey: nextSection?.key,
     };
   }
 
   async getArticleList(
-    request: ArticleListRequestDto,
-    publishedBefore: Date,
-  ): Promise<PageResponse<ArticleDto>> {
-    let opts: ArticleFindOptions = {
-      page: request.page,
-      limit: DEFAULT_PAGE_SIZE,
-      category: request.category,
-      language: request.language,
-      sourceId: request.sourceId,
-      publishedBefore: publishedBefore,
-    };
-
-    if (request.excludeHomeArticles) {
-      const homeFeeds = await this.cacheService.getByPrefix<HomeFeedDto>('pf:article:home:request');
-      const articleIds = homeFeeds
-        .flatMap((feed) => feed.section.articles)
-        .map((article) => article.id);
+    opts: ArticleFindOptions,
+    excludeHomeArticles: boolean,
+  ): Promise<[ArticleResult[], number]> {
+    if (excludeHomeArticles) {
+      const sections =
+        await this.cacheService.getByPrefix<ArticleSectionDto>('pf:article:home:request');
+      const articleIds = sections.flatMap((feed) => feed.articles).map((article) => article.id);
 
       opts = { ...opts, excludeIds: articleIds };
     }
@@ -89,7 +80,7 @@ export class ArticleService {
     return this.getArticlesByOpts(opts);
   }
 
-  private async getArticlesByOpts(opts: ArticleFindOptions): Promise<PageResponse<ArticleDto>> {
+  private async getArticlesByOpts(opts: ArticleFindOptions): Promise<[ArticleResult[], number]> {
     if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
       this.logger.warn(ArticleService.name, `category: ${opts.category} is not found`);
       throw new NotFoundException();
@@ -103,7 +94,7 @@ export class ArticleService {
     const [data, total] = await this.getFilteredArticlesFromDb(opts);
     this.logger.log(ArticleService.name, 'Load articles from db.');
 
-    return new PageResponse<ArticleDto>(data, total, opts.page, opts.limit);
+    return [data, total];
   }
 
   /**
@@ -111,24 +102,13 @@ export class ArticleService {
    */
   private async getFilteredArticlesFromDb(
     opts: ArticleFindOptions,
-  ): Promise<[ArticleDto[], number]> {
+  ): Promise<[ArticleResult[], number]> {
     const [items, total] = await this.articleRepository.getArticles(opts);
-
-    let data: ArticleDto[] = items.map(({ article, source }) => {
-      return {
-        id: article.id,
-        title: article.title,
-        description: article.description,
-        image: article.image,
-        link: article.link,
-        publishedAt: article.publishedAt ?? article.createdAt,
-        source: SourceDto.fromModel(source),
-      };
-    });
-
-    data = this.shuffleService.shuffleByKey(data, (article) => article.source?.id || 'unknown');
-
-    return [data, total];
+    const shuffled = this.shuffleService.shuffleByKey(
+      items,
+      (article) => article.source?.id || 'unknown',
+    );
+    return [shuffled, total];
   }
 
   static getArticleRequestPublishedTime(): Date {

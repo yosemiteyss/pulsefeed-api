@@ -1,6 +1,5 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { LanguageRepository } from '../repository/language.repository';
-import { EnableLanguageDto } from '../dto/enable-language.dto';
 import { LanguageService } from '../language.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
@@ -40,40 +39,36 @@ describe('LanguageService', () => {
 
   describe('getSupportedLanguages', () => {
     it('should return a list of supported languages', async () => {
-      const mockLanguages = [
-        { key: 'en', enabled: true },
-        { key: 'fr', enabled: true },
-      ];
+      const mockLanguages: Language[] = [{ key: 'en' }, { key: 'fr' }];
 
       languageRepository.getEnabledLanguages.mockResolvedValue(mockLanguages);
 
       const result = await languageService.getSupportedLanguages();
 
-      expect(result).toEqual([{ key: 'en' }, { key: 'fr' }]);
+      expect(result).toEqual(mockLanguages);
       expect(languageRepository.getEnabledLanguages).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('setLanguageEnabled', () => {
     it('should enable a language', async () => {
-      const request: EnableLanguageDto = { key: 'en', enabled: true };
       const mockLanguage: Language = { key: 'en' };
 
       languageRepository.getLanguageByKey.mockResolvedValue(mockLanguage);
       languageRepository.setLanguageEnabled.mockResolvedValue();
 
-      await languageService.setLanguageEnabled(request);
+      await languageService.setLanguageEnabled('en', true);
 
       expect(languageRepository.getLanguageByKey).toHaveBeenCalledWith('en');
       expect(languageRepository.setLanguageEnabled).toHaveBeenCalledWith('en', true);
     });
 
     it('should throw NotFoundException if language is not found', async () => {
-      const request: EnableLanguageDto = { key: 'nonexistent', enabled: true };
-
       languageRepository.getLanguageByKey.mockResolvedValue(undefined);
 
-      await expect(languageService.setLanguageEnabled(request)).rejects.toThrow(NotFoundException);
+      await expect(languageService.setLanguageEnabled('invalid', true)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
