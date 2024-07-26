@@ -104,10 +104,7 @@ export class ArticleService {
     opts: ArticleFindOptions,
   ): Promise<[ArticleResult[], number]> {
     const [items, total] = await this.articleRepository.getArticles(opts);
-    const shuffled = this.shuffleService.shuffleByKey(
-      items,
-      (article) => article.source?.id || 'unknown',
-    );
+    const shuffled = this.shuffleService.shuffleByKey(items, (article) => article.source.id);
     return [shuffled, total];
   }
 
