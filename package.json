@@ -39,7 +39,7 @@
     "nest-winston": "^1.9.4",
     "nestjs-http-logger": "^1.1.1",
     "pg": "^8.11.5",
-    "pulsefeed-common": "file:pulsefeed-common",
+    "@pulsefeed/common": "file:pulsefeed-common",
     "ramda": "^0.29.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
