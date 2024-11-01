@@ -4,12 +4,12 @@ import { CategoryResult } from '../category/type/category-result';
 import { ArticleFindOptions } from './type/article-find-options';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
+import { roundDownToNearestHalfHour } from '@pulsefeed/common';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ArticleSectionDto } from './dto/article-section.dto';
-import { roundDownToNearestHalfHour } from '@common/utils';
 import { ArticleResult } from './type/article-result';
-import { LoggerService } from '@common/logger';
-import { CacheService } from '@common/cache';
+import { LoggerService } from '@pulsefeed/common';
+import { CacheService } from '@pulsefeed/common';
 
 @Injectable()
 export class ArticleService {

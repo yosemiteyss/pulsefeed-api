@@ -1,5 +1,5 @@
+import { shuffle } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
-import { shuffle } from '@common/utils';
 
 @Injectable()
 export class ShuffleService {

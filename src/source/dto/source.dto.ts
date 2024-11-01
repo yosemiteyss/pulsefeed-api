@@ -1,4 +1,4 @@
-import { Source } from '@common/model';
+import { Source } from '@pulsefeed/common';
 
 export class SourceDto {
   readonly id: string;

@@ -1,9 +1,9 @@
 import { CategoryRepository } from './repository/category.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CategoryResult } from './type/category-result';
-import { ArticleCategoryEnum } from '@common/model';
-import { LoggerService } from '@common/logger';
-import { stringToEnum } from '@common/utils';
+import { ArticleCategoryEnum } from '@pulsefeed/common';
+import { LoggerService } from '@pulsefeed/common';
+import { stringToEnum } from '@pulsefeed/common';
 
 @Injectable()
 export class CategoryService {

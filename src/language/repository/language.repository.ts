@@ -1,7 +1,7 @@
 import { LanguageMapper } from './language.mapper';
+import { PrismaService } from '@pulsefeed/common';
+import { Language } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/db';
-import { Language } from '@common/model';
 
 @Injectable()
 export class LanguageRepository {

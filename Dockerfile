@@ -1,22 +1,31 @@
-FROM node:20
+# Stage 1: Build the application
+FROM node:20-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy packge.json
-COPY package*.json ./
-
-# Copy project
 COPY . .
 
-# Install app dependencies
+RUN apk --no-cache add git \
+    && git submodule init \
+    && git submodule update
+
 RUN npm ci
 
-# Run build
+RUN npm run prisma:generate
+
 RUN npm run build
 
-# Expose port
+# Stage 2: Create the final image with only the dist folder
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+
+COPY package.json package-lock.json ./
+
+RUN npm install --only=production
+
 EXPOSE 3000
 
-# Start prod build
 ENTRYPOINT ["npm", "run", "start:prod"]

@@ -1,6 +1,6 @@
 import { Source as SourceEntity } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
-import { Source } from '@common/model';
+import { Source } from '@pulsefeed/common';
 
 @Injectable()
 export class SourceMapper {

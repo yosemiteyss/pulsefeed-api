@@ -1,6 +1,6 @@
 import { Prisma, Language as LanguageEntity } from '@prisma/client';
+import { Language } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
-import { Language } from '@common/model';
 
 @Injectable()
 export class LanguageMapper {

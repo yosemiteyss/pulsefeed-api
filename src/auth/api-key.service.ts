@@ -1,6 +1,6 @@
 import { ApiKeyRepository } from './api-key.repository';
-import { LoggerService } from '@common/logger';
-import { CacheService } from '@common/cache';
+import { LoggerService } from '@pulsefeed/common';
+import { CacheService } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

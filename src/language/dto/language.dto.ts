@@ -1,4 +1,4 @@
-import { Language } from '@common/model';
+import { Language } from '@pulsefeed/common';
 
 export class LanguageDto {
   readonly key: string;

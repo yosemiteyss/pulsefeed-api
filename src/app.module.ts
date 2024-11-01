@@ -1,17 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { HmacMiddleware } from './auth/middleware/hmac.middleware';
-import { ConfigModule } from '@common/config/config.module';
+import { ConfigModule, DatabaseModule } from '@pulsefeed/common';
 import { CategoryModule } from './category/category.module';
 import { LanguageModule } from './language/language.module';
 import { ArticleModule } from './article/article.module';
 import { SourceModule } from './source/source.module';
 import { LoggerMiddleware } from 'nestjs-http-logger';
 import { AdminModule } from './admin/admin.module';
+import { LoggerModule } from '@pulsefeed/common';
 import { AuthModule } from './auth/auth.module';
-import { LoggerModule } from '@common/logger';
-import { CacheModule } from '@common/cache';
-import { DatabaseModule } from '@common/db';
+import { CacheModule } from '@pulsefeed/common';
 import { APP_GUARD } from '@nestjs/core';
 
 @Module({

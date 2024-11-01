@@ -1,5 +1,5 @@
-import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
 import { ArticleSectionRequestDto } from './dto/article-section-request.dto';
+import { ApiOkResponsePaginated, PageResponse } from '@pulsefeed/common';
 import { ArticleListRequestDto } from './dto/article-list-request.dto';
 import { ArticleSectionDto } from './dto/article-section.dto';
 import { CategoryDto } from '../category/dto/category.dto';
@@ -9,7 +9,6 @@ import { Body, Controller, Get } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleDto } from './dto/article.dto';
 import { Cacheable } from 'nestjs-cacheable';
-import { PageResponse } from '@common/dto';
 
 @ApiTags('article')
 @Controller('article')

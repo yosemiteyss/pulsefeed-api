@@ -1,7 +1,6 @@
-import { ApiOkResponsePaginated } from '@common/decorator/api-ok-response-paginated.decorator';
+import { ApiOkResponsePaginated, PageRequest, PageResponse } from '@pulsefeed/common';
 import { DEFAULT_PAGE_SIZE, DEFAULT_TTL } from '../shared/constants';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PageRequest, PageResponse } from '@common/dto';
 import { Body, Controller, Get } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { Cacheable } from 'nestjs-cacheable';

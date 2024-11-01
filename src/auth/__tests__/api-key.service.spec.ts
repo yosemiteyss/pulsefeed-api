@@ -2,8 +2,8 @@ import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { ApiKeyRepository } from '../api-key.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiKeyService } from '../api-key.service';
-import { LoggerService } from '@common/logger';
-import { CacheService } from '@common/cache';
+import { LoggerService } from '@pulsefeed/common';
+import { CacheService } from '@pulsefeed/common';
 
 describe('ApiKeyService', () => {
   let apiKeyService: ApiKeyService;

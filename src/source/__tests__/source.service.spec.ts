@@ -1,11 +1,11 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { SourceRepository } from '../repository/source.repository';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
+import { LanguageEnum, Source } from '@pulsefeed/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LanguageEnum, Source } from '@common/model';
 import { NotFoundException } from '@nestjs/common';
 import { SourceService } from '../source.service';
-import { LoggerService } from '@common/logger';
+import { LoggerService } from '@pulsefeed/common';
 import mock = jest.mock;
 
 describe('SourceService', () => {

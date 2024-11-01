@@ -23,7 +23,9 @@ jobs:
           node-version: 20.18.0
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm run prisma:generate
 
       - name: Run Test
         run: npm test
@@ -49,11 +51,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ env.VERSION_NAME }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ env.VERSION_NAME }}
-          tag_name: ${{ env.VERSION_NAME }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.CREATE_RELEASE_PAT }}

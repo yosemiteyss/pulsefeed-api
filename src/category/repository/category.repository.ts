@@ -1,7 +1,7 @@
+import { ArticleCategory } from '@pulsefeed/common';
 import { CategoryMapper } from './category.mapper';
-import { ArticleCategory } from '@common/model';
+import { PrismaService } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/db';
 
 @Injectable()
 export class CategoryRepository {

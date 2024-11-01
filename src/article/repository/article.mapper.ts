@@ -1,4 +1,4 @@
-import { ArticleCategoryEnum, LanguageEnum } from '@common/model';
+import { ArticleCategoryEnum, LanguageEnum } from '@pulsefeed/common';
 import { ArticleResult } from '../type/article-result';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';

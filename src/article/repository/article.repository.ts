@@ -1,8 +1,8 @@
 import { ArticleFindOptions } from '../type/article-find-options';
 import { ArticleResult } from '../type/article-result';
+import { PrismaService } from '@pulsefeed/common';
 import { ArticleMapper } from './article.mapper';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/db';
 import { Prisma } from '@prisma/client';
 
 @Injectable()

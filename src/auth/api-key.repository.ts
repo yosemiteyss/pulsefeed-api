@@ -1,6 +1,6 @@
+import { PrismaService } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@common/db';
-import { ApiKey } from '@common/model';
+import { ApiKey } from '@pulsefeed/common';
 
 @Injectable()
 export class ApiKeyRepository {

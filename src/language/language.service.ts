@@ -1,8 +1,8 @@
 import { LanguageRepository } from './repository/language.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Language, LanguageEnum } from '@common/model';
-import { LoggerService } from '@common/logger';
-import { stringToEnum } from '@common/utils';
+import { Language, LanguageEnum } from '@pulsefeed/common';
+import { LoggerService } from '@pulsefeed/common';
+import { stringToEnum } from '@pulsefeed/common';
 
 @Injectable()
 export class LanguageService {

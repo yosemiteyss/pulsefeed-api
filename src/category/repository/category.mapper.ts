@@ -2,7 +2,7 @@ import {
   ArticleCategory as CategoryEntity,
   ArticleCategoryTitle as CategoryTitleEntity,
 } from '@prisma/client';
-import { ArticleCategory, ArticleCategoryTitle } from '@common/model';
+import { ArticleCategory, ArticleCategoryTitle } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { Article, Source } from '@common/model';
+import { Article, Source } from '@pulsefeed/common';
 
 export type ArticleResult = {
   article: Article;

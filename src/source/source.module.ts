@@ -1,8 +1,8 @@
 import { SourceRepository } from './repository/source.repository';
 import { SourceMapper } from './repository/source.mapper';
 import { SourceController } from './source.controller';
+import { DatabaseModule } from '@pulsefeed/common';
 import { SourceService } from './source.service';
-import { DatabaseModule } from '@common/db';
 import { Module } from '@nestjs/common';
 
 @Module({

@@ -1,8 +1,8 @@
 import { Global, Module, OnModuleInit } from '@nestjs/common';
 import { ApiKeyRepository } from './api-key.repository';
+import { DatabaseModule } from '@pulsefeed/common';
 import { ApiKeyService } from './api-key.service';
-import { CacheModule } from '@common/cache';
-import { DatabaseModule } from '@common/db';
+import { CacheModule } from '@pulsefeed/common';
 
 @Global()
 @Module({

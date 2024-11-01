@@ -5,8 +5,8 @@ import { CategoryModule } from '../category/category.module';
 import { ArticleMapper } from './repository/article.mapper';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
-import { CacheModule } from '@common/cache';
-import { DatabaseModule } from '@common/db';
+import { DatabaseModule } from '@pulsefeed/common';
+import { CacheModule } from '@pulsefeed/common';
 import { Module } from '@nestjs/common';
 
 @Module({

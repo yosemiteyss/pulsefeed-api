@@ -1,7 +1,7 @@
 import { SourceRepository } from './repository/source.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { LoggerService } from '@common/logger';
-import { Source } from '@common/model';
+import { LoggerService } from '@pulsefeed/common';
+import { Source } from '@pulsefeed/common';
 
 @Injectable()
 export class SourceService {

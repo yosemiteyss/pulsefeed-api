@@ -1,5 +1,5 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { PageRequest } from '@common/dto';
+import { PageRequest } from '@pulsefeed/common';
 
 export class ArticleListRequestDto extends PageRequest {
   @IsString()

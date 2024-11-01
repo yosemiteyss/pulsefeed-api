@@ -3,8 +3,8 @@ import { LanguageRepository } from '../repository/language.repository';
 import { LanguageService } from '../language.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { LoggerService } from '@common/logger';
-import { Language } from '@common/model';
+import { LoggerService } from '@pulsefeed/common';
+import { Language } from '@pulsefeed/common';
 
 describe('LanguageService', () => {
   let languageService: LanguageService;
