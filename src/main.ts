@@ -1,6 +1,7 @@
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston/dist/winston.constants';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
@@ -24,9 +25,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   // Setup swagger document.
-  const config = new DocumentBuilder().setTitle('pf-api').setVersion('1.0').build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  const configService = app.get(ConfigService);
+  if (configService.get('NODE_ENV') === 'development') {
+    const config = new DocumentBuilder().setTitle('pf-api').setVersion('1.0').build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(3000, '0.0.0.0');
 
