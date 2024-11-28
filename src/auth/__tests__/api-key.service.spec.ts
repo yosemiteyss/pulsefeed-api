@@ -1,8 +1,8 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ApiKeyRepository } from '../api-key.repository';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiKeyService } from '../api-key.service';
-import { LoggerService } from '@pulsefeed/common';
 import { CacheService } from '@pulsefeed/common';
 
 describe('ApiKeyService', () => {
@@ -31,7 +31,7 @@ describe('ApiKeyService', () => {
           },
         },
         {
-          provide: LoggerService,
+          provide: WINSTON_MODULE_NEST_PROVIDER,
           useValue: mockLoggerService,
         },
       ],

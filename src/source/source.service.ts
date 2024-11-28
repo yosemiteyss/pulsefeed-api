@@ -1,13 +1,13 @@
+import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { SourceRepository } from './repository/source.repository';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { LoggerService } from '@pulsefeed/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Source } from '@pulsefeed/common';
 
 @Injectable()
 export class SourceService {
   constructor(
     private readonly sourceRepository: SourceRepository,
-    private readonly logger: LoggerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   async getSourceById(id: string): Promise<Source> {

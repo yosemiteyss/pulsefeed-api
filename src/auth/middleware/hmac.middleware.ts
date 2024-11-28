@@ -1,13 +1,19 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  LoggerService,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ApiKeyService } from '../api-key.service';
-import { LoggerService } from '@pulsefeed/common';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class HmacMiddleware implements NestMiddleware {
   constructor(
     private readonly apiKeyService: ApiKeyService,
-    private readonly logger: LoggerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   async use(req: any, res: any, next: (error?: any) => void) {

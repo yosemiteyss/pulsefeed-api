@@ -1,14 +1,14 @@
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ApiKeyRepository } from './api-key.repository';
-import { LoggerService } from '@pulsefeed/common';
 import { CacheService } from '@pulsefeed/common';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ApiKeyService {
   constructor(
     private readonly apiKeyRepository: ApiKeyRepository,
     private readonly cacheService: CacheService,
-    private readonly logger: LoggerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   async getDefaultKey(): Promise<string | undefined> {

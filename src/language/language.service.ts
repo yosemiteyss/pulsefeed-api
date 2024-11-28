@@ -1,14 +1,14 @@
+import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { LanguageRepository } from './repository/language.repository';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Language, LanguageEnum } from '@pulsefeed/common';
-import { LoggerService } from '@pulsefeed/common';
 import { stringToEnum } from '@pulsefeed/common';
 
 @Injectable()
 export class LanguageService {
   constructor(
     private readonly languageRepository: LanguageRepository,
-    private readonly logger: LoggerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   async getSupportedLanguages(): Promise<Language[]> {

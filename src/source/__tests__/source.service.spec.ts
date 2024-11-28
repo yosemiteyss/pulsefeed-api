@@ -1,12 +1,11 @@
 import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { SourceRepository } from '../repository/source.repository';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { LanguageEnum, Source } from '@pulsefeed/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { SourceService } from '../source.service';
-import { LoggerService } from '@pulsefeed/common';
-import mock = jest.mock;
 
 describe('SourceService', () => {
   let sourceService: SourceService;
@@ -25,7 +24,7 @@ describe('SourceService', () => {
           },
         },
         {
-          provide: LoggerService,
+          provide: WINSTON_MODULE_NEST_PROVIDER,
           useValue: mockLoggerService,
         },
       ],

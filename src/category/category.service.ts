@@ -1,15 +1,15 @@
+import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { CategoryRepository } from './repository/category.repository';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CategoryResult } from './type/category-result';
 import { ArticleCategoryEnum } from '@pulsefeed/common';
-import { LoggerService } from '@pulsefeed/common';
 import { stringToEnum } from '@pulsefeed/common';
 
 @Injectable()
 export class CategoryService {
   constructor(
     private readonly categoryRepository: CategoryRepository,
-    private readonly logger: LoggerService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   async getSupportedCategories(langKey: string): Promise<CategoryResult[]> {
