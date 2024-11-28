@@ -25,7 +25,7 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigModule,
     DatabaseModule,
     CacheModule,
-    LoggerModule.forRoot({ appName: 'pf-api' }),
+    LoggerModule,
     AuthModule,
     AdminModule,
     ArticleModule,
