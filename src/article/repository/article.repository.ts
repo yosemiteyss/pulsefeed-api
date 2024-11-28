@@ -1,4 +1,4 @@
-import { ArticleFindOptions } from '../type/article-find-options';
+import { ArticleListOptions } from '../type/article-list-options';
 import { ArticleResult } from '../type/article-result';
 import { PrismaService } from '@pulsefeed/common';
 import { ArticleMapper } from './article.mapper';
@@ -20,7 +20,8 @@ export class ArticleRepository {
     sourceId,
     publishedBefore,
     excludeIds,
-  }: ArticleFindOptions): Promise<[ArticleResult[], number]> {
+    searchTerm,
+  }: ArticleListOptions): Promise<[ArticleResult[], number]> {
     const whereClause: Prisma.ArticleWhereInput = {
       publishedAt: {
         lt: publishedBefore,
@@ -44,6 +45,14 @@ export class ArticleRepository {
         id: sourceId,
         enabled: true,
       };
+    }
+
+    // Search by title or description
+    if (searchTerm && searchTerm.length > 0) {
+      whereClause.OR = [
+        { title: { contains: searchTerm } },
+        { description: { contains: searchTerm } },
+      ];
     }
 
     if (excludeIds) {

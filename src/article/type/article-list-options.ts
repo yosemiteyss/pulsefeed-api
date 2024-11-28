@@ -1,9 +1,10 @@
-export interface ArticleFindOptions {
+export interface ArticleListOptions {
   readonly page: number;
   readonly limit: number;
-  readonly category?: string;
   readonly language: string;
-  readonly sourceId?: string;
   readonly publishedBefore: Date;
+  readonly category?: string;
+  readonly sourceId?: string;
   readonly excludeIds?: string[];
+  readonly searchTerm?: string;
 }

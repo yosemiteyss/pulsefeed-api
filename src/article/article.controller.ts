@@ -29,14 +29,15 @@ export class ArticleController {
     const limit = DEFAULT_PAGE_SIZE;
     const publishedBefore = ArticleService.getArticleRequestPublishedTime();
 
-    const [data, total] = await this.articleService.getArticleList(
+    const [data, total] = await this.articleService.getArticles(
       {
         page: request.page,
+        publishedBefore: publishedBefore,
         limit: limit,
         category: request.category,
         language: request.language,
         sourceId: request.sourceId,
-        publishedBefore: publishedBefore,
+        searchTerm: request.searchTerm,
       },
       request.excludeHomeArticles ?? false,
     );
@@ -50,14 +51,14 @@ export class ArticleController {
   @Cacheable({
     key: (request: ArticleSectionRequestDto) => {
       const publishedBefore = ArticleService.getArticleRequestPublishedTime();
-      return `pf:article:home:request:${JSON.stringify(request)}:publishedBefore:${publishedBefore}`;
+      return `pf:article:feed:request:${JSON.stringify(request)}:publishedBefore:${publishedBefore}`;
     },
     ttl: 2 * 60 * 60 * 1000, // 4 hours
   })
-  async listHomeFeed(
+  async listFeed(
     @Body() { language, sectionKey }: ArticleSectionRequestDto,
   ): Promise<ArticleSectionDto> {
-    const section = await this.articleService.getHomeFeed(language, sectionKey);
+    const section = await this.articleService.getFeed(language, sectionKey);
 
     return {
       category: CategoryDto.fromModel(section.category),

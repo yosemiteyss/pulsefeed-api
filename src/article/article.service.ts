@@ -2,7 +2,7 @@ import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/co
 import { ArticleRepository } from './repository/article.repository';
 import { ShuffleService } from '../shared/service/shuffle.service';
 import { CategoryResult } from '../category/type/category-result';
-import { ArticleFindOptions } from './type/article-find-options';
+import { ArticleListOptions } from './type/article-list-options';
 import { LanguageService } from '../language/language.service';
 import { CategoryService } from '../category/category.service';
 import { roundDownToNearestHalfHour } from '@pulsefeed/common';
@@ -22,7 +22,7 @@ export class ArticleService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async getHomeFeed(
+  async getFeed(
     langKey: string,
     sectionKey?: string,
   ): Promise<{
@@ -65,13 +65,13 @@ export class ArticleService {
     };
   }
 
-  async getArticleList(
-    opts: ArticleFindOptions,
-    excludeHomeArticles: boolean,
+  async getArticles(
+    opts: ArticleListOptions,
+    excludeFeedArticles: boolean,
   ): Promise<[ArticleResult[], number]> {
-    if (excludeHomeArticles) {
+    if (excludeFeedArticles) {
       const sections =
-        await this.cacheService.getByPrefix<ArticleSectionDto>('pf:article:home:request');
+        await this.cacheService.getByPrefix<ArticleSectionDto>('pf:article:feed:request');
       const articleIds = sections.flatMap((feed) => feed.articles).map((article) => article.id);
 
       opts = { ...opts, excludeIds: articleIds };
@@ -80,7 +80,7 @@ export class ArticleService {
     return this.getArticlesByOpts(opts);
   }
 
-  private async getArticlesByOpts(opts: ArticleFindOptions): Promise<[ArticleResult[], number]> {
+  private async getArticlesByOpts(opts: ArticleListOptions): Promise<[ArticleResult[], number]> {
     if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
       this.logger.warn(`category: ${opts.category} is not found`, ArticleService.name);
       throw new NotFoundException();
@@ -101,7 +101,7 @@ export class ArticleService {
    * Get filtered articles from database.
    */
   private async getFilteredArticlesFromDb(
-    opts: ArticleFindOptions,
+    opts: ArticleListOptions,
   ): Promise<[ArticleResult[], number]> {
     const [items, total] = await this.articleRepository.getArticles(opts);
     const shuffled = this.shuffleService.shuffleByKey(items, (article) => article.source.id);

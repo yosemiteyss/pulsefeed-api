@@ -13,6 +13,10 @@ export class ArticleListRequestDto extends PageRequest {
   @IsOptional()
   readonly sourceId?: string;
 
+  @IsString()
+  @IsOptional()
+  readonly searchTerm?: string;
+
   @IsBoolean()
   @IsOptional()
   readonly excludeHomeArticles?: boolean;
