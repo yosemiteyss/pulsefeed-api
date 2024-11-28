@@ -1,4 +1,4 @@
-import { Article, Source } from '@pulsefeed/common';
+import { Article, Source, ArticleCategory } from '@pulsefeed/common';
 
 export type ArticleResult = {
   article: Article;
