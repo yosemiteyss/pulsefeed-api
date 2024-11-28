@@ -33,7 +33,7 @@ export class ApiKeyService {
       await this.cacheService.setByKeyPrefix('pf:api-key', i, keys[i].key);
     }
 
-    this.logger.log(ApiKeyService.name, `Pushed api keys to cache: ${keys.length}`);
+    this.logger.log(`Pushed api keys to cache: ${keys.length}`, ApiKeyService.name);
   }
 
   async createKey(): Promise<string> {
@@ -47,7 +47,7 @@ export class ApiKeyService {
     // Save key to cache.
     await this.cacheService.setByKeyPrefix('pf:api-key', 0, entity.key);
 
-    this.logger.log(ApiKeyService.name, `Created new api key: ${entity.key}`);
+    this.logger.log(`Created new api key: ${entity.key}`, ApiKeyService.name);
 
     return entity.key;
   }

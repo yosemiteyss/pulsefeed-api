@@ -21,12 +21,12 @@ export class HmacMiddleware implements NestMiddleware {
     const timestamp = req.headers['x-timestamp'] as string;
 
     if (!signature) {
-      this.logger.warn(HmacMiddleware.name, `Invalid signature: ${signature}`);
+      this.logger.warn(`Invalid signature: ${signature}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 
     if (!timestamp) {
-      this.logger.warn(HmacMiddleware.name, `Invalid timestamp: ${timestamp}`);
+      this.logger.warn(`Invalid timestamp: ${timestamp}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 
@@ -40,14 +40,14 @@ export class HmacMiddleware implements NestMiddleware {
     const reqTimestamp = parseInt(timestamp, 10);
 
     if (isNaN(reqTimestamp) || Date.now() - reqTimestamp > timeDiffMs) {
-      this.logger.warn(HmacMiddleware.name, `Expired timestamp: ${timestamp} > ${reqTimestamp}`);
+      this.logger.warn(`Expired timestamp: ${timestamp} > ${reqTimestamp}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 
     const stringToSign =
       `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
-    //this.logger.log(HmacMiddleware.name, `stringToSign: ${stringToSign}`);
+    //this.logger.log(`stringToSign: ${stringToSign}`, HmacMiddleware.name);
 
     const computedSignature = crypto
       .createHmac('sha256', secretKey)

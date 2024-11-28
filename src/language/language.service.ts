@@ -19,7 +19,7 @@ export class LanguageService {
     const language = await this.languageRepository.getLanguageByKey(key);
 
     if (!language) {
-      this.logger.warn(LanguageService.name, `language not found: ${key}`);
+      this.logger.warn(`language not found: ${key}`, LanguageService.name);
       throw new NotFoundException();
     }
 

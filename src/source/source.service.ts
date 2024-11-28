@@ -14,7 +14,7 @@ export class SourceService {
     const source = await this.sourceRepository.getSourceById(id);
 
     if (!source) {
-      this.logger.warn(SourceService.name, `source not found: ${id}`);
+      this.logger.warn(`source not found: ${id}`, SourceService.name);
       throw new NotFoundException();
     }
 

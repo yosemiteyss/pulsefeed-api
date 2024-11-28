@@ -54,8 +54,8 @@ export class ArticleService {
     const nextSection = index + 1 >= topCategories.length ? undefined : topCategories[index + 1];
 
     this.logger.log(
-      ArticleService.name,
       `current index: ${index}, nextSection: ${nextSection?.key}`,
+      ArticleService.name,
     );
 
     return {
@@ -82,17 +82,17 @@ export class ArticleService {
 
   private async getArticlesByOpts(opts: ArticleFindOptions): Promise<[ArticleResult[], number]> {
     if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
-      this.logger.warn(ArticleService.name, `category: ${opts.category} is not found`);
+      this.logger.warn(`category: ${opts.category} is not found`, ArticleService.name);
       throw new NotFoundException();
     }
 
     if (!this.languageService.isSupportedLanguage(opts.language)) {
-      this.logger.warn(ArticleService.name, `language: ${opts.language} is not found`);
+      this.logger.warn(`language: ${opts.language} is not found`, ArticleService.name);
       throw new NotFoundException();
     }
 
     const [data, total] = await this.getFilteredArticlesFromDb(opts);
-    this.logger.log(ArticleService.name, 'Load articles from db.');
+    this.logger.log('Load articles from db.', ArticleService.name);
 
     return [data, total];
   }

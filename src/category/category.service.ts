@@ -20,7 +20,7 @@ export class CategoryService {
     const category = await this.categoryRepository.getCategoryByKey(key);
 
     if (!category) {
-      this.logger.warn(CategoryService.name, `category not found: ${key}`);
+      this.logger.warn(`category not found: ${key}`, CategoryService.name);
       throw new NotFoundException();
     }
 
