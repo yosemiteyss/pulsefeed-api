@@ -1,12 +1,11 @@
-import { LanguageRepository } from './repository/language.repository';
-import { LanguageMapper } from './repository/language.mapper';
+import { LanguageRepository, LanguageMapper } from './repository';
+import { CacheModule, DatabaseModule } from '@pulsefeed/common';
 import { LanguageController } from './language.controller';
 import { LanguageService } from './language.service';
-import { DatabaseModule } from '@pulsefeed/common';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, CacheModule],
   controllers: [LanguageController],
   providers: [LanguageService, LanguageRepository, LanguageMapper],
   exports: [LanguageService],

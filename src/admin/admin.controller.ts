@@ -5,17 +5,17 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import { EnableLanguageDto } from '../language/dto/enable-language.dto';
-import { EnableCategoryDto } from '../category/dto/enable-category.dto';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { EnableSourceDto } from '../source/dto/enable-source.dto';
-import { CreateApiKeyDto } from '../auth/dto/create-api-key.dto';
-import { CategoryService } from '../category/category.service';
-import { LanguageService } from '../language/language.service';
 import { ApiKeyService } from 'src/auth/api-key.service';
-import { SourceService } from '../source/source.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { EnableLanguageDto } from '../language';
+import { EnableCategoryDto } from '../category';
+import { CategoryService } from '../category';
+import { LanguageService } from '../language';
+import { EnableSourceDto } from '../source';
 import { AdminGuard } from './admin.guard';
+import { SourceService } from '../source';
+import { CreateApiKeyDto } from '../auth';
 
 @ApiTags('admin')
 @Controller('admin')
