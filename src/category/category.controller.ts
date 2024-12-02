@@ -1,10 +1,10 @@
-import { CategoryListRequestDto } from './dto/category-list-request.dto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { DEFAULT_TTL } from '../shared/constants';
-import { CategoryDto } from './dto/category.dto';
+import { CategoryListRequestDto } from './dto';
 import { Cacheable } from 'nestjs-cacheable';
+import { DEFAULT_TTL } from '../shared';
+import { CategoryDto } from './dto';
 
 @ApiTags('category')
 @Controller('category')

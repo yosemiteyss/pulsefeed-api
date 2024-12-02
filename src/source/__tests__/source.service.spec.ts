@@ -1,11 +1,11 @@
-import { mockLoggerService } from '../../shared/__tests__/logger.service.mock';
-import { SourceRepository } from '../repository/source.repository';
+import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { DEFAULT_PAGE_SIZE } from '../../shared/constants';
 import { LanguageEnum, Source } from '@pulsefeed/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { SourceService } from '../source.service';
+import { SourceRepository } from '../repository';
+import { DEFAULT_PAGE_SIZE } from '../../shared';
 
 describe('SourceService', () => {
   let sourceService: SourceService;

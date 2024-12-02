@@ -1,9 +1,9 @@
-import { mockLoggerService } from '../../shared/__tests__/logger.service.mock';
-import { LanguageRepository } from '../repository/language.repository';
+import { mockLoggerService } from '../../shared/mock/logger.service.mock';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { LanguageService } from '../language.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { LanguageRepository } from '../repository';
 import { Language } from '@pulsefeed/common';
 
 describe('LanguageService', () => {

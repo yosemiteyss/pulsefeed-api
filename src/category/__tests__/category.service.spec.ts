@@ -1,10 +1,10 @@
-import { mockLoggerService } from '../../shared/__tests__/logger.service.mock';
 import { CategoryRepository } from '../repository/category.repository';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CategoryService } from '../category.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ArticleCategory } from '@pulsefeed/common';
 import { NotFoundException } from '@nestjs/common';
+import { mockLoggerService } from "../../shared/mock/logger.service.mock";
 
 describe('CategoryService', () => {
   let categoryService: CategoryService;
