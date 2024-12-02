@@ -1,9 +1,9 @@
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { CategoryRepository } from './repository/category.repository';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { CategoryResult } from './type/category-result';
 import { ArticleCategoryEnum } from '@pulsefeed/common';
+import { CategoryRepository } from './repository';
 import { stringToEnum } from '@pulsefeed/common';
+import { CategoryResult } from './model';
 
 @Injectable()
 export class CategoryService {

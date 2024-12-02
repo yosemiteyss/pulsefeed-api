@@ -1,4 +1,4 @@
-import { mockLoggerService } from '../../shared/mock/logger.service.mock';
+import { mockLoggerService } from '../../shared/__tests__/logger.service.mock';
 import { CategoryRepository } from '../repository/category.repository';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CategoryService } from '../category.service';

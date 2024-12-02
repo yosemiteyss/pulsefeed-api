@@ -1,6 +1,14 @@
 import { Source } from '@pulsefeed/common';
 
 export class SourceDto {
+  constructor(id: string, title: string, link: string, image?: string, description?: string) {
+    this.id = id;
+    this.title = title;
+    this.link = link;
+    this.image = image;
+    this.description = description;
+  }
+
   readonly id: string;
   readonly title: string;
   readonly link: string;

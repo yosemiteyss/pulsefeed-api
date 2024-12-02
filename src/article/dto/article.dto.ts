@@ -1,34 +1,32 @@
-import { SourceDto } from '../../source/dto/source.dto';
-import { ArticleResult } from '../type/article-result';
+import { SourceDto } from '../../source';
+import { ArticleResult } from '../model';
 
-/**
- * Article DTO.
- */
 export class ArticleDto {
-  /**
-   * The id of this article.
-   */
+  constructor(
+    id: string,
+    title: string,
+    link: string,
+    description: string,
+    image: string,
+    source: SourceDto,
+    publishedAt?: Date,
+  ) {
+    this.id = id;
+    this.title = title;
+    this.link = link;
+    this.description = description;
+    this.image = image;
+    this.source = source;
+    this.publishedAt = publishedAt;
+  }
+
   readonly id: string;
-
-  /**
-   * The title of this article.
-   */
   readonly title: string;
-
-  /**
-   * The description of this article.
-   */
+  readonly link: string;
   readonly description?: string;
-
-  /**
-   * The image URL of this article.
-   */
-  readonly imageUrl?: string;
-
-  /**
-   * The date when this article was published.
-   */
-  readonly publishedAt: Date;
+  readonly image?: string;
+  readonly publishedAt?: Date;
+  readonly source: SourceDto;
 
   static fromModel({ article, source }: ArticleResult): ArticleDto {
     return {

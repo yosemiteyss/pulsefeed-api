@@ -1,15 +1,13 @@
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { ArticleRepository } from './repository/article.repository';
-import { ShuffleService } from '../shared/service/shuffle.service';
-import { CategoryResult } from '../category/type/category-result';
-import { ArticleListOptions } from './type/article-list-options';
-import { LanguageService } from '../language/language.service';
-import { CategoryService } from '../category/category.service';
 import { roundDownToNearestHalfHour } from '@pulsefeed/common';
-import { ArticleSectionDto } from './dto/article-section.dto';
+import { CategoryResult, CategoryService } from '../category';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ArticleResult } from './type/article-result';
+import { ArticleListOptions, ArticleResult } from './model';
 import { CacheService } from '@pulsefeed/common';
+import { ArticleRepository } from './repository';
+import { LanguageService } from '../language';
+import { ShuffleService } from '../shared';
+import { ArticleSectionDto } from './dto';
 
 @Injectable()
 export class ArticleService {

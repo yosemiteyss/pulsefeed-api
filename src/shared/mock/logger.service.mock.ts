@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 export const mockLoggerService = {
   log: jest.fn(),
   error: jest.fn(),

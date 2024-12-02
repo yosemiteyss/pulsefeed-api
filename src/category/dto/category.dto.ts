@@ -1,6 +1,12 @@
-import { CategoryResult } from '../type/category-result';
+import { CategoryResult } from '../model';
 
 export class CategoryDto {
+  constructor(key: string, name: string, priority: number) {
+    this.key = key;
+    this.name = name;
+    this.priority = priority;
+  }
+
   readonly key: string;
   readonly name: string;
   readonly priority: number;

@@ -1,4 +1,4 @@
-import { mockLoggerService } from '../../../shared/mock/logger.service.mock';
+import { mockLoggerService } from '../../../shared/__tests__/logger.service.mock';
 import { UnauthorizedException } from '@nestjs/common';
 import { HmacMiddleware } from '../hmac.middleware';
 import crypto from 'crypto';
