@@ -1,10 +1,11 @@
 import { Inject, Injectable, LoggerService, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ArticleCategoryEnum, CacheService, stringToEnum } from '@pulsefeed/common';
+import { CACHE_KEY_CATEGORY_LIST, cacheKeyCategoryList } from './cache.constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { cacheKeyLangList } from './cache.constants';
 import { CategoryRepository } from './repository';
+import { CACHE_KEY_ARTICLE } from '../article';
 import { LanguageService } from '../language';
-import { DEFAULT_TTL } from '../shared';
+import { ONE_DAY_IN_MS } from '../shared';
 import { CategoryItem } from './model';
 
 @Injectable()
@@ -30,10 +31,27 @@ export class CategoryService implements OnModuleInit {
    */
   async getTranslatedCategories(langKey: string): Promise<CategoryItem[]> {
     return this.cacheService.wrap(
-      cacheKeyLangList(langKey),
-      () => this.categoryRepository.getCategoryByLang(langKey),
-      DEFAULT_TTL,
+      cacheKeyCategoryList(langKey),
+      () => this.categoryRepository.getCategoriesByLang(langKey),
+      ONE_DAY_IN_MS,
     );
+  }
+
+  /**
+   * Return category with translated title.
+   * @param categoryKey the key of the category.
+   * @param languageKey the key of the language.
+   */
+  async getTranslatedCategory(categoryKey: string, languageKey: string): Promise<CategoryItem> {
+    const categories = await this.getTranslatedCategories(languageKey);
+    const category = categories.find((category) => category.key === categoryKey);
+
+    if (!category) {
+      this.logger.error(`category not found: ${categoryKey}`, CategoryService.name);
+      throw new NotFoundException();
+    }
+
+    return category;
   }
 
   /**
@@ -45,11 +63,14 @@ export class CategoryService implements OnModuleInit {
     const category = await this.categoryRepository.getCategoryByKey(key);
 
     if (!category) {
-      this.logger.warn(`category not found: ${key}`, CategoryService.name);
+      this.logger.error(`category not found: ${key}`, CategoryService.name);
       throw new NotFoundException();
     }
 
     await this.categoryRepository.setCategoryEnabled(category.key, enabled);
+
+    await this.cacheService.delByPrefix(CACHE_KEY_CATEGORY_LIST);
+    await this.cacheService.delByPrefix(CACHE_KEY_ARTICLE);
   }
 
   /**

@@ -36,6 +36,16 @@ export class SourceRepository {
     return [models, total];
   }
 
+  async getAllEnabledSources(): Promise<Source[]> {
+    const sources = await this.prismaService.source.findMany({
+      where: {
+        enabled: true,
+      },
+    });
+
+    return sources.map((source) => this.sourceMapper.sourceEntityToModel(source));
+  }
+
   async setSourceEnabled(id: string, enabled: boolean) {
     await this.prismaService.source.update({
       where: {

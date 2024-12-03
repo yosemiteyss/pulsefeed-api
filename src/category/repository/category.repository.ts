@@ -1,6 +1,7 @@
 import { ArticleCategory, PrismaService } from '@pulsefeed/common';
 import { CategoryMapper } from './category.mapper';
 import { Injectable } from '@nestjs/common';
+import { CategoryItem } from '../model';
 
 @Injectable()
 export class CategoryRepository {
@@ -33,9 +34,7 @@ export class CategoryRepository {
     return result.map((category) => this.categoryMapper.categoryEntityToModel(category));
   }
 
-  async getCategoryByLang(
-    languageKey: string,
-  ): Promise<{ key: string; title: string; priority: number }[]> {
+  async getCategoriesByLang(languageKey: string): Promise<CategoryItem[]> {
     const result = await this.prismaService.articleCategoryTitle.findMany({
       include: {
         category: true,

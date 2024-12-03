@@ -1,5 +1,4 @@
-import { SourceDto } from '../../source';
-import { ArticleResult } from '../model';
+import { Article } from '@pulsefeed/common';
 
 export class ArticleDto {
   constructor(
@@ -8,15 +7,17 @@ export class ArticleDto {
     link: string,
     description: string,
     image: string,
-    source: SourceDto,
+    categoryKey: string,
+    sourceId: string,
     publishedAt?: Date,
   ) {
     this.id = id;
     this.title = title;
     this.link = link;
     this.description = description;
-    this.image = image;
-    this.source = source;
+    this.imageUrl = image;
+    this.categoryKey = categoryKey;
+    this.sourceId = sourceId;
     this.publishedAt = publishedAt;
   }
 
@@ -24,19 +25,21 @@ export class ArticleDto {
   readonly title: string;
   readonly link: string;
   readonly description?: string;
-  readonly image?: string;
+  readonly imageUrl?: string;
+  readonly categoryKey: string;
+  readonly sourceId: string;
   readonly publishedAt?: Date;
-  readonly source: SourceDto;
 
-  static fromModel({ article, source }: ArticleResult): ArticleDto {
+  static fromModel(article: Article): ArticleDto {
     return {
       id: article.id,
       title: article.title,
       description: article.description,
-      image: article.image,
+      imageUrl: article.image,
       link: article.link,
+      categoryKey: article.category,
+      sourceId: article.sourceId,
       publishedAt: article.publishedAt ?? article.createdAt,
-      source: SourceDto.fromModel(source),
     };
   }
 }

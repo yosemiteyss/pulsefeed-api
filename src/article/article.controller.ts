@@ -4,11 +4,12 @@ import {
   ArticleDto,
   ArticleSectionRequestDto,
 } from './dto';
+import { cacheKeyArticleFeed, cacheKeyArticleList } from './cache.constants';
 import { ApiOkResponsePaginated, PageResponse } from '@pulsefeed/common';
+import { DEFAULT_PAGE_SIZE, TWELVE_HOUR_IN_MS } from '../shared';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get } from '@nestjs/common';
-import { ArticleService } from './article.service';
-import { DEFAULT_PAGE_SIZE } from '../shared';
+import { ArticleService } from './service/article.service';
 import { Cacheable } from 'nestjs-cacheable';
 import { CategoryDto } from '../category';
 
@@ -23,9 +24,9 @@ export class ArticleController {
   @Cacheable({
     key: (request: ArticleListRequestDto) => {
       const publishedBefore = ArticleService.getArticleRequestPublishedTime();
-      return `pf:article:list:request:${JSON.stringify(request)}:publishedBefore:${publishedBefore}`;
+      return cacheKeyArticleList(request, publishedBefore);
     },
-    ttl: 2 * 60 * 60 * 1000, // 4 hours
+    ttl: TWELVE_HOUR_IN_MS,
   })
   async listArticle(@Body() request: ArticleListRequestDto): Promise<PageResponse<ArticleDto>> {
     const limit = DEFAULT_PAGE_SIZE;
@@ -44,8 +45,8 @@ export class ArticleController {
       request.excludeFeedArticles ?? false,
     );
 
-    const articleList = data.map((article) => ArticleDto.fromModel(article));
-    return new PageResponse<ArticleDto>(articleList, total, request.page, limit);
+    const articles = data.map((result) => ArticleDto.fromModel(result.article));
+    return new PageResponse<ArticleDto>(articles, total, request.page, limit);
   }
 
   @Get('/home')
@@ -53,19 +54,19 @@ export class ArticleController {
   @Cacheable({
     key: (request: ArticleSectionRequestDto) => {
       const publishedBefore = ArticleService.getArticleRequestPublishedTime();
-      return `pf:article:feed:request:${JSON.stringify(request)}:publishedBefore:${publishedBefore}`;
+      return cacheKeyArticleFeed(request, publishedBefore);
     },
-    ttl: 2 * 60 * 60 * 1000, // 4 hours
+    ttl: TWELVE_HOUR_IN_MS,
   })
   async listFeed(
     @Body() { language, sectionKey }: ArticleSectionRequestDto,
   ): Promise<ArticleSectionDto> {
-    const section = await this.articleService.getFeed(language, sectionKey);
+    const feed = await this.articleService.getFeed(language, sectionKey);
 
     return {
-      category: CategoryDto.fromModel(section.category),
-      articles: section.articles.map((article) => ArticleDto.fromModel(article)),
-      nextSectionKey: section.nextSectionKey,
+      category: CategoryDto.fromModel(feed.category),
+      articles: feed.articles.map((result) => ArticleDto.fromModel(result.article)),
+      nextSectionKey: feed.nextSectionKey,
     };
   }
 }

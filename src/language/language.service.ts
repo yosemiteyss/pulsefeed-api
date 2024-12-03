@@ -3,7 +3,7 @@ import { CacheService, Language, LanguageEnum, stringToEnum } from '@pulsefeed/c
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CACHE_KEY_LANG_LIST } from './cache.constants';
 import { LanguageRepository } from './repository';
-import { DEFAULT_TTL } from '../shared';
+import { ONE_DAY_IN_MS } from '../shared';
 
 @Injectable()
 export class LanguageService implements OnModuleInit {
@@ -29,7 +29,7 @@ export class LanguageService implements OnModuleInit {
     return this.cacheService.wrap(
       CACHE_KEY_LANG_LIST,
       () => this.languageRepository.getEnabledLanguages(),
-      DEFAULT_TTL,
+      ONE_DAY_IN_MS,
     );
   }
 
@@ -56,6 +56,7 @@ export class LanguageService implements OnModuleInit {
   async setLanguageEnabled(key: string, enabled: boolean) {
     const language = await this.getLanguageByKey(key);
     await this.languageRepository.setLanguageEnabled(language.key, enabled);
+    await this.cacheService.delete(CACHE_KEY_LANG_LIST);
   }
 
   /**

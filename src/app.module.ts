@@ -5,6 +5,7 @@ import { LoggerMiddleware } from 'nestjs-http-logger';
 import { HmacMiddleware, AuthModule } from './auth';
 import { CategoryModule } from './category';
 import { LanguageModule } from './language';
+import { ONE_SECOND_IN_MS } from './shared';
 import { ArticleModule } from './article';
 import { APP_GUARD } from '@nestjs/core';
 import { SourceModule } from './source';
@@ -15,7 +16,7 @@ import { AdminModule } from './admin';
     ThrottlerModule.forRoot([
       // No more than 5 calls in a second.
       {
-        ttl: 1000,
+        ttl: ONE_SECOND_IN_MS,
         limit: 5,
       },
     ]),

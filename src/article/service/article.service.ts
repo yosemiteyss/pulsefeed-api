@@ -1,12 +1,12 @@
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { roundDownToNearestHalfHour, CacheService } from '@pulsefeed/common';
+import { ArticleResult, ArticleListOptions, FeedResult } from '../model';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { CategoryItem, CategoryService } from '../category';
-import { ArticleListOptions, ArticleResult } from './model';
-import { ArticleRepository } from './repository';
-import { LanguageService } from '../language';
-import { ShuffleService } from '../shared';
-import { ArticleSectionDto } from './dto';
+import { ArticleRepository } from '../repository';
+import { CategoryService } from '../../category';
+import { LanguageService } from '../../language';
+import { ShuffleService } from '../../shared';
+import { ArticleSectionDto } from '../dto';
 
 @Injectable()
 export class ArticleService {
@@ -19,14 +19,12 @@ export class ArticleService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async getFeed(
-    langKey: string,
-    sectionKey?: string,
-  ): Promise<{
-    category: CategoryItem;
-    articles: ArticleResult[];
-    nextSectionKey?: string;
-  }> {
+  /**
+   * Returns home feed.
+   * @param langKey the language key.
+   * @param sectionKey the section key.
+   */
+  async getFeed(langKey: string, sectionKey?: string): Promise<FeedResult> {
     const categories = await this.categoryService.getTranslatedCategories(langKey);
     const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
@@ -62,6 +60,11 @@ export class ArticleService {
     };
   }
 
+  /**
+   * Returns article list.
+   * @param opts the options for filtering articles.
+   * @param excludeFeedArticles true to exclude articles already presented in feed.
+   */
   async getArticles(
     opts: ArticleListOptions,
     excludeFeedArticles: boolean,
@@ -79,29 +82,23 @@ export class ArticleService {
 
   private async getArticlesByOpts(opts: ArticleListOptions): Promise<[ArticleResult[], number]> {
     if (opts.category && !this.categoryService.isSupportedCategory(opts.category)) {
-      this.logger.warn(`category: ${opts.category} is not found`, ArticleService.name);
+      this.logger.error(`category: ${opts.category} is not found`, ArticleService.name);
       throw new NotFoundException();
     }
 
     if (!this.languageService.isSupportedLanguage(opts.language)) {
-      this.logger.warn(`language: ${opts.language} is not found`, ArticleService.name);
+      this.logger.error(`language: ${opts.language} is not found`, ArticleService.name);
       throw new NotFoundException();
     }
 
-    const [data, total] = await this.getFilteredArticlesFromDb(opts);
-    this.logger.log('Load articles from db.', ArticleService.name);
+    const [articles, total] = await this.articleRepository.getArticles(opts);
+    this.logger.log(
+      `Load articles from db, size: ${articles.length}, total: ${total}`,
+      ArticleService.name,
+    );
 
-    return [data, total];
-  }
+    const shuffled = this.shuffleService.shuffleByKey(articles, (article) => article.source.id);
 
-  /**
-   * Get filtered articles from database.
-   */
-  private async getFilteredArticlesFromDb(
-    opts: ArticleListOptions,
-  ): Promise<[ArticleResult[], number]> {
-    const [items, total] = await this.articleRepository.getArticles(opts);
-    const shuffled = this.shuffleService.shuffleByKey(items, (article) => article.source.id);
     return [shuffled, total];
   }
 

@@ -21,12 +21,12 @@ export class HmacMiddleware implements NestMiddleware {
     const timestamp = req.headers['x-timestamp'] as string;
 
     if (!signature) {
-      this.logger.warn(`Invalid signature: ${signature}`, HmacMiddleware.name);
+      this.logger.error(`Invalid signature: ${signature}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 
     if (!timestamp) {
-      this.logger.warn(`Invalid timestamp: ${timestamp}`, HmacMiddleware.name);
+      this.logger.error(`Invalid timestamp: ${timestamp}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 
@@ -40,7 +40,7 @@ export class HmacMiddleware implements NestMiddleware {
     const reqTimestamp = parseInt(timestamp, 10);
 
     if (isNaN(reqTimestamp) || Date.now() - reqTimestamp > timeDiffMs) {
-      this.logger.warn(`Expired timestamp: ${timestamp} > ${reqTimestamp}`, HmacMiddleware.name);
+      this.logger.error(`Expired timestamp: ${timestamp} > ${reqTimestamp}`, HmacMiddleware.name);
       throw new UnauthorizedException();
     }
 

@@ -10,15 +10,7 @@ describe('PostGridTileBlock', () => {
 
     const categoryDto = new CategoryDto('key', 'name', 1.0);
     const sourceDto = new SourceDto('id', 'title', 'link', 'image', 'description');
-    const articleDto = new ArticleDto(
-      'id',
-      'title',
-      'link',
-      'description',
-      'image',
-      sourceDto,
-      publishedAt,
-    );
+    const articleDto = new ArticleDto('id', 'title', 'link', 'description', 'image', publishedAt);
 
     const block = new PostGridTileBlock(
       articleDto,
