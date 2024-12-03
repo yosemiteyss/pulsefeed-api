@@ -4,3 +4,4 @@ export * from './dto';
 export * from './category.module';
 export * from './category.service';
 export * from './category.controller';
+export * from './cache.constants';

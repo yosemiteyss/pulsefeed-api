@@ -1,7 +1,6 @@
-import { PrismaService } from '@pulsefeed/common';
+import { PrismaService, Source } from '@pulsefeed/common';
 import { SourceMapper } from './source.mapper';
 import { Injectable } from '@nestjs/common';
-import { Source } from '@pulsefeed/common';
 
 @Injectable()
 export class SourceRepository {

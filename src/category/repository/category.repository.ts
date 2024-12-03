@@ -1,6 +1,5 @@
-import { ArticleCategory } from '@pulsefeed/common';
+import { ArticleCategory, PrismaService } from '@pulsefeed/common';
 import { CategoryMapper } from './category.mapper';
-import { PrismaService } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

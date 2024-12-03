@@ -1,14 +1,16 @@
-import { ArticleSectionRequestDto } from './dto/article-section-request.dto';
+import {
+  ArticleListRequestDto,
+  ArticleSectionDto,
+  ArticleDto,
+  ArticleSectionRequestDto,
+} from './dto';
 import { ApiOkResponsePaginated, PageResponse } from '@pulsefeed/common';
-import { ArticleListRequestDto } from './dto/article-list-request.dto';
-import { ArticleSectionDto } from './dto/article-section.dto';
-import { CategoryDto } from '../category/dto/category.dto';
-import { DEFAULT_PAGE_SIZE } from '../shared/constants';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { ArticleDto } from './dto/article.dto';
+import { DEFAULT_PAGE_SIZE } from '../shared';
 import { Cacheable } from 'nestjs-cacheable';
+import { CategoryDto } from '../category';
 
 @ApiTags('article')
 @Controller('article')
@@ -39,7 +41,7 @@ export class ArticleController {
         sourceId: request.sourceId,
         searchTerm: request.searchTerm,
       },
-      request.excludeHomeArticles ?? false,
+      request.excludeFeedArticles ?? false,
     );
 
     const articleList = data.map((article) => ArticleDto.fromModel(article));

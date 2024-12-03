@@ -1,9 +1,8 @@
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { roundDownToNearestHalfHour } from '@pulsefeed/common';
-import { CategoryResult, CategoryService } from '../category';
+import { roundDownToNearestHalfHour, CacheService } from '@pulsefeed/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { CategoryItem, CategoryService } from '../category';
 import { ArticleListOptions, ArticleResult } from './model';
-import { CacheService } from '@pulsefeed/common';
 import { ArticleRepository } from './repository';
 import { LanguageService } from '../language';
 import { ShuffleService } from '../shared';
@@ -24,11 +23,11 @@ export class ArticleService {
     langKey: string,
     sectionKey?: string,
   ): Promise<{
-    category: CategoryResult;
+    category: CategoryItem;
     articles: ArticleResult[];
     nextSectionKey?: string;
   }> {
-    const categories = await this.categoryService.getSupportedCategories(langKey);
+    const categories = await this.categoryService.getTranslatedCategories(langKey);
     const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
     // Find category section index.

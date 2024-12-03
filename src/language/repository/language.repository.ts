@@ -1,6 +1,5 @@
+import { PrismaService, Language } from '@pulsefeed/common';
 import { LanguageMapper } from './language.mapper';
-import { PrismaService } from '@pulsefeed/common';
-import { Language } from '@pulsefeed/common';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

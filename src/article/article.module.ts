@@ -1,12 +1,10 @@
-import { ArticleRepository } from './repository/article.repository';
-import { ShuffleService } from '../shared/service/shuffle.service';
-import { LanguageModule } from '../language/language.module';
-import { CategoryModule } from '../category/category.module';
-import { ArticleMapper } from './repository/article.mapper';
+import { DatabaseModule, CacheModule } from '@pulsefeed/common';
+import { ArticleRepository, ArticleMapper } from './repository';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
-import { DatabaseModule } from '@pulsefeed/common';
-import { CacheModule } from '@pulsefeed/common';
+import { LanguageModule } from '../language';
+import { CategoryModule } from '../category';
+import { ShuffleService } from '../shared';
 import { Module } from '@nestjs/common';
 
 @Module({

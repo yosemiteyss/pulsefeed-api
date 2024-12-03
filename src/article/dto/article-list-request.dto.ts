@@ -19,5 +19,5 @@ export class ArticleListRequestDto extends PageRequest {
 
   @IsBoolean()
   @IsOptional()
-  readonly excludeHomeArticles?: boolean;
+  readonly excludeFeedArticles?: boolean;
 }

@@ -1,12 +1,12 @@
-import { CategoryRepository } from './repository/category.repository';
-import { CategoryMapper } from './repository/category.mapper';
+import { CategoryRepository, CategoryMapper } from './repository';
+import { CacheModule, DatabaseModule } from '@pulsefeed/common';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
-import { DatabaseModule } from '@pulsefeed/common';
+import { LanguageModule } from '../language';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, CacheModule, LanguageModule],
   controllers: [CategoryController],
   providers: [CategoryService, CategoryRepository, CategoryMapper],
   exports: [CategoryService],

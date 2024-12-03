@@ -1,4 +1,4 @@
-import { CategoryResult } from '../model';
+import { CategoryItem } from '../model';
 
 export class CategoryDto {
   constructor(key: string, name: string, priority: number) {
@@ -11,7 +11,7 @@ export class CategoryDto {
   readonly name: string;
   readonly priority: number;
 
-  static fromModel(model: CategoryResult): CategoryDto {
+  static fromModel(model: CategoryItem): CategoryDto {
     return {
       key: model.key,
       name: model.title,

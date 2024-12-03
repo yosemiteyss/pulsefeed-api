@@ -1,8 +1,8 @@
-import { CategoryModule } from '../category/category.module';
-import { LanguageModule } from '../language/language.module';
-import { SourceModule } from '../source/source.module';
 import { AdminController } from './admin.controller';
 import { TerminusModule } from '@nestjs/terminus';
+import { CategoryModule } from '../category';
+import { LanguageModule } from '../language';
+import { SourceModule } from '../source';
 import { Module } from '@nestjs/common';
 
 @Module({
