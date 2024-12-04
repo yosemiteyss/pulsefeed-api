@@ -6,7 +6,7 @@ export class ArticleDto {
     title: string,
     link: string,
     description: string,
-    image: string,
+    imageUrl: string,
     categoryKey: string,
     sourceId: string,
     publishedAt?: Date,
@@ -15,7 +15,7 @@ export class ArticleDto {
     this.title = title;
     this.link = link;
     this.description = description;
-    this.imageUrl = image;
+    this.imageUrl = imageUrl;
     this.categoryKey = categoryKey;
     this.sourceId = sourceId;
     this.publishedAt = publishedAt;

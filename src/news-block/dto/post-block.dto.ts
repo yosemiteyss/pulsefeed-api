@@ -9,7 +9,7 @@ import { SourceDto } from '../../source';
  */
 export abstract class PostBlock extends NewsBlock {
   protected constructor(
-    type: string = PostBlock.identifier,
+    type: string,
     article: ArticleDto,
     category: CategoryDto,
     source: SourceDto,

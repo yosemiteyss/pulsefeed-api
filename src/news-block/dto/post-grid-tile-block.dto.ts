@@ -16,17 +16,8 @@ export class PostGridTileBlock extends PostBlock {
     source: SourceDto,
     action: BlockAction,
     isPremium: boolean = false,
-    isContentOverlaid: boolean = false,
   ) {
-    super(
-      PostGridTileBlock.identifier,
-      article,
-      category,
-      source,
-      action,
-      isPremium,
-      isContentOverlaid,
-    );
+    super(PostGridTileBlock.identifier, article, category, source, action, isPremium, true);
   }
 
   /**

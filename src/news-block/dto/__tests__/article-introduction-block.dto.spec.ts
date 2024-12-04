@@ -10,10 +10,10 @@ describe('ArticleIntroductionBlock', () => {
   it('should serialize to JSON correctly', () => {
     const block = new ArticleIntroductionBlock(
       'Article Title',
-      'https://example.com/image.jpg',
       categoryDto,
       sourceDto,
       publishedAt,
+      'image',
       true,
     );
 
@@ -22,7 +22,7 @@ describe('ArticleIntroductionBlock', () => {
     const expectedJson = {
       type: '__article_introduction__',
       title: 'Article Title',
-      imageUrl: 'https://example.com/image.jpg',
+      imageUrl: 'image',
       category: categoryDto,
       source: sourceDto,
       publishedAt: publishedAt.toISOString(),

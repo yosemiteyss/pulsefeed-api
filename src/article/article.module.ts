@@ -1,4 +1,3 @@
-import { FeedService } from './service/feed.service';
 import { DatabaseModule, CacheModule } from '@pulsefeed/common';
 import { ArticleRepository, ArticleMapper } from './repository';
 import { ArticleService } from './service/article.service';
@@ -11,7 +10,7 @@ import { Module } from '@nestjs/common';
 @Module({
   imports: [DatabaseModule, CacheModule, CategoryModule, LanguageModule],
   controllers: [ArticleController],
-  providers: [ArticleService, ArticleRepository, ArticleMapper, ShuffleService, FeedService],
+  providers: [ArticleService, ArticleRepository, ArticleMapper, ShuffleService],
   exports: [ArticleService],
 })
 export class ArticleModule {}

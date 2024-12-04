@@ -5,18 +5,18 @@ export class SourceDto {
     this.id = id;
     this.title = title;
     this.link = link;
-    this.image = image;
+    this.imageUrl = image;
     this.description = description;
   }
 
   readonly id: string;
   readonly title: string;
   readonly link: string;
-  readonly image?: string;
+  readonly imageUrl?: string;
   readonly description?: string;
 
   static fromModel(model: Source): SourceDto {
     const { id, title, link, image, description } = model;
-    return { id, title, link, image, description };
+    return { id, title, link, imageUrl: image, description };
   }
 }

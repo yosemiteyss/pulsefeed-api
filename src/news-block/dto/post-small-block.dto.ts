@@ -14,17 +14,8 @@ export class PostSmallBlock extends PostBlock {
     source: SourceDto,
     action: BlockAction,
     isPremium: boolean = false,
-    isContentOverlaid: boolean = false,
   ) {
-    super(
-      PostSmallBlock.identifier,
-      article,
-      category,
-      source,
-      action,
-      isPremium,
-      isContentOverlaid,
-    );
+    super(PostSmallBlock.identifier, article, category, source, action, isPremium, false);
   }
 
   /**

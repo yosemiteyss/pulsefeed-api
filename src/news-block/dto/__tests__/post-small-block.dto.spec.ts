@@ -9,7 +9,16 @@ describe('PostSmallBlock', () => {
     const publishedAt = new Date();
     const categoryDto = new CategoryDto('key', 'name', 1.0);
     const sourceDto = new SourceDto('id', 'title', 'link', 'image', 'description');
-    const articleDto = new ArticleDto('id', 'title', 'link', 'description', 'image', publishedAt);
+    const articleDto = new ArticleDto(
+      'id',
+      'title',
+      'link',
+      'description',
+      'image',
+      'category',
+      'source',
+      publishedAt,
+    );
 
     const block = new PostSmallBlock(
       articleDto,
@@ -26,15 +35,10 @@ describe('PostSmallBlock', () => {
         title: 'title',
         link: 'link',
         description: 'description',
-        image: 'image',
+        imageUrl: 'image',
+        categoryKey: 'category',
+        sourceId: 'source',
         publishedAt: articleDto.publishedAt?.toISOString(),
-        source: {
-          id: 'id',
-          title: 'title',
-          link: 'link',
-          image: 'image',
-          description: 'description',
-        },
       },
       category: {
         key: 'key',
@@ -45,7 +49,7 @@ describe('PostSmallBlock', () => {
         id: 'id',
         title: 'title',
         link: 'link',
-        image: 'image',
+        imageUrl: 'image',
         description: 'description',
       },
       action: {

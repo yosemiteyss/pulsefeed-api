@@ -8,18 +8,18 @@ import { SourceDto } from '../../source';
 export class ArticleIntroductionBlock extends NewsBlock {
   constructor(
     title: string,
-    imageUrl: string,
     category: CategoryDto,
     source: SourceDto,
     publishedAt: Date,
+    imageUrl?: string,
     isPremium: boolean = false,
   ) {
     super(ArticleIntroductionBlock.identifier);
     this.title = title;
-    this.imageUrl = imageUrl;
     this.category = category;
     this.source = source;
     this.publishedAt = publishedAt;
+    this.imageUrl = imageUrl;
     this.isPremium = isPremium;
   }
 
@@ -36,7 +36,7 @@ export class ArticleIntroductionBlock extends NewsBlock {
   /**
    * The image URL of the associated article.
    */
-  readonly imageUrl: string;
+  readonly imageUrl?: string;
 
   /**
    * The category of the associated article.
