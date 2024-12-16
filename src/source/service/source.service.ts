@@ -7,8 +7,8 @@ import {
 } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE, ResponseCacheKeys } from '../../shared';
+import { EnableSourceRequest, SourceResponse } from '../dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { SourceResponse } from '../dto';
 
 @Injectable()
 export class SourceService {
@@ -48,15 +48,14 @@ export class SourceService {
 
   /**
    * Enable or disable source.
-   * @param id the id of the source.
-   * @param enabled true to enable language.
+   * @param request enable source request.
    */
-  async setSourceEnabled(id: string, enabled: boolean) {
-    const source = await this.sourceRepository.getSource(id);
+  async setSourceEnabled(request: EnableSourceRequest) {
+    const source = await this.sourceRepository.getSource(request.id);
     if (!source) {
       throw new NotFoundException('Source is not found.');
     }
-    await this.sourceRepository.setSourceEnabled(source.id, enabled);
+    await this.sourceRepository.setSourceEnabled(source.id, request.enabled);
     await this.cacheService.deleteByPrefix(ResponseCacheKeys.SOURCE_LIST, true);
   }
 }

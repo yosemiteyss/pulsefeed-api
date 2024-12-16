@@ -5,5 +5,8 @@ export class LanguageListResponse {
     this.languages = languages;
   }
 
+  /**
+   * List of languages.
+   */
   readonly languages: LanguageResponse[];
 }

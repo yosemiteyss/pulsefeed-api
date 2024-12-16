@@ -1,9 +1,10 @@
 import { LanguageListResponse, LanguageResponse } from '../../dto';
+import { INestApplication, LoggerService } from '@nestjs/common';
 import { CacheService, PrismaService } from '@pulsefeed/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { LanguageModule } from '../../language.module';
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import { LanguageService } from '../../service';
 import request from 'supertest';
 
@@ -12,11 +13,13 @@ describe('LanguageController', () => {
   let languageService: DeepMockProxy<LanguageService>;
   let prismaService: DeepMockProxy<PrismaService>;
   let cacheService: DeepMockProxy<CacheService>;
+  let loggerService: DeepMockProxy<LoggerService>;
 
   beforeAll(async () => {
     languageService = mockDeep<LanguageService>();
     prismaService = mockDeep<PrismaService>();
     cacheService = mockDeep<CacheService>();
+    loggerService = mockDeep<LoggerService>();
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [LanguageModule],
@@ -27,10 +30,16 @@ describe('LanguageController', () => {
       .useValue(prismaService)
       .overrideProvider(CacheService)
       .useValue(cacheService)
+      .overrideProvider(WINSTON_MODULE_NEST_PROVIDER)
+      .useValue(loggerService)
       .compile();
 
     app = module.createNestApplication();
     await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   it('(GET) /language/list', async () => {

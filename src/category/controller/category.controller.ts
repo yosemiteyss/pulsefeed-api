@@ -8,6 +8,10 @@ import { CategoryService } from '../service';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  /**
+   * Get categories.
+   * @param request category list request.
+   */
   @Get('/list')
   @ApiOperation({ description: 'Get article categories' })
   @ApiOkResponse({ type: CategoryResponse, isArray: true })

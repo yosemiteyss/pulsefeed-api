@@ -84,14 +84,16 @@ describe('SourceService', () => {
         languages: [LanguageEnum.en_us],
       };
       sourceRepository.getSource.mockResolvedValue(source);
-      await sourceService.setSourceEnabled('id', false);
+      await sourceService.setSourceEnabled({ id: 'id', enabled: false });
       expect(sourceRepository.setSourceEnabled).toHaveBeenCalledWith(source.id, false);
       expect(cacheService.deleteByPrefix).toHaveBeenCalledWith(ResponseCacheKeys.SOURCE_LIST, true);
     });
 
     it('should throw NotFoundException if source is not found', async () => {
       sourceRepository.getSource.mockResolvedValue(undefined);
-      await expect(sourceService.setSourceEnabled('id', false)).rejects.toThrow(NotFoundException);
+      await expect(sourceService.setSourceEnabled({ id: 'id', enabled: false })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

@@ -5,6 +5,9 @@ export class LanguageResponse {
     this.key = key;
   }
 
+  /**
+   * The language key.
+   */
   readonly key: string;
 
   static fromModel(model: Language): LanguageResponse {

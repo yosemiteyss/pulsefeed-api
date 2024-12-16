@@ -9,6 +9,7 @@ import {
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE, ResponseCacheKeys, ShuffleService } from '../../shared';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
+import { LatestFeedResponse } from '../dto/latest-feed.response';
 import { CategoryFeedRequest, LatestFeedRequest } from '../dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ArticleData, ArticleFilter } from '../model';
@@ -27,7 +28,9 @@ export class ArticleService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
-  async getLatestFeedPageResponse(request: LatestFeedRequest): Promise<PageResponse<NewsBlock>> {
+  async getLatestFeedPageResponse(
+    request: LatestFeedRequest,
+  ): Promise<LatestFeedResponse<NewsBlock>> {
     const cacheKey = ResponseCacheKeys.ARTICLE_FEED_LATEST.replace(
       '{request}',
       JSON.stringify(request),
@@ -66,9 +69,14 @@ export class ArticleService {
         categoryTitles[topCategories[categoryIndex].key],
         categoryIndex === 0,
       );
+
+      const isLastPage = categoryIndex + 1 >= topCategories.length;
+      const nextCategory = isLastPage ? undefined : topCategories[categoryIndex + 1];
+
       return {
         data: blockList,
-        isLastPage: categoryIndex + 1 >= topCategories.length,
+        isLastPage: isLastPage,
+        feedSection: nextCategory?.key,
       };
     };
 
@@ -94,7 +102,7 @@ export class ArticleService {
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
       const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
-        request.categoryKey,
+        request.languageKey,
       );
 
       // Add top spacing for first page.
@@ -117,7 +125,7 @@ export class ArticleService {
     }
 
     const languages = await this.languageRepository.getEnabledLanguages();
-    if (!languages.find((language) => language.key === filter.categoryKey)) {
+    if (!languages.find((language) => language.key === filter.languageKey)) {
       throw new NotFoundException('Invalid language');
     }
 

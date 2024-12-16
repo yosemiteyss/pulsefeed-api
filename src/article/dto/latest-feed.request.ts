@@ -8,7 +8,7 @@ export class LatestFeedRequest {
   readonly languageKey: string;
 
   /**
-   * Next feed section identifier.
+   * The identifier of the next feed section.
    */
   @IsString()
   @IsOptional()

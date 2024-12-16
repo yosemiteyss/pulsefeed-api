@@ -21,13 +21,44 @@ export class ArticleResponse {
     this.publishedAt = publishedAt;
   }
 
+  /**
+   * The article id.
+   */
   readonly id: string;
+
+  /**
+   * The article title.
+   */
   readonly title: string;
+
+  /**
+   * The article url.
+   */
   readonly link: string;
+
+  /**
+   * The article description.
+   */
   readonly description?: string;
+
+  /**
+   * The article image url.
+   */
   readonly imageUrl?: string;
+
+  /**
+   * The category key of the article.
+   */
   readonly categoryKey: string;
+
+  /**
+   * The source id of the article.
+   */
   readonly sourceId: string;
+
+  /**
+   * The article publish date.
+   */
   readonly publishedAt?: Date;
 
   static fromModel(article: Article): ArticleResponse {

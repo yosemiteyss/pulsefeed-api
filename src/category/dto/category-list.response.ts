@@ -5,5 +5,8 @@ export class CategoryListResponse {
     this.categories = categories;
   }
 
+  /**
+   * List of categories.
+   */
   readonly categories: CategoryResponse[];
 }

@@ -1,7 +1,7 @@
 import { ApiOkResponsePaginated, PageRequest, PageResponse } from '@pulsefeed/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get } from '@nestjs/common';
 import { SourceService } from '../service';
+import { ApiTags } from '@nestjs/swagger';
 import { SourceResponse } from '../dto';
 
 @ApiTags('source')
@@ -9,9 +9,12 @@ import { SourceResponse } from '../dto';
 export class SourceController {
   constructor(private readonly sourceService: SourceService) {}
 
+  /**
+   * Get all enabled sources.
+   * @param request page request.
+   */
   @Get('/list')
   @ApiOkResponsePaginated(SourceResponse)
-  @ApiOperation({ description: 'Get all enabled sources' })
   async listSource(@Body() request: PageRequest): Promise<PageResponse<SourceResponse>> {
     return this.sourceService.getSourcePageResponse(request);
   }

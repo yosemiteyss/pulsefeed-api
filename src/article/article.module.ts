@@ -1,15 +1,25 @@
-import { DatabaseModule, CacheModule } from '@pulsefeed/common';
+import {
+  DatabaseModule,
+  CacheModule,
+  ArticleCategoryRepository,
+  LanguageRepository,
+} from '@pulsefeed/common';
+import { ArticleFeedBuilder, ArticleService } from './service';
 import { ArticleRepository } from './repository';
 import { ArticleController } from './controller';
-import { ArticleService } from './service';
-import { LanguageModule } from '../language';
-import { CategoryModule } from '../category';
 import { ShuffleService } from '../shared';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [DatabaseModule, CacheModule, CategoryModule, LanguageModule],
+  imports: [DatabaseModule, CacheModule],
   controllers: [ArticleController],
-  providers: [ArticleService, ArticleRepository, ShuffleService],
+  providers: [
+    ArticleService,
+    ArticleRepository,
+    ArticleCategoryRepository,
+    LanguageRepository,
+    ShuffleService,
+    ArticleFeedBuilder,
+  ],
 })
 export class ArticleModule {}

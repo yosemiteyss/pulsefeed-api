@@ -24,7 +24,7 @@ export class ApiKeyService implements OnModuleInit {
       this.logger.warn('No api key is found, start create new one.', ApiKeyService.name);
       await this.createApiKey();
     } else {
-      this.logger.warn(`Api key: ${apiKey}`, ApiKeyService.name);
+      this.logger.log(`Api key: ${apiKey}`, ApiKeyService.name);
     }
   }
 

@@ -9,9 +9,9 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { EnableLanguageRequest, LanguageService } from '../language';
 import { EnableCategoryRequest, CategoryService } from '../category';
 import { EnableSourceRequest, SourceService } from '../source';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiKeyResponse, ApiKeyService } from '../auth';
 import { AdminGuard } from './admin.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -27,33 +27,46 @@ export class AdminController {
     private readonly memoryHealth: MemoryHealthIndicator,
   ) {}
 
+  /**
+   * Create a new api key
+   */
   @Post('/create-api-key')
-  @ApiOperation({ description: 'Create a new api key' })
   async createApiKey(): Promise<ApiKeyResponse> {
     return this.apiKeyService.createApiKey();
   }
 
+  /**
+   * Enable or disable source.
+   * @param request enable source request
+   */
   @Post('/source-enable')
-  @ApiOperation({ description: 'Enable or disable article source' })
-  async enableSource(@Body() { id, enabled }: EnableSourceRequest) {
-    await this.sourceService.setSourceEnabled(id, enabled);
+  async enableSource(@Body() request: EnableSourceRequest) {
+    await this.sourceService.setSourceEnabled(request);
   }
 
+  /**
+   * Enable or disable article category.
+   * @param request enable category request.
+   */
   @Post('/category-enable')
-  @ApiOperation({ description: 'Enable or disable article category' })
   async enableCategory(@Body() request: EnableCategoryRequest) {
     await this.categoryService.setCategoryEnabled(request);
   }
 
+  /**
+   * Enable or disable language.
+   * @param request enable language request.
+   */
   @Post('/language-enable')
-  @ApiOperation({ description: 'Enable or disable language' })
   async enableLanguage(@Body() request: EnableLanguageRequest) {
     await this.languageService.setLanguageEnabled(request);
   }
 
+  /**
+   * Service health check.
+   */
   @Get('/health-check')
   @HealthCheck()
-  @ApiOperation({ description: 'Services health check' })
   healthCheck(): Promise<HealthCheckResult> {
     return this.healthCheckService.check([
       () => this.dbHealth.pingCheck('database'),

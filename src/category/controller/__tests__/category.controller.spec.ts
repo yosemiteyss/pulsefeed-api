@@ -33,6 +33,10 @@ describe('CategoryController', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('(GET) /category/list', async () => {
     const response: CategoryListResponse = new CategoryListResponse([
       new CategoryResponse('key', 'title', 1),

@@ -9,10 +9,29 @@ export class SourceResponse {
     this.description = description;
   }
 
+  /**
+   * Source id.
+   */
   readonly id: string;
+
+  /**
+   * Source title.
+   */
   readonly title: string;
+
+  /**
+   * Source url.
+   */
   readonly link: string;
+
+  /**
+   * Source image url.
+   */
   readonly imageUrl?: string;
+
+  /**
+   * Source description.
+   */
   readonly description?: string;
 
   static fromModel(model: Source): SourceResponse {
