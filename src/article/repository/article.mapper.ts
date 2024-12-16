@@ -1,15 +1,13 @@
 import { ArticleCategoryEnum, LanguageEnum } from '@pulsefeed/common';
-import { Injectable } from '@nestjs/common';
-import { ArticleResult } from '../model';
 import { Prisma } from '@prisma/client';
+import { ArticleData } from '../model';
 
-@Injectable()
 export class ArticleMapper {
-  articleEntityToModel(
+  entityToModel(
     entity: Prisma.ArticleGetPayload<{
       include: { source: true; category: true; languages: true };
     }>,
-  ): ArticleResult {
+  ): ArticleData {
     return {
       article: {
         id: entity.id,
@@ -29,7 +27,11 @@ export class ArticleMapper {
         link: entity.source.link,
         image: entity.source.image ?? undefined,
         description: entity.source.description ?? undefined,
-        languages: [],
+        languages: entity.languages.map((language) => language.languageKey as LanguageEnum),
+      },
+      category: {
+        key: entity.category.key,
+        priority: entity.category.priority.toNumber(),
       },
     };
   }

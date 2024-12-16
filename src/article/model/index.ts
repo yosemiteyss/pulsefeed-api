@@ -1,3 +1,2 @@
-export * from './article-result.model';
-export * from './article-list-options.model';
-export * from './feed-result';
+export * from './article-data.model';
+export * from './article-filter.model';

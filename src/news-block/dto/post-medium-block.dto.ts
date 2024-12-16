@@ -1,17 +1,17 @@
+import { CategoryResponse } from '../../category';
 import { BlockAction } from './block-action.dto';
+import { ArticleResponse } from 'src/article';
 import { PostBlock } from './post-block.dto';
-import { CategoryDto } from '../../category';
-import { ArticleDto } from '../../article';
-import { SourceDto } from '../../source';
+import { SourceResponse } from 'src/source';
 
 /**
  * A block which represents a medium post block.
  */
 export class PostMediumBlock extends PostBlock {
   constructor(
-    article: ArticleDto,
-    category: CategoryDto,
-    source: SourceDto,
+    article: ArticleResponse,
+    category: CategoryResponse,
+    source: SourceResponse,
     action: BlockAction,
     isPremium: boolean = false,
     isContentOverlaid: boolean = false,

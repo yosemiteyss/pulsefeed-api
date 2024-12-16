@@ -1,4 +1,4 @@
-import { ArticleResult, ArticleListOptions } from '../model';
+import { ArticleData, ArticleFilter } from '../model';
 import { PrismaService } from '@pulsefeed/common';
 import { ArticleMapper } from './article.mapper';
 import { Injectable } from '@nestjs/common';
@@ -6,57 +6,57 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArticleRepository {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly articleMapper: ArticleMapper,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async getArticles({
-    page,
-    limit,
-    category,
-    language,
-    sourceId,
-    publishedBefore,
-    excludeIds,
-    searchTerm,
-  }: ArticleListOptions): Promise<[ArticleResult[], number]> {
-    const whereClause: Prisma.ArticleWhereInput = {
-      publishedAt: {
-        lt: publishedBefore,
-      },
+  private readonly articleMapper = new ArticleMapper();
 
-      languages: {
-        some: {
-          languageKey: language,
-        },
+  /**
+   * Return articles which match the given filtering options.
+   * @param filter filtering options.
+   * @returns array of article data and number of articles
+   */
+  async getArticles(filter: ArticleFilter): Promise<[ArticleData[], number]> {
+    const whereClause: Prisma.ArticleWhereInput = {};
+
+    // Filter by publish date.
+    whereClause.publishedAt = {
+      lt: filter.publishedBefore,
+    };
+
+    // Filter by language.
+    whereClause.languages = {
+      some: {
+        languageKey: filter.languageKey,
       },
     };
 
-    if (category) {
+    // Filter by category.
+    if (filter.categoryKey) {
       whereClause.category = {
-        key: category,
+        key: filter.categoryKey,
       };
     }
 
-    if (sourceId) {
+    // Filter by source.
+    if (filter.sourceId) {
       whereClause.source = {
-        id: sourceId,
+        id: filter.sourceId,
         enabled: true,
       };
     }
 
     // Search by title or description
-    if (searchTerm && searchTerm.length > 0) {
+    if (filter.searchTerm && filter.searchTerm.length > 0) {
       whereClause.OR = [
-        { title: { contains: searchTerm } },
-        { description: { contains: searchTerm } },
+        { title: { contains: filter.searchTerm } },
+        { description: { contains: filter.searchTerm } },
       ];
     }
 
-    if (excludeIds) {
+    // Exclude articles with the given ids.
+    if (filter.excludeIds) {
       whereClause.id = {
-        notIn: excludeIds,
+        notIn: filter.excludeIds,
       };
     }
 
@@ -70,10 +70,11 @@ export class ArticleRepository {
       orderBy: {
         publishedAt: 'desc',
       },
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: (filter.page - 1) * filter.limit,
+      take: filter.limit,
     });
 
-    return [entities.map((article) => this.articleMapper.articleEntityToModel(article)), total];
+    const models = entities.map((article) => this.articleMapper.entityToModel(article));
+    return [models, total];
   }
 }

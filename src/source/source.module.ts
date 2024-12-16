@@ -1,13 +1,12 @@
-import { CacheModule, DatabaseModule } from '@pulsefeed/common';
-import { SourceRepository, SourceMapper } from './repository';
-import { SourceController } from './source.controller';
-import { SourceService } from './source.service';
+import { CacheModule, DatabaseModule, SourceRepository } from '@pulsefeed/common';
+import { SourceController } from './controller';
+import { SourceService } from './service';
 import { Module } from '@nestjs/common';
 
 @Module({
   imports: [DatabaseModule, CacheModule],
   controllers: [SourceController],
-  providers: [SourceService, SourceRepository, SourceMapper],
+  providers: [SourceService, SourceRepository],
   exports: [SourceService],
 })
 export class SourceModule {}

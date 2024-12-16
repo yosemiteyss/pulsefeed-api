@@ -39,8 +39,8 @@ export abstract class BlockAction {
  * A block action which represents navigation to the article.
  */
 export class NavigateToArticleAction extends BlockAction {
-  constructor(actionType: BlockActionType, articleId: string) {
-    super(NavigateToArticleAction.identifier, actionType);
+  constructor(articleId: string) {
+    super(NavigateToArticleAction.identifier, BlockActionType.Navigation);
     this.articleId = articleId;
   }
 
@@ -59,8 +59,8 @@ export class NavigateToArticleAction extends BlockAction {
  * A block action which represents navigation to the video article.
  */
 export class NavigateToVideoArticleAction extends BlockAction {
-  constructor(actionType: BlockActionType, articleId: string) {
-    super(NavigateToVideoArticleAction.identifier, actionType);
+  constructor(articleId: string) {
+    super(NavigateToVideoArticleAction.identifier, BlockActionType.Navigation);
     this.articleId = articleId;
   }
 
@@ -79,8 +79,8 @@ export class NavigateToVideoArticleAction extends BlockAction {
  * A block action which represents navigation to the feed.
  */
 export class NavigateToFeedCategoryAction extends BlockAction {
-  constructor(actionType: BlockActionType, categoryKey: string) {
-    super(NavigateToFeedCategoryAction.identifier, actionType);
+  constructor(categoryKey: string) {
+    super(NavigateToFeedCategoryAction.identifier, BlockActionType.Navigation);
     this.categoryKey = categoryKey;
   }
 
@@ -99,8 +99,8 @@ export class NavigateToFeedCategoryAction extends BlockAction {
  * A block action which represents navigation to the slideshow.
  */
 export class NavigateToSlideshowAction extends BlockAction {
-  constructor(actionType: BlockActionType, articleId: string, slideshow: SlideshowBlock) {
-    super(NavigateToSlideshowAction.identifier, actionType);
+  constructor(articleId: string, slideshow: SlideshowBlock) {
+    super(NavigateToSlideshowAction.identifier, BlockActionType.Navigation);
     this.articleId = articleId;
     this.slideshow = slideshow;
   }

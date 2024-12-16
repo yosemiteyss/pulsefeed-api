@@ -3,10 +3,7 @@ import { SectionHeaderBlock } from '../section-header-block.dto';
 
 describe('SectionHeaderBlock', () => {
   it('should serialize SectionHeaderBlock to JSON correctly', () => {
-    const block = new SectionHeaderBlock(
-      'title',
-      new NavigateToFeedCategoryAction(BlockActionType.Navigation, 'category'),
-    );
+    const block = new SectionHeaderBlock('title', new NavigateToFeedCategoryAction('category'));
     const jsonString = JSON.stringify(block);
 
     const expectedJson = {

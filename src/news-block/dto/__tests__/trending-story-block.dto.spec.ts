@@ -1,16 +1,16 @@
-import { BlockActionType, NavigateToArticleAction } from '../block-action.dto';
 import { TrendingStoryBlock } from '../trending-story-block.dto';
+import { NavigateToArticleAction } from '../block-action.dto';
 import { PostSmallBlock } from '../post-small-block.dto';
-import { CategoryDto } from '../../../category';
-import { ArticleDto } from '../../../article';
-import { SourceDto } from '../../../source';
+import { CategoryResponse } from '../../../category';
+import { ArticleResponse } from 'src/article';
+import { SourceResponse } from 'src/source';
 
 describe('TrendingStoryBlock', () => {
   it('should serialize TrendingStoryBlock to JSON correctly', () => {
     const publishedAt = new Date();
-    const categoryDto = new CategoryDto('key', 'name', 1.0);
-    const sourceDto = new SourceDto('id', 'title', 'link', 'image', 'description');
-    const articleDto = new ArticleDto(
+    const categoryDto = new CategoryResponse('key', 'title', 1.0);
+    const sourceDto = new SourceResponse('id', 'title', 'link', 'image', 'description');
+    const articleDto = new ArticleResponse(
       'id',
       'title',
       'link',
@@ -26,7 +26,7 @@ describe('TrendingStoryBlock', () => {
         articleDto,
         categoryDto,
         sourceDto,
-        new NavigateToArticleAction(BlockActionType.Navigation, articleDto.id),
+        new NavigateToArticleAction(articleDto.id),
       ),
     );
     const jsonString = JSON.stringify(block);
@@ -47,7 +47,7 @@ describe('TrendingStoryBlock', () => {
         },
         category: {
           key: 'key',
-          name: 'name',
+          title: 'title',
           priority: 1.0,
         },
         source: {

@@ -1,10 +1,10 @@
 import { VideoIntroductionBlock } from '../video-introduction-block.dto';
-import { CategoryDto } from '../../../category';
+import { CategoryResponse } from '../../../category';
 
 describe('VideoIntroductionBlock', () => {
   it('should serialize VideoIntroductionBlock to JSON correctly', () => {
     const block = new VideoIntroductionBlock(
-      new CategoryDto('key', 'name', 1.0),
+      new CategoryResponse('key', 'title', 1.0),
       'title',
       'videoUrl',
     );
@@ -14,7 +14,7 @@ describe('VideoIntroductionBlock', () => {
       type: VideoIntroductionBlock.identifier,
       category: {
         key: 'key',
-        name: 'name',
+        title: 'title',
         priority: 1.0,
       },
       title: 'title',

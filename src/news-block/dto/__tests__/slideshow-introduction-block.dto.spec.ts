@@ -6,7 +6,7 @@ describe('SlideshowIntroductionBlock', () => {
     const block = new SlideshowIntroductionBlock(
       'title',
       'coverImageUrl',
-      new NavigateToFeedCategoryAction(BlockActionType.Navigation, 'category'),
+      new NavigateToFeedCategoryAction('category'),
     );
     const jsonString = JSON.stringify(block);
 

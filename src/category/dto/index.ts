@@ -1,3 +1,4 @@
-export * from './category.dto';
-export * from './enable-category.dto';
-export * from './category-list-request.dto';
+export * from './category.response';
+export * from './enable-category.request';
+export * from './category-list.request';
+export * from './category-list.response';

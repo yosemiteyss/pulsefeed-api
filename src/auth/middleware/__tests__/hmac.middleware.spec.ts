@@ -1,21 +1,18 @@
-import { mockLoggerService } from '../../../shared/mock/logger.service.mock';
-import { UnauthorizedException } from '@nestjs/common';
+import { LoggerService, UnauthorizedException } from '@nestjs/common';
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { HmacMiddleware } from '../hmac.middleware';
+import { ApiKeyService } from '../../service';
 import crypto from 'crypto';
-
-const mockApiKeyService = {
-  getDefaultKey: jest.fn(),
-};
 
 describe('HmacMiddleware', () => {
   let hmacMiddleware: HmacMiddleware;
+  let mockApiKeyService: DeepMockProxy<ApiKeyService>;
+  let loggerService: DeepMockProxy<LoggerService>;
 
   beforeEach(() => {
-    hmacMiddleware = new HmacMiddleware(mockApiKeyService as any, mockLoggerService as any);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    mockApiKeyService = mockDeep<ApiKeyService>();
+    loggerService = mockDeep<LoggerService>();
+    hmacMiddleware = new HmacMiddleware(mockApiKeyService, loggerService);
   });
 
   it('should throw UnauthorizedException if signature is missing', async () => {
@@ -32,7 +29,7 @@ describe('HmacMiddleware', () => {
     const res = {};
     const next = jest.fn();
 
-    mockApiKeyService.getDefaultKey.mockResolvedValue(undefined);
+    mockApiKeyService.getDefaultApiKey.mockResolvedValue(undefined);
 
     await expect(hmacMiddleware.use(req, res, next)).rejects.toThrow(UnauthorizedException);
     expect(next).not.toHaveBeenCalled();
@@ -86,7 +83,7 @@ describe('HmacMiddleware', () => {
     const res = {};
     const next = jest.fn();
 
-    mockApiKeyService.getDefaultKey.mockResolvedValue(secretKey);
+    mockApiKeyService.getDefaultApiKey.mockResolvedValue(secretKey);
 
     await hmacMiddleware.use(req, res, next);
     expect(next).toHaveBeenCalled();

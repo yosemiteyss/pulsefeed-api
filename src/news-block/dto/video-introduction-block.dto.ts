@@ -1,11 +1,11 @@
+import { CategoryResponse } from '../../category';
 import { NewsBlock } from './news-block.dto';
-import { CategoryDto } from '../../category';
 
 /**
  * A block which represents a video introduction.
  */
 export class VideoIntroductionBlock extends NewsBlock {
-  constructor(category: CategoryDto, title: string, videoUrl: string) {
+  constructor(category: CategoryResponse, title: string, videoUrl: string) {
     super(VideoIntroductionBlock.identifier);
     this.category = category;
     this.title = title;
@@ -15,7 +15,7 @@ export class VideoIntroductionBlock extends NewsBlock {
   /**
    * The category of the associated article.
    */
-  readonly category: CategoryDto;
+  readonly category: CategoryResponse;
 
   /**
    * The title of the associated article.

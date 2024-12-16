@@ -11,7 +11,7 @@ import { SlideBlock } from '../slide-block.dto';
 
 describe('BlockAction', () => {
   it('should serialize NavigateToArticleAction to JSON correctly', () => {
-    const block = new NavigateToArticleAction(BlockActionType.Navigation, 'articleId');
+    const block = new NavigateToArticleAction('articleId');
     const jsonString = JSON.stringify(block);
 
     const expectedJson = {
@@ -24,7 +24,7 @@ describe('BlockAction', () => {
   });
 
   it('should serialize NavigateToVideoArticleAction to JSON correctly', () => {
-    const block = new NavigateToVideoArticleAction(BlockActionType.Navigation, 'articleId');
+    const block = new NavigateToVideoArticleAction('articleId');
     const jsonString = JSON.stringify(block);
 
     const expectedJson = {
@@ -37,7 +37,7 @@ describe('BlockAction', () => {
   });
 
   it('should serialize NavigateToFeedCategoryAction to JSON correctly', () => {
-    const block = new NavigateToFeedCategoryAction(BlockActionType.Navigation, 'categoryKey');
+    const block = new NavigateToFeedCategoryAction('categoryKey');
     const jsonString = JSON.stringify(block);
 
     const expectedJson = {
@@ -51,7 +51,6 @@ describe('BlockAction', () => {
 
   it('should serialize NavigateToSlideshowAction to JSON correctly', () => {
     const block = new NavigateToSlideshowAction(
-      BlockActionType.Navigation,
       'articleId',
       new SlideshowBlock('title', [
         new SlideBlock('caption', 'description', 'photoCredit', 'imageUrl'),

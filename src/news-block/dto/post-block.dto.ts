@@ -1,8 +1,8 @@
+import { CategoryResponse } from '../../category';
 import { BlockAction } from './block-action.dto';
+import { ArticleResponse } from '../../article';
+import { SourceResponse } from '../../source';
 import { NewsBlock } from './news-block.dto';
-import { CategoryDto } from '../../category';
-import { ArticleDto } from '../../article';
-import { SourceDto } from '../../source';
 
 /**
  * An abstract block which represents a post block.
@@ -10,9 +10,9 @@ import { SourceDto } from '../../source';
 export abstract class PostBlock extends NewsBlock {
   protected constructor(
     type: string,
-    article: ArticleDto,
-    category: CategoryDto,
-    source: SourceDto,
+    article: ArticleResponse,
+    category: CategoryResponse,
+    source: SourceResponse,
     action: BlockAction,
     isPremium: boolean = false,
     isContentOverlaid: boolean = false,
@@ -34,17 +34,17 @@ export abstract class PostBlock extends NewsBlock {
   /**
    * Article data.
    */
-  readonly article: ArticleDto;
+  readonly article: ArticleResponse;
 
   /**
    * Category data.
    */
-  readonly category: CategoryDto;
+  readonly category: CategoryResponse;
 
   /**
    * Source data.
    */
-  readonly source: SourceDto;
+  readonly source: SourceResponse;
 
   /**
    * An optional action which occurs upon interaction.

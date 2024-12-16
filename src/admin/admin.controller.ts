@@ -6,13 +6,12 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { EnableLanguageDto, LanguageService } from '../language';
-import { EnableCategoryDto, CategoryService } from '../category';
-import { EnableSourceDto, SourceService } from '../source';
-import { ApiKeyService } from 'src/auth/api-key.service';
+import { EnableLanguageRequest, LanguageService } from '../language';
+import { EnableCategoryRequest, CategoryService } from '../category';
+import { EnableSourceRequest, SourceService } from '../source';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiKeyResponse, ApiKeyService } from '../auth';
 import { AdminGuard } from './admin.guard';
-import { CreateApiKeyDto } from '../auth';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -30,27 +29,26 @@ export class AdminController {
 
   @Post('/create-api-key')
   @ApiOperation({ description: 'Create a new api key' })
-  async createApiKey(): Promise<CreateApiKeyDto> {
-    const key = await this.apiKeyService.createKey();
-    return { key };
+  async createApiKey(): Promise<ApiKeyResponse> {
+    return this.apiKeyService.createApiKey();
   }
 
   @Post('/source-enable')
   @ApiOperation({ description: 'Enable or disable article source' })
-  async enableSource(@Body() { id, enabled }: EnableSourceDto) {
+  async enableSource(@Body() { id, enabled }: EnableSourceRequest) {
     await this.sourceService.setSourceEnabled(id, enabled);
   }
 
   @Post('/category-enable')
   @ApiOperation({ description: 'Enable or disable article category' })
-  async enableCategory(@Body() { key, enabled }: EnableCategoryDto) {
-    await this.categoryService.setCategoryEnabled(key, enabled);
+  async enableCategory(@Body() request: EnableCategoryRequest) {
+    await this.categoryService.setCategoryEnabled(request);
   }
 
   @Post('/language-enable')
   @ApiOperation({ description: 'Enable or disable language' })
-  async enableLanguage(@Body() { key, enabled }: EnableLanguageDto) {
-    await this.languageService.setLanguageEnabled(key, enabled);
+  async enableLanguage(@Body() request: EnableLanguageRequest) {
+    await this.languageService.setLanguageEnabled(request);
   }
 
   @Get('/health-check')

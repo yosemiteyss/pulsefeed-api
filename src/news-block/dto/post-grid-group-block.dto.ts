@@ -1,12 +1,12 @@
 import { PostGridTileBlock } from './post-grid-tile-block.dto';
+import { CategoryResponse } from '../../category';
 import { NewsBlock } from './news-block.dto';
-import { CategoryDto } from '../../category';
 
 /**
  * A block which represents a post grid group.
  */
 export class PostGridGroupBlock extends NewsBlock {
-  constructor(category: CategoryDto, tiles: PostGridTileBlock[]) {
+  constructor(category: CategoryResponse, tiles: PostGridTileBlock[]) {
     super(PostGridGroupBlock.identifier);
     this.category = category;
     this.tiles = tiles;
@@ -20,7 +20,7 @@ export class PostGridGroupBlock extends NewsBlock {
   /**
    * The category of this article grid group.
    */
-  readonly category: CategoryDto;
+  readonly category: CategoryResponse;
 
   /**
    * The associated list of {@link PostGridTileBlock} tiles.

@@ -1,6 +1,6 @@
+import { CategoryResponse } from '../../category';
+import { SourceResponse } from '../../source';
 import { NewsBlock } from './news-block.dto';
-import { CategoryDto } from '../../category';
-import { SourceDto } from '../../source';
 
 /**
  * A block which represents an article introduction.
@@ -8,8 +8,8 @@ import { SourceDto } from '../../source';
 export class ArticleIntroductionBlock extends NewsBlock {
   constructor(
     title: string,
-    category: CategoryDto,
-    source: SourceDto,
+    category: CategoryResponse,
+    source: SourceResponse,
     publishedAt: Date,
     imageUrl?: string,
     isPremium: boolean = false,
@@ -41,12 +41,12 @@ export class ArticleIntroductionBlock extends NewsBlock {
   /**
    * The category of the associated article.
    */
-  readonly category: CategoryDto;
+  readonly category: CategoryResponse;
 
   /**
    * The source of the associated article.
    */
-  readonly source: SourceDto;
+  readonly source: SourceResponse;
 
   /**
    * The date when the associated article was published.

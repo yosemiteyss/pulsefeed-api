@@ -1,4 +1,4 @@
-export * from './article.dto';
+export * from './article.response';
 export * from './article-section.dto';
-export * from './article-list-request.dto';
-export * from './article-section-request.dto';
+export * from './category-feed.request';
+export * from './latest-feed.request';

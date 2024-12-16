@@ -1,17 +1,17 @@
+import { ArticleResponse } from '../../article/dto';
+import { CategoryResponse } from '../../category';
 import { BlockAction } from './block-action.dto';
+import { SourceResponse } from '../../source';
 import { PostBlock } from './post-block.dto';
-import { CategoryDto } from '../../category';
-import { ArticleDto } from '../../article';
-import { SourceDto } from '../../source';
 
 /**
  * A block which represents a small post block.
  */
 export class PostSmallBlock extends PostBlock {
   constructor(
-    article: ArticleDto,
-    category: CategoryDto,
-    source: SourceDto,
+    article: ArticleResponse,
+    category: CategoryResponse,
+    source: SourceResponse,
     action: BlockAction,
     isPremium: boolean = false,
   ) {

@@ -1,10 +1,10 @@
 import { ArticleIntroductionBlock } from '../article-introduction-block.dto';
-import { CategoryDto } from '../../../category';
-import { SourceDto } from '../../../source';
+import { CategoryResponse } from '../../../category';
+import { SourceResponse } from '../../../source';
 
 describe('ArticleIntroductionBlock', () => {
-  const categoryDto = new CategoryDto('key', 'category', 1.0);
-  const sourceDto = new SourceDto('id', 'title', 'link', 'image', 'description');
+  const categoryDto = new CategoryResponse('key', 'title', 1.0);
+  const sourceDto = new SourceResponse('id', 'title', 'link', 'image', 'description');
   const publishedAt = new Date('2023-01-01T00:00:00Z');
 
   it('should serialize to JSON correctly', () => {

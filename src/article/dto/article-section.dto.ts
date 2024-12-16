@@ -1,8 +1,8 @@
-import { CategoryDto } from '../../category';
-import { ArticleDto } from './article.dto';
+import { ArticleResponse } from './article.response';
+import { CategoryResponse } from '../../category';
 
 export class ArticleSectionDto {
-  readonly category: CategoryDto;
-  readonly articles: ArticleDto[];
+  readonly category: CategoryResponse;
+  readonly articles: ArticleResponse[];
   readonly nextSectionKey?: string;
 }
