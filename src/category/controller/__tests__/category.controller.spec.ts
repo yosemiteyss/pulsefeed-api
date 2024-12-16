@@ -1,8 +1,9 @@
+import { CacheService, LoggerModule, PrismaService } from '@pulsefeed/common';
 import { CategoryListResponse, CategoryResponse } from '../../dto';
-import { CacheService, PrismaService } from '@pulsefeed/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { CategoryModule } from '../../category.module';
 import { Test, TestingModule } from '@nestjs/testing';
+import { MockLoggerModule } from '../../../shared';
 import { INestApplication } from '@nestjs/common';
 import { CategoryService } from '../../service';
 import request from 'supertest';
@@ -21,6 +22,8 @@ describe('CategoryController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [CategoryModule],
     })
+      .overrideModule(LoggerModule)
+      .useModule(MockLoggerModule)
       .overrideProvider(CategoryService)
       .useValue(categoryService)
       .overrideProvider(PrismaService)
