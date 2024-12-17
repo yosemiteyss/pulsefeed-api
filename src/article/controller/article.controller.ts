@@ -1,6 +1,6 @@
 import { LatestFeedResponse } from '../dto/latest-feed.response';
 import { CategoryFeedRequest, LatestFeedRequest } from '../dto';
-import { Body, Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { PageResponse } from '@pulsefeed/common';
 import { NewsBlock } from '../../news-block';
 import { ArticleService } from '../service';
@@ -15,7 +15,7 @@ export class ArticleController {
    * Get latest feed.
    * @param request latest feed request.
    */
-  @Get('/latest-feed')
+  @Post('/latest-feed')
   async getLatestFeed(@Body() request: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
     return this.articleFeedService.getLatestFeedPageResponse(request);
   }
@@ -24,7 +24,7 @@ export class ArticleController {
    * Get category feed.
    * @param request category feed request.
    */
-  @Get('/category-feed')
+  @Post('/category-feed')
   async getCategoryFeed(@Body() request: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
     return this.articleFeedService.getCategoryFeedPageResponse(request);
   }

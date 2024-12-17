@@ -34,11 +34,6 @@ export class ArticleIntroductionBlock extends NewsBlock {
   readonly title: string;
 
   /**
-   * The image URL of the associated article.
-   */
-  readonly imageUrl?: string;
-
-  /**
    * The category of the associated article.
    */
   readonly category: CategoryResponse;
@@ -52,6 +47,11 @@ export class ArticleIntroductionBlock extends NewsBlock {
    * The date when the associated article was published.
    */
   readonly publishedAt: Date;
+
+  /**
+   * The image URL of the associated article.
+   */
+  readonly imageUrl?: string;
 
   /**
    * Whether the associated article requires a premium subscription to access.
