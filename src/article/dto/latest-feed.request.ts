@@ -1,10 +1,11 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class LatestFeedRequest {
   /**
    * Returns articles with the given language key.
    */
   @IsString()
+  @IsNotEmpty()
   readonly languageKey: string;
 
   /**

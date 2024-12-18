@@ -1,5 +1,9 @@
-import { LatestFeedResponse } from '../dto/latest-feed.response';
-import { CategoryFeedRequest, LatestFeedRequest } from '../dto';
+import {
+  CategoryFeedRequest,
+  LatestFeedRequest,
+  LatestFeedResponse,
+  SearchArticleRequest,
+} from '../dto';
 import { Body, Controller, Post } from '@nestjs/common';
 import { PageResponse } from '@pulsefeed/common';
 import { NewsBlock } from '../../news-block';
@@ -9,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('article')
 @Controller('article')
 export class ArticleController {
-  constructor(private readonly articleFeedService: ArticleService) {}
+  constructor(private readonly articleService: ArticleService) {}
 
   /**
    * Get latest feed.
@@ -17,7 +21,7 @@ export class ArticleController {
    */
   @Post('/latest-feed')
   async getLatestFeed(@Body() request: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
-    return this.articleFeedService.getLatestFeedPageResponse(request);
+    return this.articleService.getLatestFeedPageResponse(request);
   }
 
   /**
@@ -26,6 +30,14 @@ export class ArticleController {
    */
   @Post('/category-feed')
   async getCategoryFeed(@Body() request: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
-    return this.articleFeedService.getCategoryFeedPageResponse(request);
+    return this.articleService.getCategoryFeedPageResponse(request);
+  }
+
+  /**
+   * Search articles by terms.
+   */
+  @Post('/search')
+  async searchArticles(@Body() request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
+    return this.articleService.searchArticles(request);
   }
 }

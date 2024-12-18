@@ -117,15 +117,38 @@ export class ArticleFeedBuilder {
 
     return blockList;
   }
-}
 
-// export type LatestFeedSection = CategorySection | ArticleSection;
-//
-// export interface CategorySection {
-//   readonly type: 'category';
-//   readonly categoryKey: string;
-// }
-//
-// export interface ArticleSection {
-//   readonly type: 'article';
-// }
+  buildArticleListPage(
+    articles: ArticleData[],
+    categoryTitles: Record<string, ArticleCategoryTitle>,
+    includeTopSpacing: boolean = false,
+    includeAds: boolean = true,
+  ) {
+    const blockList: NewsBlock[] = [];
+
+    // Insert top spacing.
+    if (includeTopSpacing) {
+      blockList.push(new SpacerBlock(Spacing.Small));
+    }
+
+    for (let i = 0; i < articles.length; i++) {
+      const item = articles[i];
+      const block = new PostSmallBlock(
+        ArticleResponse.fromModel(item.article),
+        CategoryResponse.fromModel(item.category, categoryTitles[item.category.key]),
+        SourceResponse.fromModel(item.source),
+        new NavigateToArticleAction(item.article.id),
+      );
+      blockList.push(block);
+
+      // Insert ads for between every 10 articles.
+      if (includeAds) {
+        if (i % 10 === 0) {
+          blockList.push(new BannerAdBlock(BannerAdSize.Normal));
+        }
+      }
+    }
+
+    return blockList;
+  }
+}

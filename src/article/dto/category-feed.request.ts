@@ -1,11 +1,12 @@
+import { IsNotEmpty, IsString } from 'class-validator';
 import { PageRequest } from '@pulsefeed/common';
-import { IsString } from 'class-validator';
 
 export class CategoryFeedRequest extends PageRequest {
   /**
    * Returns articles with the given language key.
    */
   @IsString()
+  @IsNotEmpty()
   readonly languageKey: string;
 
   /**
@@ -13,5 +14,6 @@ export class CategoryFeedRequest extends PageRequest {
    * When it's not set, returns articles from all categories.
    */
   @IsString()
+  @IsNotEmpty()
   readonly categoryKey: string;
 }

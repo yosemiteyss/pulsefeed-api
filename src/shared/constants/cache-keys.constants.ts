@@ -9,4 +9,5 @@ export const ResponseCacheKeys = {
   CATEGORY_LIST_BY_LANG: 'pf:api:response:category:list:languageKey:{languageKey}',
   ARTICLE_FEED_LATEST: `pf:api:response:article:latest-feed:request:{request}`,
   ARTICLE_FEED_CATEGORY: 'pf:api:response:article:category-feed:filter:{filter}',
+  ARTICLE_SEARCH: 'pf:api:response:article:search:filter:{filter}',
 };

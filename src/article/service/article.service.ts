@@ -2,15 +2,25 @@ import {
   ArticleCategoryRepository,
   CacheService,
   LanguageRepository,
+  ONE_DAY_IN_MS,
   ONE_HOUR_IN_MS,
   PageResponse,
   roundDownToNearestHalfHour,
 } from '@pulsefeed/common';
+import {
+  CategoryFeedRequest,
+  LatestFeedRequest,
+  SearchArticleRequest,
+  LatestFeedResponse,
+} from '../dto';
+import {
+  DEFAULT_PAGE_SIZE,
+  getLastYearDate,
+  ResponseCacheKeys,
+  ShuffleService,
+} from '../../shared';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE, ResponseCacheKeys, ShuffleService } from '../../shared';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
-import { LatestFeedResponse } from '../dto/latest-feed.response';
-import { CategoryFeedRequest, LatestFeedRequest } from '../dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ArticleData, ArticleFilter } from '../model';
 import { ArticleRepository } from '../repository';
@@ -116,6 +126,32 @@ export class ArticleService {
     };
 
     return this.cacheService.wrap(cacheKey, action, ONE_HOUR_IN_MS);
+  }
+
+  async searchArticles(request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
+    const filter: ArticleFilter = {
+      page: request.page,
+      limit: DEFAULT_PAGE_SIZE,
+      languageKey: request.languageKey,
+      publishedBefore: getLastYearDate(),
+      searchTerm: request.term,
+    };
+    const cacheKey = ResponseCacheKeys.ARTICLE_SEARCH.replace('{filter}', JSON.stringify(filter));
+
+    const action: () => Promise<PageResponse<NewsBlock>> = async () => {
+      const [articles, total] = await this.getArticlesByFilter(filter);
+      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
+        request.languageKey,
+      );
+
+      // Add top spacing for first page.
+      const topSpacing = filter.page === 0;
+      const blockList = this.feedBuilder.buildArticleListPage(articles, categoryTitles, topSpacing);
+
+      return new PageResponse(blockList, total, filter.page, filter.limit);
+    };
+
+    return this.cacheService.wrap(cacheKey, action, ONE_DAY_IN_MS);
   }
 
   private async getArticlesByFilter(filter: ArticleFilter): Promise<[ArticleData[], number]> {
