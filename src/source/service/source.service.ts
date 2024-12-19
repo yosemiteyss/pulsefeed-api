@@ -6,7 +6,7 @@ import {
   SourceRepository,
 } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE, ResponseCacheKeys } from '../../shared';
+import { DEFAULT_PAGE_SIZE, ResponseCacheKeys, toCacheKeyPart } from '../../shared';
 import { EnableSourceRequest, SourceResponse } from '../dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
@@ -25,10 +25,7 @@ export class SourceService {
    */
   async getSourcePageResponse({ page }: PageRequest): Promise<PageResponse<SourceResponse>> {
     const limit = DEFAULT_PAGE_SIZE;
-    const cacheKey = ResponseCacheKeys.SOURCE_PAGE.replace('{page}', `${page}`).replace(
-      '{limit}',
-      `${limit}`,
-    );
+    const cacheKey = ResponseCacheKeys.SOURCE_LIST + toCacheKeyPart({ page: page, limit: limit });
     const action = async () => {
       const [sources, total] = await this.sourceRepository.getEnabledSourcesPaginated(
         page,

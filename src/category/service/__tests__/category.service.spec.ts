@@ -50,10 +50,7 @@ describe('CategoryService', () => {
       cacheService.wrap.mockResolvedValue(mockedCategories);
 
       const languageKey = 'en';
-      const cacheKey = ResponseCacheKeys.CATEGORY_LIST_BY_LANG.replace(
-        '{languageKey}',
-        languageKey,
-      );
+      const cacheKey = ResponseCacheKeys.CATEGORY_LIST + `:languageKey:${languageKey}`;
       const result = await categoryService.getCategoryListResponse({ languageKey });
       expect(cacheService.wrap).toHaveBeenCalledWith(cacheKey, expect.any(Function), ONE_DAY_IN_MS);
 

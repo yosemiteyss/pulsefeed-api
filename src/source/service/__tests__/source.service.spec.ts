@@ -58,10 +58,7 @@ describe('SourceService', () => {
       );
       cacheService.wrap.mockResolvedValue(mockedPage);
 
-      const cacheKey = ResponseCacheKeys.SOURCE_PAGE.replace('{page}', `${page}`).replace(
-        '{limit}',
-        `${DEFAULT_PAGE_SIZE}`,
-      );
+      const cacheKey = ResponseCacheKeys.SOURCE_LIST + `:page:${page}:limit:${DEFAULT_PAGE_SIZE}`;
       const result = await sourceService.getSourcePageResponse({ page });
       expect(cacheService.wrap).toHaveBeenCalledWith(cacheKey, expect.any(Function), ONE_DAY_IN_MS);
 

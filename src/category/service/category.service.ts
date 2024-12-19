@@ -6,8 +6,8 @@ import {
 } from '../dto';
 import { ArticleCategoryRepository, CacheService, ONE_DAY_IN_MS } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
+import { ResponseCacheKeys, toCacheKeyPart } from '../../shared';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ResponseCacheKeys } from '../../shared';
 
 @Injectable()
 export class CategoryService {
@@ -39,7 +39,7 @@ export class CategoryService {
         );
       });
     };
-    const cacheKey = ResponseCacheKeys.CATEGORY_LIST_BY_LANG.replace('{languageKey}', languageKey);
+    const cacheKey = ResponseCacheKeys.CATEGORY_LIST + toCacheKeyPart({ languageKey: languageKey });
     const categories = await this.cacheService.wrap(cacheKey, action, ONE_DAY_IN_MS);
     this.logger.log(`getCategoryListResponse, size: ${categories.length}`, CategoryService.name);
 

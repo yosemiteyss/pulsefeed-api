@@ -1,24 +1,25 @@
 import {
   ArticleCategoryRepository,
   CacheService,
+  HALF_HOUR_IN_MS,
   LanguageRepository,
   ONE_DAY_IN_MS,
-  ONE_HOUR_IN_MS,
   PageResponse,
   roundDownToNearestHalfHour,
 } from '@pulsefeed/common';
+import {
+  DEFAULT_PAGE_SIZE,
+  getLastYearDate,
+  ResponseCacheKeys,
+  ShuffleService,
+  toCacheKeyPart,
+} from '../../shared';
 import {
   CategoryFeedRequest,
   LatestFeedRequest,
   SearchArticleRequest,
   LatestFeedResponse,
 } from '../dto';
-import {
-  DEFAULT_PAGE_SIZE,
-  getLastYearDate,
-  ResponseCacheKeys,
-  ShuffleService,
-} from '../../shared';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -41,10 +42,7 @@ export class ArticleService {
   async getLatestFeedPageResponse(
     request: LatestFeedRequest,
   ): Promise<LatestFeedResponse<NewsBlock>> {
-    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_LATEST.replace(
-      '{request}',
-      JSON.stringify(request),
-    );
+    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_LATEST + toCacheKeyPart(request);
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const categories = await this.categoryRepository.getEnabledCategories();
@@ -90,42 +88,39 @@ export class ArticleService {
       };
     };
 
-    return this.cacheService.wrap(cacheKey, action, ONE_HOUR_IN_MS / 2);
+    return this.cacheService.wrap(cacheKey, action, HALF_HOUR_IN_MS);
   }
 
-  async getCategoryFeedPageResponse(
-    request: CategoryFeedRequest,
-  ): Promise<PageResponse<NewsBlock>> {
+  async getCategoryFeedPageResponse({
+    page,
+    languageKey,
+    categoryKey,
+  }: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
     const publishedBefore = roundDownToNearestHalfHour(new Date());
     const filter: ArticleFilter = {
-      page: request.page,
+      page: page,
       limit: DEFAULT_PAGE_SIZE,
-      categoryKey: request.categoryKey,
-      languageKey: request.languageKey,
+      categoryKey: categoryKey,
+      languageKey: languageKey,
       publishedBefore: publishedBefore,
     };
-    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_CATEGORY.replace(
-      '{filter}',
-      JSON.stringify(filter),
-    );
+    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_CATEGORY + toCacheKeyPart(filter);
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
-      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
-        request.languageKey,
-      );
+      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
 
       // Add top spacing for first page.
       const topSpacing = filter.page === 0;
       const blockList = this.feedBuilder.buildCategoryFeedPage(
         articles,
-        categoryTitles[request.categoryKey],
+        categoryTitles[categoryKey],
         topSpacing,
       );
       return new PageResponse(blockList, total, filter.page, filter.limit);
     };
 
-    return this.cacheService.wrap(cacheKey, action, ONE_HOUR_IN_MS);
+    return this.cacheService.wrap(cacheKey, action, HALF_HOUR_IN_MS);
   }
 
   async searchArticles(request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
@@ -136,7 +131,7 @@ export class ArticleService {
       publishedBefore: getLastYearDate(),
       searchTerm: request.term,
     };
-    const cacheKey = ResponseCacheKeys.ARTICLE_SEARCH.replace('{filter}', JSON.stringify(filter));
+    const cacheKey = ResponseCacheKeys.ARTICLE_SEARCH + toCacheKeyPart(filter);
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
