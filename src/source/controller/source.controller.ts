@@ -1,5 +1,5 @@
 import { ApiOkResponsePaginated, PageRequest, PageResponse } from '@pulsefeed/common';
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { SourceService } from '../service';
 import { ApiTags } from '@nestjs/swagger';
 import { SourceResponse } from '../dto';
@@ -14,6 +14,7 @@ export class SourceController {
    * @param request page request.
    */
   @Post('/list')
+  @HttpCode(200)
   @ApiOkResponsePaginated(SourceResponse)
   async listSource(@Body() request: PageRequest): Promise<PageResponse<SourceResponse>> {
     return this.sourceService.getSourcePageResponse(request);

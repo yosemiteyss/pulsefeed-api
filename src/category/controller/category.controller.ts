@@ -1,6 +1,6 @@
 import { CategoryListRequest, CategoryListResponse, CategoryResponse } from '../dto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { CategoryService } from '../service';
 
 @ApiTags('category')
@@ -15,6 +15,7 @@ export class CategoryController {
   @Post('/list')
   @ApiOperation({ description: 'Get article categories' })
   @ApiOkResponse({ type: CategoryResponse, isArray: true })
+  @HttpCode(200)
   async listCategory(@Body() request: CategoryListRequest): Promise<CategoryListResponse> {
     return this.categoryService.getCategoryListResponse(request);
   }

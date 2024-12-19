@@ -4,7 +4,7 @@ import {
   LatestFeedResponse,
   SearchArticleRequest,
 } from '../dto';
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { PageResponse } from '@pulsefeed/common';
 import { NewsBlock } from '../../news-block';
 import { ArticleService } from '../service';
@@ -20,6 +20,7 @@ export class ArticleController {
    * @param request latest feed request.
    */
   @Post('/latest-feed')
+  @HttpCode(200)
   async getLatestFeed(@Body() request: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
     return this.articleService.getLatestFeedPageResponse(request);
   }
@@ -29,6 +30,7 @@ export class ArticleController {
    * @param request category feed request.
    */
   @Post('/category-feed')
+  @HttpCode(200)
   async getCategoryFeed(@Body() request: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
     return this.articleService.getCategoryFeedPageResponse(request);
   }
@@ -37,6 +39,7 @@ export class ArticleController {
    * Search articles by terms.
    */
   @Post('/search')
+  @HttpCode(200)
   async searchArticles(@Body() request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
     return this.articleService.searchArticles(request);
   }

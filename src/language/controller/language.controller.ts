@@ -1,6 +1,6 @@
 import { LanguageListResponse, LanguageResponse } from '../dto';
+import { Controller, HttpCode, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { Controller, Post } from '@nestjs/common';
 import { LanguageService } from '../service';
 
 @ApiTags('language')
@@ -12,6 +12,7 @@ export class LanguageController {
    * Get supported languages.
    */
   @Post('/list')
+  @HttpCode(200)
   @ApiOkResponse({ type: LanguageResponse, isArray: true })
   async listLanguage(): Promise<LanguageListResponse> {
     return this.languageService.getLanguageListResponse();
