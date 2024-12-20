@@ -1,4 +1,4 @@
-export function toCacheKeyPart(params: object, includeStartSeparator: boolean = true): string {
+export function toCacheKeyPart(params: object): string {
   const parts: string[] = [];
 
   for (const [key, value] of Object.entries(params)) {
@@ -18,6 +18,5 @@ export function toCacheKeyPart(params: object, includeStartSeparator: boolean = 
     parts.push(`${key}:${value}`);
   }
 
-  const partString = parts.join(':');
-  return includeStartSeparator ? `:${partString}` : partString;
+  return parts.join(':');
 }

@@ -1,12 +1,6 @@
-import {
-  CacheService,
-  ONE_DAY_IN_MS,
-  PageRequest,
-  PageResponse,
-  SourceRepository,
-} from '@pulsefeed/common';
+import { CacheService, PageRequest, PageResponse, SourceRepository } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE, ResponseCacheKeys, toCacheKeyPart } from '../../shared';
+import { DEFAULT_PAGE_SIZE, ApiResponseCacheKey } from '../../shared';
 import { EnableSourceRequest, SourceResponse } from '../dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
@@ -25,7 +19,7 @@ export class SourceService {
    */
   async getSourcePageResponse({ page }: PageRequest): Promise<PageResponse<SourceResponse>> {
     const limit = DEFAULT_PAGE_SIZE;
-    const cacheKey = ResponseCacheKeys.SOURCE_LIST + toCacheKeyPart({ page: page, limit: limit });
+    const { generate, ttl } = ApiResponseCacheKey.SOURCE_LIST;
     const action = async () => {
       const [sources, total] = await this.sourceRepository.getEnabledSourcesPaginated(
         page,
@@ -36,7 +30,7 @@ export class SourceService {
       return new PageResponse<SourceResponse>(response, total, page, limit);
     };
 
-    const pageResponse = await this.cacheService.wrap(cacheKey, action, ONE_DAY_IN_MS);
+    const pageResponse = await this.cacheService.wrap(generate(page, limit), action, ttl);
     this.logger.log(
       `getEnabledSourcesPageResponse, page: ${page}, size: ${pageResponse.data.length}`,
     );
@@ -53,6 +47,6 @@ export class SourceService {
       throw new NotFoundException('Source is not found.');
     }
     await this.sourceRepository.setSourceEnabled(source.id, request.enabled);
-    await this.cacheService.deleteByPrefix(ResponseCacheKeys.SOURCE_LIST, true);
+    await this.cacheService.deleteByPrefix(ApiResponseCacheKey.SOURCE_LIST.prefix, true);
   }
 }

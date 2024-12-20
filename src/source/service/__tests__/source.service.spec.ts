@@ -1,12 +1,11 @@
 import {
   CacheService,
   LanguageEnum,
-  ONE_DAY_IN_MS,
   PageResponse,
   Source,
   SourceRepository,
 } from '@pulsefeed/common';
-import { DEFAULT_PAGE_SIZE, ResponseCacheKeys } from '../../../shared';
+import { DEFAULT_PAGE_SIZE, ApiResponseCacheKey } from '../../../shared';
 import { LoggerService, NotFoundException } from '@nestjs/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -58,9 +57,13 @@ describe('SourceService', () => {
       );
       cacheService.wrap.mockResolvedValue(mockedPage);
 
-      const cacheKey = ResponseCacheKeys.SOURCE_LIST + `:page:${page}:limit:${DEFAULT_PAGE_SIZE}`;
+      const { generate, ttl } = ApiResponseCacheKey.SOURCE_LIST;
       const result = await sourceService.getSourcePageResponse({ page });
-      expect(cacheService.wrap).toHaveBeenCalledWith(cacheKey, expect.any(Function), ONE_DAY_IN_MS);
+      expect(cacheService.wrap).toHaveBeenCalledWith(
+        generate(page, DEFAULT_PAGE_SIZE),
+        expect.any(Function),
+        ttl,
+      );
 
       const expected = new PageResponse<SourceResponse>(
         responses,
@@ -83,7 +86,10 @@ describe('SourceService', () => {
       sourceRepository.getSource.mockResolvedValue(source);
       await sourceService.setSourceEnabled({ id: 'id', enabled: false });
       expect(sourceRepository.setSourceEnabled).toHaveBeenCalledWith(source.id, false);
-      expect(cacheService.deleteByPrefix).toHaveBeenCalledWith(ResponseCacheKeys.SOURCE_LIST, true);
+      expect(cacheService.deleteByPrefix).toHaveBeenCalledWith(
+        ApiResponseCacheKey.SOURCE_LIST.prefix,
+        true,
+      );
     });
 
     it('should throw NotFoundException if source is not found', async () => {

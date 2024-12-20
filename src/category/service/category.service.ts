@@ -4,10 +4,10 @@ import {
   EnableCategoryRequest,
   CategoryListResponse,
 } from '../dto';
-import { ArticleCategoryRepository, CacheService, ONE_DAY_IN_MS } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { ResponseCacheKeys, toCacheKeyPart } from '../../shared';
+import { ArticleCategoryRepository, CacheService } from '@pulsefeed/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { ApiResponseCacheKey } from '../../shared';
 
 @Injectable()
 export class CategoryService {
@@ -39,8 +39,8 @@ export class CategoryService {
         );
       });
     };
-    const cacheKey = ResponseCacheKeys.CATEGORY_LIST + toCacheKeyPart({ languageKey: languageKey });
-    const categories = await this.cacheService.wrap(cacheKey, action, ONE_DAY_IN_MS);
+    const { generate, ttl } = ApiResponseCacheKey.CATEGORY_LIST;
+    const categories = await this.cacheService.wrap(generate(languageKey), action, ttl);
     this.logger.log(`getCategoryListResponse, size: ${categories.length}`, CategoryService.name);
 
     return new CategoryListResponse(categories);
@@ -59,7 +59,7 @@ export class CategoryService {
     }
 
     await this.categoryRepository.setCategoryEnabled(category.key, enabled);
-    await this.cacheService.deleteByPrefix(ResponseCacheKeys.CATEGORY_LIST, true);
+    await this.cacheService.deleteByPrefix(ApiResponseCacheKey.CATEGORY_LIST.prefix, true);
     this.logger.log(`setCategoryEnabled, key: ${key}, enabled: ${enabled}`, CategoryService.name);
   }
 }

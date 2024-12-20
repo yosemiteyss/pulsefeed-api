@@ -1,7 +1,6 @@
 import {
   ArticleCategoryRepository,
   CacheService,
-  HALF_HOUR_IN_MS,
   LanguageRepository,
   ONE_DAY_IN_MS,
   PageResponse,
@@ -10,7 +9,7 @@ import {
 import {
   DEFAULT_PAGE_SIZE,
   getLastYearDate,
-  ResponseCacheKeys,
+  ApiResponseCacheKey,
   ShuffleService,
   toCacheKeyPart,
 } from '../../shared';
@@ -39,22 +38,21 @@ export class ArticleService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
-  async getLatestFeedPageResponse(
-    request: LatestFeedRequest,
-  ): Promise<LatestFeedResponse<NewsBlock>> {
-    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_LATEST + toCacheKeyPart(request);
+  async getLatestFeedPageResponse({
+    languageKey,
+    feedSection,
+  }: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
+    const { generate, ttl } = ApiResponseCacheKey.ARTICLE_LATEST_FEED;
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const categories = await this.categoryRepository.getEnabledCategories();
-      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
-        request.languageKey,
-      );
+      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
       const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
 
       // Resolve category index.
       let categoryIndex = 0;
-      if (request.feedSection) {
-        const index = topCategories.findIndex((category) => category.key === request.feedSection);
+      if (feedSection) {
+        const index = topCategories.findIndex((category) => category.key === feedSection);
         if (index != -1) {
           categoryIndex = index;
         }
@@ -66,7 +64,7 @@ export class ArticleService {
         page: 1,
         limit: 20,
         categoryKey: topCategories[categoryIndex].key,
-        languageKey: request.languageKey,
+        languageKey: languageKey,
         publishedBefore: publishedBefore,
       });
       articles = articles.slice(0, 10);
@@ -88,7 +86,7 @@ export class ArticleService {
       };
     };
 
-    return this.cacheService.wrap(cacheKey, action, HALF_HOUR_IN_MS);
+    return this.cacheService.wrap(generate(languageKey, feedSection), action, ttl);
   }
 
   async getCategoryFeedPageResponse({
@@ -104,7 +102,7 @@ export class ArticleService {
       languageKey: languageKey,
       publishedBefore: publishedBefore,
     };
-    const cacheKey = ResponseCacheKeys.ARTICLE_FEED_CATEGORY + toCacheKeyPart(filter);
+    const { generate, ttl } = ApiResponseCacheKey.ARTICLE_CATEGORY_FEED;
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
@@ -120,7 +118,7 @@ export class ArticleService {
       return new PageResponse(blockList, total, filter.page, filter.limit);
     };
 
-    return this.cacheService.wrap(cacheKey, action, HALF_HOUR_IN_MS);
+    return this.cacheService.wrap(generate(filter), action, ttl);
   }
 
   async searchArticles(request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
@@ -131,7 +129,7 @@ export class ArticleService {
       publishedBefore: getLastYearDate(),
       searchTerm: request.term,
     };
-    const cacheKey = ResponseCacheKeys.ARTICLE_SEARCH + toCacheKeyPart(filter);
+    const cacheKey = ApiResponseCacheKey.ARTICLE_SEARCH + toCacheKeyPart(filter);
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
