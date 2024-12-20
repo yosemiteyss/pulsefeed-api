@@ -18,7 +18,7 @@ import { AdminModule } from './admin';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ ttl: ONE_SECOND_IN_MS, limit: 5 }]),
+    ThrottlerModule.forRoot([{ ttl: ONE_SECOND_IN_MS, limit: 100 }]),
     ConfigModule,
     DatabaseModule,
     CacheModule,
