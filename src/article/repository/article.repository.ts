@@ -1,8 +1,7 @@
+import { PrismaClient, PrismaService } from '@pulsefeed/common';
 import { ArticleData, ArticleFilter } from '../model';
-import { PrismaService } from '@pulsefeed/common';
 import { ArticleMapper } from './article.mapper';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArticleRepository {
@@ -16,7 +15,7 @@ export class ArticleRepository {
    * @returns array of article data and number of articles
    */
   async getArticles(filter: ArticleFilter): Promise<[ArticleData[], number]> {
-    const whereClause: Prisma.ArticleWhereInput = {};
+    const whereClause: PrismaClient.Prisma.ArticleWhereInput = {};
 
     // Filter by publish date.
     whereClause.publishedAt = {

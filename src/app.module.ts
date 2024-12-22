@@ -22,7 +22,7 @@ import { AdminModule } from './admin';
     ConfigModule,
     DatabaseModule,
     CacheModule,
-    LoggerModule,
+    LoggerModule.forRootAsync(),
     AuthModule,
     AdminModule,
     ArticleModule,
