@@ -1,33 +1,23 @@
-## Setup Project
+# pulsefeed-api
+API service for pulsefeed frontend applications.
 
+## Setup
 ```bash
 $ cp .env.local .env
-
-$ git submodule init
-$ git submodule update
-
 $ npm install
-
-$ npm run prisma:generate
-
-$ npm run build
 ```
 
-## Run App
-
+## Run
 ```bash
-# development
 $ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
-
 ```bash
 $ npm run test
 ```
+
+## Post-Build
+### Copy generated prisma client to dist folder
+- During post-build stage, we manually copy the generated prisma client to dist folder.
+  This is done by including the generated client directory as assets in `nest-cli.json`.
