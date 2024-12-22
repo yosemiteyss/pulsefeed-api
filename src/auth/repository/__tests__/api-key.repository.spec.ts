@@ -1,7 +1,6 @@
+import { ApiKey, PrismaClient, PrismaService } from '@pulsefeed/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
-import { ApiKey, PrismaService } from '@pulsefeed/common';
 import { ApiKeyRepository } from '../api-key.repository';
-import { ApiKey as ApiKeyEntity } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 
 describe('ApiKeyRepository', () => {
@@ -26,7 +25,7 @@ describe('ApiKeyRepository', () => {
 
   describe('getAll', () => {
     it('should return all api keys', async () => {
-      const entities: ApiKeyEntity[] = [
+      const entities: PrismaClient.ApiKey[] = [
         {
           key: '123asdf',
           createdAt: new Date(),
@@ -45,7 +44,7 @@ describe('ApiKeyRepository', () => {
   describe('create', () => {
     it('should create new api key', async () => {
       const apiKey: ApiKey = { key: '123asdf' };
-      const entity: ApiKeyEntity = {
+      const entity: PrismaClient.ApiKey = {
         key: apiKey.key,
         createdAt: new Date(),
         updatedAt: new Date(),
