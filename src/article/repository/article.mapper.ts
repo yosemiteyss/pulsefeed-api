@@ -1,9 +1,10 @@
-import { ArticleCategoryEnum, LanguageEnum, PrismaClient } from '@pulsefeed/common';
+import { ArticleCategoryEnum, LanguageEnum } from '@pulsefeed/common';
+import { Prisma } from '@prisma/client';
 import { ArticleData } from '../model';
 
 export class ArticleMapper {
   entityToModel(
-    entity: PrismaClient.Prisma.ArticleGetPayload<{
+    entity: Prisma.ArticleGetPayload<{
       include: { source: true; category: true; languages: true };
     }>,
   ): ArticleData {
