@@ -1,6 +1,10 @@
 # pulsefeed-api
 API service for pulsefeed frontend applications.
 
+## Swagger
+- Swagger documentation is auto generated when application starts.
+- Url: http://127.0.0.1:3000/docs
+
 ## Setup
 ```bash
 $ npm run submodule init
