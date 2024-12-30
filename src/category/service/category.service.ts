@@ -4,8 +4,8 @@ import {
   EnableCategoryRequest,
   CategoryListResponse,
 } from '../dto';
+import { ArticleCategoryRepository, CacheKeyBuilder, CacheService } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { ArticleCategoryRepository, CacheService } from '@pulsefeed/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ApiResponseCacheKey } from '../../shared';
 
@@ -39,8 +39,13 @@ export class CategoryService {
         );
       });
     };
-    const { generate, ttl } = ApiResponseCacheKey.CATEGORY_LIST;
-    const categories = await this.cacheService.wrap(generate(languageKey), action, ttl);
+    const categories = await this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.CATEGORY_LIST.prefix, {
+        languageKey: languageKey,
+      }),
+      action,
+      ApiResponseCacheKey.CATEGORY_LIST.ttl,
+    );
     this.logger.log(`getCategoryListResponse, size: ${categories.length}`, CategoryService.name);
 
     return new CategoryListResponse(categories);

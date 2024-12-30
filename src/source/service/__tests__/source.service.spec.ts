@@ -55,14 +55,15 @@ describe('SourceService', () => {
         page,
         DEFAULT_PAGE_SIZE,
       );
+
       cacheService.wrap.mockResolvedValue(mockedPage);
 
-      const { generate, ttl } = ApiResponseCacheKey.SOURCE_LIST;
+      const cacheKey = `${ApiResponseCacheKey.SOURCE_LIST.prefix}:page:${page}:limit:${DEFAULT_PAGE_SIZE}`;
       const result = await sourceService.getSourcePageResponse({ page });
       expect(cacheService.wrap).toHaveBeenCalledWith(
-        generate(page, DEFAULT_PAGE_SIZE),
+        cacheKey,
         expect.any(Function),
-        ttl,
+        ApiResponseCacheKey.SOURCE_LIST.ttl,
       );
 
       const expected = new PageResponse<SourceResponse>(

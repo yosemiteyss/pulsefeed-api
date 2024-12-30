@@ -41,16 +41,17 @@ describe('CategoryService', () => {
 
   describe('getCategoryListResponse', () => {
     it('should get cached categories', async () => {
+      const languageKey = 'en';
       const mockedCategories: CategoryResponse[] = [new CategoryResponse('key', 'title', 1)];
+      const cacheKey = `${ApiResponseCacheKey.CATEGORY_LIST.prefix}:languageKey:${languageKey}`;
+
       cacheService.wrap.mockResolvedValue(mockedCategories);
 
-      const languageKey = 'en';
-      const { generate, ttl } = ApiResponseCacheKey.CATEGORY_LIST;
       const result = await categoryService.getCategoryListResponse({ languageKey });
       expect(cacheService.wrap).toHaveBeenCalledWith(
-        generate(languageKey),
+        cacheKey,
         expect.any(Function),
-        ttl,
+        ApiResponseCacheKey.CATEGORY_LIST.ttl,
       );
 
       const response = new CategoryListResponse(mockedCategories);

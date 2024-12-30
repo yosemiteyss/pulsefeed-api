@@ -1,6 +1,6 @@
 import { EnableLanguageRequest, LanguageListResponse, LanguageResponse } from '../dto';
+import { CacheKeyBuilder, CacheService, LanguageRepository } from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
-import { CacheService, LanguageRepository } from '@pulsefeed/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ApiResponseCacheKey } from '../../shared';
 
@@ -21,8 +21,11 @@ export class LanguageService {
       const languages = await this.languageRepository.getEnabledLanguages(false);
       return languages.map((language) => LanguageResponse.fromModel(language));
     };
-    const { generate, ttl } = ApiResponseCacheKey.LANGUAGE_LIST;
-    const languages = await this.cacheService.wrap(generate(), action, ttl);
+    const languages = await this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithSegments(ApiResponseCacheKey.LANGUAGE_LIST.prefix),
+      action,
+      ApiResponseCacheKey.LANGUAGE_LIST.ttl,
+    );
 
     this.logger.log(`getLanguageListResponse, size: ${languages.length}`, LanguageService.name);
     return new LanguageListResponse(languages);

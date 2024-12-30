@@ -1,5 +1,6 @@
 import {
   ArticleCategoryRepository,
+  CacheKeyBuilder,
   CacheService,
   LanguageRepository,
   ONE_DAY_IN_MS,
@@ -7,9 +8,9 @@ import {
   roundDownToNearestHalfHour,
 } from '@pulsefeed/common';
 import {
+  ApiResponseCacheKey,
   DEFAULT_PAGE_SIZE,
   getLastYearDate,
-  ApiResponseCacheKey,
   ShuffleService,
   toCacheKeyPart,
 } from '../../shared';
@@ -42,8 +43,6 @@ export class ArticleService {
     languageKey,
     feedSection,
   }: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
-    const { generate, ttl } = ApiResponseCacheKey.ARTICLE_LATEST_FEED;
-
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const categories = await this.categoryRepository.getEnabledCategories();
       const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
@@ -86,7 +85,14 @@ export class ArticleService {
       };
     };
 
-    return this.cacheService.wrap(generate(languageKey, feedSection), action, ttl);
+    return this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_LATEST_FEED.prefix, {
+        languageKey: languageKey,
+        feedSection: feedSection,
+      }),
+      action,
+      ApiResponseCacheKey.ARTICLE_LATEST_FEED.ttl,
+    );
   }
 
   async getCategoryFeedPageResponse({
@@ -102,7 +108,6 @@ export class ArticleService {
       languageKey: languageKey,
       publishedBefore: publishedBefore,
     };
-    const { generate, ttl } = ApiResponseCacheKey.ARTICLE_CATEGORY_FEED;
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
@@ -118,7 +123,13 @@ export class ArticleService {
       return new PageResponse(blockList, total, filter.page, filter.limit);
     };
 
-    return this.cacheService.wrap(generate(filter), action, ttl);
+    return this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.prefix, {
+        filter: filter,
+      }),
+      action,
+      ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.ttl,
+    );
   }
 
   async searchArticles(request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {

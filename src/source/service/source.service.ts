@@ -1,4 +1,10 @@
-import { CacheService, PageRequest, PageResponse, SourceRepository } from '@pulsefeed/common';
+import {
+  CacheKeyBuilder,
+  CacheService,
+  PageRequest,
+  PageResponse,
+  SourceRepository,
+} from '@pulsefeed/common';
 import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { DEFAULT_PAGE_SIZE, ApiResponseCacheKey } from '../../shared';
 import { EnableSourceRequest, SourceResponse } from '../dto';
@@ -19,7 +25,6 @@ export class SourceService {
    */
   async getSourcePageResponse({ page }: PageRequest): Promise<PageResponse<SourceResponse>> {
     const limit = DEFAULT_PAGE_SIZE;
-    const { generate, ttl } = ApiResponseCacheKey.SOURCE_LIST;
     const action = async () => {
       const [sources, total] = await this.sourceRepository.getEnabledSourcesPaginated(
         page,
@@ -30,7 +35,14 @@ export class SourceService {
       return new PageResponse<SourceResponse>(response, total, page, limit);
     };
 
-    const pageResponse = await this.cacheService.wrap(generate(page, limit), action, ttl);
+    const pageResponse = await this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.SOURCE_LIST.prefix, {
+        page: page,
+        limit: limit,
+      }),
+      action,
+      ApiResponseCacheKey.SOURCE_LIST.ttl,
+    );
     this.logger.log(
       `getEnabledSourcesPageResponse, page: ${page}, size: ${pageResponse.data.length}`,
     );

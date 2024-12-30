@@ -44,9 +44,12 @@ describe('LanguageService', () => {
       const mockedLangDtos: LanguageResponse[] = [{ key: 'en' }];
       cacheService.wrap.mockResolvedValue(mockedLangDtos);
 
-      const { generate, ttl } = ApiResponseCacheKey.LANGUAGE_LIST;
       const result = await languageService.getLanguageListResponse();
-      expect(cacheService.wrap).toHaveBeenCalledWith(generate(), expect.any(Function), ttl);
+      expect(cacheService.wrap).toHaveBeenCalledWith(
+        ApiResponseCacheKey.LANGUAGE_LIST.prefix,
+        expect.any(Function),
+        ApiResponseCacheKey.LANGUAGE_LIST.ttl,
+      );
 
       const response = new LanguageListResponse(mockedLangDtos);
       expect(result).toEqual(response);
