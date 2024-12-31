@@ -124,9 +124,7 @@ export class ArticleService {
     };
 
     return this.cacheService.wrap(
-      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.prefix, {
-        filter: filter,
-      }),
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.prefix, filter),
       action,
       ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.ttl,
     );
