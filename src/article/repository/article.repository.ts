@@ -18,6 +18,9 @@ export class ArticleRepository {
   async getArticles(filter: ArticleFilter): Promise<[ArticleData[], number]> {
     const whereClause: Prisma.ArticleWhereInput = {};
 
+    // Retrieve only published articles.
+    whereClause.isPublished = true;
+
     // Filter by publish date.
     whereClause.publishedAt = {
       lt: filter.publishedBefore,
