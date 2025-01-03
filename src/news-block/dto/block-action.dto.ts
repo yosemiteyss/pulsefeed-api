@@ -39,9 +39,10 @@ export abstract class BlockAction {
  * A block action which represents navigation to the article.
  */
 export class NavigateToArticleAction extends BlockAction {
-  constructor(articleId: string) {
+  constructor(articleId: string, articleUrl: string) {
     super(NavigateToArticleAction.identifier, BlockActionType.Navigation);
     this.articleId = articleId;
+    this.articleUrl = articleUrl;
   }
 
   /**
@@ -53,6 +54,11 @@ export class NavigateToArticleAction extends BlockAction {
    * The id of the video article to navigate to.
    */
   readonly articleId: string;
+
+  /**
+   * The url of the video article to navigate to.
+   */
+  readonly articleUrl: string;
 }
 
 /**

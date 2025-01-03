@@ -25,7 +25,7 @@ describe('PostGridTileBlock', () => {
       articleDto,
       categoryDto,
       sourceDto,
-      new NavigateToArticleAction(articleDto.id),
+      new NavigateToArticleAction(articleDto.id, articleDto.link),
     );
     const jsonString = JSON.stringify(block);
 
@@ -57,6 +57,7 @@ describe('PostGridTileBlock', () => {
         type: NavigateToArticleAction.identifier,
         actionType: 0,
         articleId: 'id',
+        articleUrl: 'link',
       },
       isPremium: false,
       isContentOverlaid: true,

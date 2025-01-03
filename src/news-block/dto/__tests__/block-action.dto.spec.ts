@@ -11,13 +11,14 @@ import { SlideBlock } from '../slide-block.dto';
 
 describe('BlockAction', () => {
   it('should serialize NavigateToArticleAction to JSON correctly', () => {
-    const block = new NavigateToArticleAction('articleId');
+    const block = new NavigateToArticleAction('articleId', 'articleUrl');
     const jsonString = JSON.stringify(block);
 
     const expectedJson = {
       type: NavigateToArticleAction.identifier,
       actionType: BlockActionType.Navigation,
       articleId: 'articleId',
+      articleUrl: 'articleUrl',
     };
 
     expect(JSON.parse(jsonString)).toEqual(expectedJson);

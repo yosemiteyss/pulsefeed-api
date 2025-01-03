@@ -54,7 +54,7 @@ export class ArticleFeedBuilder {
           ArticleResponse.fromModel(item.article),
           CategoryResponse.fromModel(item.category, categoryTitle),
           SourceResponse.fromModel(item.source),
-          new NavigateToArticleAction(item.article.id),
+          new NavigateToArticleAction(item.article.id, item.article.link),
         );
       }),
     );
@@ -69,7 +69,7 @@ export class ArticleFeedBuilder {
         ArticleResponse.fromModel(item.article),
         CategoryResponse.fromModel(item.category, categoryTitle),
         SourceResponse.fromModel(item.source),
-        new NavigateToArticleAction(item.article.id),
+        new NavigateToArticleAction(item.article.id, item.article.link),
       );
       blockList.push(block);
 
@@ -103,7 +103,7 @@ export class ArticleFeedBuilder {
         ArticleResponse.fromModel(item.article),
         CategoryResponse.fromModel(item.category, categoryTitle),
         SourceResponse.fromModel(item.source),
-        new NavigateToArticleAction(item.article.id),
+        new NavigateToArticleAction(item.article.id, item.article.link),
       );
       blockList.push(block);
 
@@ -137,7 +137,7 @@ export class ArticleFeedBuilder {
         ArticleResponse.fromModel(item.article),
         CategoryResponse.fromModel(item.category, categoryTitles[item.category.key]),
         SourceResponse.fromModel(item.source),
-        new NavigateToArticleAction(item.article.id),
+        new NavigateToArticleAction(item.article.id, item.article.link),
       );
       blockList.push(block);
 

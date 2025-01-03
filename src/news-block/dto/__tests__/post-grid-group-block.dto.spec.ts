@@ -27,7 +27,7 @@ describe('PostGridGroupBlock', () => {
         articleDto,
         categoryDto,
         sourceDto,
-        new NavigateToArticleAction(articleDto.id),
+        new NavigateToArticleAction(articleDto.id, articleDto.link),
       ),
     ]);
     const jsonString = JSON.stringify(block);
@@ -68,6 +68,7 @@ describe('PostGridGroupBlock', () => {
             type: NavigateToArticleAction.identifier,
             actionType: 0,
             articleId: 'id',
+            articleUrl: 'link',
           },
           isPremium: false,
           isContentOverlaid: true,

@@ -24,7 +24,7 @@ describe('PostMediumBlock', () => {
       articleDto,
       categoryDto,
       sourceDto,
-      new NavigateToArticleAction(articleDto.id),
+      new NavigateToArticleAction(articleDto.id, articleDto.link),
     );
     const jsonString = JSON.stringify(block);
 
@@ -56,6 +56,7 @@ describe('PostMediumBlock', () => {
         type: NavigateToArticleAction.identifier,
         actionType: 0,
         articleId: 'id',
+        articleUrl: 'link',
       },
       isPremium: false,
       isContentOverlaid: false,

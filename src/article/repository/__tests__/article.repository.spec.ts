@@ -42,6 +42,7 @@ describe('ArticleRepository', () => {
           languages: true,
         },
         where: {
+          isPublished: true,
           languages: {
             some: {
               languageKey: filter.languageKey,
@@ -81,6 +82,7 @@ describe('ArticleRepository', () => {
           languages: true,
         },
         where: {
+          isPublished: true,
           publishedAt: {
             lt: filter.publishedBefore,
           },
