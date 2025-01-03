@@ -1,18 +1,18 @@
 import { LoggerService, UnauthorizedException } from '@nestjs/common';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { HmacMiddleware } from '../hmac.middleware';
-import { ApiKeyService } from '../../service';
+import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
 
 describe('HmacMiddleware', () => {
   let hmacMiddleware: HmacMiddleware;
-  let mockApiKeyService: DeepMockProxy<ApiKeyService>;
+  let configService: DeepMockProxy<ConfigService>;
   let loggerService: DeepMockProxy<LoggerService>;
 
   beforeEach(() => {
-    mockApiKeyService = mockDeep<ApiKeyService>();
+    configService = mockDeep<ConfigService>();
     loggerService = mockDeep<LoggerService>();
-    hmacMiddleware = new HmacMiddleware(mockApiKeyService, loggerService);
+    hmacMiddleware = new HmacMiddleware(configService, loggerService);
   });
 
   it('should throw UnauthorizedException if signature is missing', async () => {
@@ -28,8 +28,9 @@ describe('HmacMiddleware', () => {
     const req = { headers: { 'x-signature': 'valid-signature' } };
     const res = {};
     const next = jest.fn();
+    const apiKey = 'apiKey';
 
-    mockApiKeyService.getDefaultApiKey.mockResolvedValue(undefined);
+    configService.get.mockReturnValue(apiKey);
 
     await expect(hmacMiddleware.use(req, res, next)).rejects.toThrow(UnauthorizedException);
     expect(next).not.toHaveBeenCalled();
@@ -62,6 +63,9 @@ describe('HmacMiddleware', () => {
   });
 
   it('should call next() if signatures match', async () => {
+    const apiKey = 'apiKey';
+    configService.get.mockReturnValue(apiKey);
+
     const timestamp = Date.now();
     const req = {
       method: 'POST',
@@ -69,21 +73,18 @@ describe('HmacMiddleware', () => {
       headers: { 'content-type': 'application/json', 'x-timestamp': `${timestamp}` },
       body: { key: 'value' },
     };
-    const secretKey = 'secret-key';
 
     // Compute signature
     const stringToSign =
       `${req.method} ` + `${req.originalUrl}\n` + `${timestamp}\n` + `${JSON.stringify(req.body)}`;
 
     req.headers['x-signature'] = crypto
-      .createHmac('sha256', secretKey)
+      .createHmac('sha256', apiKey)
       .update(stringToSign)
       .digest('hex');
 
     const res = {};
     const next = jest.fn();
-
-    mockApiKeyService.getDefaultApiKey.mockResolvedValue(secretKey);
 
     await hmacMiddleware.use(req, res, next);
     expect(next).toHaveBeenCalled();

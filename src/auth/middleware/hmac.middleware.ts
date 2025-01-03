@@ -6,13 +6,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ApiKeyService } from '../service';
+import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class HmacMiddleware implements NestMiddleware {
   constructor(
-    private readonly apiKeyService: ApiKeyService,
+    private readonly configService: ConfigService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
@@ -30,7 +30,7 @@ export class HmacMiddleware implements NestMiddleware {
       throw new UnauthorizedException();
     }
 
-    const secretKey = await this.apiKeyService.getDefaultApiKey();
+    const secretKey = this.configService.get<string>('API_KEY');
     if (!secretKey) {
       throw new UnauthorizedException();
     }

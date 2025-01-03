@@ -9,7 +9,6 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { EnableLanguageRequest, LanguageService } from '../language';
 import { EnableCategoryRequest, CategoryService } from '../category';
 import { EnableSourceRequest, SourceService } from '../source';
-import { ApiKeyResponse, ApiKeyService } from '../auth';
 import { AdminGuard } from './admin.guard';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -18,7 +17,6 @@ import { ApiTags } from '@nestjs/swagger';
 @UseGuards(AdminGuard)
 export class AdminController {
   constructor(
-    private readonly apiKeyService: ApiKeyService,
     private readonly sourceService: SourceService,
     private readonly categoryService: CategoryService,
     private readonly languageService: LanguageService,
@@ -26,14 +24,6 @@ export class AdminController {
     private readonly dbHealth: TypeOrmHealthIndicator,
     private readonly memoryHealth: MemoryHealthIndicator,
   ) {}
-
-  /**
-   * Create a new api key
-   */
-  @Post('/create-api-key')
-  async createApiKey(): Promise<ApiKeyResponse> {
-    return this.apiKeyService.createApiKey();
-  }
 
   /**
    * Enable or disable source.
