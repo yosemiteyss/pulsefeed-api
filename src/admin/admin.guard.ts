@@ -11,7 +11,7 @@ export class AdminGuard implements CanActivate {
 
     if (authorization && authorization.startsWith('Bearer ')) {
       const key = authorization.substring(7);
-      return key === this.configService.get<string>('ADMIN_SECRET_KEY');
+      return key === this.configService.get<string>('PF_ADMIN_KEY');
     }
 
     return false;

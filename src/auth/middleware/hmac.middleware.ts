@@ -30,7 +30,7 @@ export class HmacMiddleware implements NestMiddleware {
       throw new UnauthorizedException();
     }
 
-    const secretKey = this.configService.get<string>('API_KEY');
+    const secretKey = this.configService.get<string>('PF_API_KEY');
     if (!secretKey) {
       throw new UnauthorizedException();
     }
