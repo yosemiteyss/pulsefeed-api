@@ -17,12 +17,14 @@ import { SourceModule } from './source';
 import { AdminModule } from './admin';
 
 @Module({
+  imports: [DatabaseModule, CacheModule, ConfigModule, LoggerModule.forRootAsync()],
+})
+class CoreModule {}
+
+@Module({
   imports: [
+    CoreModule,
     ThrottlerModule.forRoot([{ ttl: ONE_SECOND_IN_MS, limit: 100 }]),
-    ConfigModule,
-    DatabaseModule,
-    CacheModule,
-    LoggerModule.forRootAsync(),
     AuthModule,
     AdminModule,
     ArticleModule,
