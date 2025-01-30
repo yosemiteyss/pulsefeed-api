@@ -24,6 +24,7 @@ export class ArticleRepository {
     // Filter by publish date.
     whereClause.publishedAt = {
       lt: filter.publishedBefore,
+      gt: filter.publishedAfter,
     };
 
     // Filter by language.
