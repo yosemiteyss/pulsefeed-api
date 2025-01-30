@@ -26,6 +26,6 @@ export const ApiResponseCacheKey = {
   },
   ARTICLE_SEARCH: {
     prefix: 'pf:api:response:article:search',
-    ttl: ONE_DAY_IN_MS,
+    ttl: HALF_HOUR_IN_MS,
   },
 };

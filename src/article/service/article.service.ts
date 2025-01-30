@@ -3,16 +3,14 @@ import {
   CacheKeyBuilder,
   CacheService,
   LanguageRepository,
-  ONE_DAY_IN_MS,
   PageResponse,
-  roundDownToNearestHalfHour,
 } from '@pulsefeed/common';
 import {
   ApiResponseCacheKey,
   DEFAULT_PAGE_SIZE,
-  getLastYearDate,
+  getLastQuarterHour,
+  getYearsAgo,
   ShuffleService,
-  toCacheKeyPart,
 } from '../../shared';
 import {
   CategoryFeedRequest,
@@ -39,6 +37,11 @@ export class ArticleService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
+  /**
+   * Get latest feed.
+   * @param languageKey the language key.
+   * @param categoryKey the category key.
+   */
   async getLatestFeedPageResponse({
     languageKey,
     feedSection,
@@ -57,14 +60,16 @@ export class ArticleService {
         }
       }
 
-      // Get first 10 articles from the selected category.
-      const publishedBefore = roundDownToNearestHalfHour(new Date());
+      const quarterHourAgo = getLastQuarterHour();
+      const oneYearAgo = getYearsAgo(1);
+
       let [articles] = await this.getArticlesByFilter({
         page: 1,
         limit: 20,
         categoryKey: topCategories[categoryIndex].key,
         languageKey: languageKey,
-        publishedBefore: publishedBefore,
+        publishedBefore: quarterHourAgo,
+        publishedAfter: oneYearAgo,
       });
       articles = articles.slice(0, 10);
 
@@ -95,18 +100,27 @@ export class ArticleService {
     );
   }
 
+  /**
+   * Get category feed.
+   * @param page the page number.
+   * @param languageKey the language key.
+   * @param categoryKey the category key.
+   */
   async getCategoryFeedPageResponse({
     page,
     languageKey,
     categoryKey,
   }: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
-    const publishedBefore = roundDownToNearestHalfHour(new Date());
+    const quarterHourAgo = getLastQuarterHour();
+    const oneYearAgo = getYearsAgo(1);
+
     const filter: ArticleFilter = {
       page: page,
       limit: DEFAULT_PAGE_SIZE,
       categoryKey: categoryKey,
       languageKey: languageKey,
-      publishedBefore: publishedBefore,
+      publishedBefore: quarterHourAgo,
+      publishedAfter: oneYearAgo,
     };
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
@@ -130,21 +144,32 @@ export class ArticleService {
     );
   }
 
-  async searchArticles(request: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
+  /**
+   * Search articles.
+   * @param page the page number.
+   * @param languageKey the language key.
+   * @param term the search term.
+   */
+  async searchArticles({
+    page,
+    languageKey,
+    term,
+  }: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
+    const quarterHourAgo = getLastQuarterHour();
+    const oneYearAgo = getYearsAgo(1);
+
     const filter: ArticleFilter = {
-      page: request.page,
+      page: page,
       limit: DEFAULT_PAGE_SIZE,
-      languageKey: request.languageKey,
-      publishedBefore: getLastYearDate(),
-      searchTerm: request.term,
+      languageKey: languageKey,
+      publishedBefore: quarterHourAgo,
+      publishedAfter: oneYearAgo,
+      searchTerm: term,
     };
-    const cacheKey = ApiResponseCacheKey.ARTICLE_SEARCH + toCacheKeyPart(filter);
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
-      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
-        request.languageKey,
-      );
+      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
 
       // Add top spacing for first page.
       const topSpacing = filter.page === 0;
@@ -153,7 +178,11 @@ export class ArticleService {
       return new PageResponse(blockList, total, filter.page, filter.limit);
     };
 
-    return this.cacheService.wrap(cacheKey, action, ONE_DAY_IN_MS);
+    return this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_SEARCH.prefix, filter),
+      action,
+      ApiResponseCacheKey.ARTICLE_SEARCH.ttl,
+    );
   }
 
   private async getArticlesByFilter(filter: ArticleFilter): Promise<[ArticleData[], number]> {

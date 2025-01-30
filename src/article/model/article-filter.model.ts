@@ -15,9 +15,14 @@ export interface ArticleFilter {
   readonly languageKey: string;
 
   /**
-   * Returns articles which published before the given date.
+   * Returns articles which are published before the given date.
    */
   readonly publishedBefore: Date;
+
+  /**
+   * Return articles which are published after the given date.
+   */
+  readonly publishedAfter?: Date;
 
   /**
    * (Optional): returns articles of the given category.

@@ -1,21 +1,31 @@
-import { getLastYearDate } from '../date.utils';
+import { getLastQuarterHour, getYearsAgo } from '../date.utils';
 
-describe('getLastYearDate', () => {
-  it('should return the same day last year with time set to 00:00:00', () => {
-    const today = new Date();
-    const expectedDate = new Date(today);
-    expectedDate.setFullYear(today.getFullYear() - 1);
-    expectedDate.setHours(0, 0, 0, 0); // Set expected time to 00:00:00
+describe('DateUtils', () => {
+  describe('getLastQuarterHour', () => {
+    it('should return the last quarter-hour correctly', () => {
+      const result = getLastQuarterHour('2025-01-31T13:37:00Z');
+      const expected = new Date('2025-01-31T13:30:00Z');
+      expect(result).toEqual(expected);
+    });
 
-    const result = getLastYearDate();
+    it('should return the exact hour when at the start of an hour', () => {
+      const result = getLastQuarterHour('2025-01-31T14:00:00Z');
+      const expected = new Date('2025-01-31T14:00:00Z');
+      expect(result).toEqual(expected);
+    });
 
-    // Compare year, month, day, hours, minutes, seconds, and milliseconds
-    expect(result.getFullYear()).toBe(expectedDate.getFullYear());
-    expect(result.getMonth()).toBe(expectedDate.getMonth());
-    expect(result.getDate()).toBe(expectedDate.getDate());
-    expect(result.getHours()).toBe(0);
-    expect(result.getMinutes()).toBe(0);
-    expect(result.getSeconds()).toBe(0);
-    expect(result.getMilliseconds()).toBe(0);
+    it('should return the previous quarter-hour correctly', () => {
+      const result = getLastQuarterHour('2025-01-31T14:59:00Z');
+      const expected = new Date('2025-01-31T14:45:00Z');
+      expect(result).toEqual(expected);
+    });
+  });
+
+  describe('getYearsAgo', () => {
+    it('should return the correct date from years ago', () => {
+      const result = getYearsAgo(3, '2025-01-31T13:37:00Z');
+      const expected = new Date('2022-01-31T00:00:00.000Z');
+      expect(result).toEqual(expected);
+    });
   });
 });
