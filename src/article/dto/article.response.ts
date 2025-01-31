@@ -62,10 +62,13 @@ export class ArticleResponse {
   readonly publishedAt?: Date;
 
   static fromModel(article: Article): ArticleResponse {
+    // Exclude description from response when article image exists.
+    const description = !article.image ? article.description : undefined;
+
     return {
       id: article.id,
       title: article.title,
-      description: article.description,
+      description: description,
       imageUrl: article.image,
       link: article.link,
       categoryKey: article.category,
