@@ -11,6 +11,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerMiddleware } from 'nestjs-http-logger';
 import { CategoryModule } from './category';
 import { LanguageModule } from './language';
+import { TrendingModule } from './trending';
 import { ArticleModule } from './article';
 import { APP_GUARD } from '@nestjs/core';
 import { SourceModule } from './source';
@@ -31,6 +32,7 @@ class CoreModule {}
     SourceModule,
     CategoryModule,
     LanguageModule,
+    TrendingModule,
   ],
   providers: [
     {
