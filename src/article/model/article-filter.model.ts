@@ -47,4 +47,9 @@ export interface ArticleFilter {
    * When it's not set, returns all articles.
    */
   readonly searchTerm?: string;
+
+  /**
+   * (Optional): return articles with the given keywords.
+   */
+  readonly keywords?: string[];
 }

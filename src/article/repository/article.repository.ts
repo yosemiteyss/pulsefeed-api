@@ -64,6 +64,13 @@ export class ArticleRepository {
       };
     }
 
+    // Filter articles by the given keywords.
+    if (filter.keywords) {
+      whereClause.keywords = {
+        hasSome: filter.keywords,
+      };
+    }
+
     const [entities, total] = await this.prismaService.article.findManyAndCount({
       include: {
         source: true,
