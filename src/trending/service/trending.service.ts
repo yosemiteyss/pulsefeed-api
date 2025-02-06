@@ -1,5 +1,5 @@
+import { Article, TrendingKeyword, TrendingKeywordsRepository } from '@pulsefeed/common';
 import { ArticleFilter, ArticleRepository, ArticleResponse } from '../../article';
-import { TrendingKeyword, TrendingKeywordsRepository } from '@pulsefeed/common';
 import { TrendingArticlesResponse } from '../dto/trending-articles.response';
 import { TrendingArticlesRequest } from '../dto/trending-articles.request';
 import { TrendingKeywordsRequest, TrendingKeywordsResponse } from '../dto';
@@ -19,7 +19,7 @@ export class TrendingService {
   private readonly KEYWORD_TRENDING_MIN_SCORE = 5;
 
   async getTrendingKeywords(request: TrendingKeywordsRequest): Promise<TrendingKeywordsResponse> {
-    const keywords = await this.getTrendingKeywordsList(request);
+    const keywords = await this.getTrendingKeywordsOrdered(request);
     return new TrendingKeywordsResponse(keywords.map((keyword) => keyword.keyword));
   }
 
@@ -30,7 +30,7 @@ export class TrendingService {
    * @param languageKey the language key.
    * @param categoryKey the category key.
    */
-  private async getTrendingKeywordsList({
+  private async getTrendingKeywordsOrdered({
     languageKey,
     categoryKey,
   }: TrendingKeywordsRequest): Promise<TrendingKeyword[]> {
@@ -81,41 +81,50 @@ export class TrendingService {
     languageKey,
     categoryKey,
   }: TrendingArticlesRequest): Promise<TrendingArticlesResponse> {
-    const keywords: TrendingKeyword[] = await this.getTrendingKeywordsList({
+    const keywords: TrendingKeyword[] = await this.getTrendingKeywordsOrdered({
       languageKey,
       categoryKey,
     });
+
+    if (keywords.length === 0) {
+      return new TrendingArticlesResponse([]);
+    }
+
     const keywordValues = keywords.map((keyword) => keyword.keyword);
-    const keywordScores = new Map(keywords.map((keyword) => [keyword.keyword, keyword.score]));
 
     const quarterHourAgo = getLastQuarterHour();
     const oneYearAgo = getYearsAgo(1);
 
     const filter: ArticleFilter = {
       page: 1,
-      limit: 20,
+      limit: 50,
       categoryKey: categoryKey,
       languageKey: languageKey,
       publishedBefore: quarterHourAgo,
       publishedAfter: oneYearAgo,
       keywords: keywordValues,
     };
-    const [articleData] = await this.articleRepository.getArticles(filter);
+    const [articleDataList] = await this.articleRepository.getArticles(filter);
 
-    // Sort articles by the keyword score.
-    const sortedArticles = articleData.sort((a, b) => {
-      const aKeywords = a.article.keywords || [];
-      const bKeywords = b.article.keywords || [];
+    // Get one article for every keyword.
+    const articleList: Article[] = [];
 
-      const aMaxScore = Math.max(...aKeywords.map((keyword) => keywordScores.get(keyword) || 0));
-      const bMaxScore = Math.max(...bKeywords.map((keyword) => keywordScores.get(keyword) || 0));
+    // For each keyword, add matched article to list.
+    for (const keyword of keywordValues) {
+      for (const articleData of articleDataList) {
+        const keywords = articleData.article.keywords ?? [];
+        if (keywords.includes(keyword)) {
+          if (articleList.includes(articleData.article)) {
+            continue;
+          }
 
-      return bMaxScore - aMaxScore; // Descending order
-    });
+          articleList.push(articleData.article);
+        }
+      }
+    }
 
-    const articleResponses = sortedArticles.map((data) => ArticleResponse.fromModel(data.article));
-    return {
-      articles: articleResponses,
-    };
+    return new TrendingArticlesResponse(
+      articleList.map((article) => ArticleResponse.fromModel(article)),
+    );
   }
 }
