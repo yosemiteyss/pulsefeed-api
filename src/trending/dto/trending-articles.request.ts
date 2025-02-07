@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class TrendingArticlesRequest {
   /**
@@ -7,12 +7,4 @@ export class TrendingArticlesRequest {
   @IsString()
   @IsNotEmpty()
   readonly languageKey: string;
-
-  /**
-   * (Optional): returns articles of the given category.
-   * When not set, return articles from all categories.
-   */
-  @IsString()
-  @IsOptional()
-  readonly categoryKey?: string;
 }
