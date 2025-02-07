@@ -3,14 +3,16 @@ import { ArticleFilter, ArticleRepository, ArticleResponse } from '../../article
 import { TrendingArticlesResponse } from '../dto/trending-articles.response';
 import { TrendingArticlesRequest } from '../dto/trending-articles.request';
 import { TrendingKeywordsRequest, TrendingKeywordsResponse } from '../dto';
-import { getLastQuarterHour, getYearsAgo } from '../../shared';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { getLastQuarterHour } from '../../shared';
 
 @Injectable()
 export class TrendingService {
   constructor(
     private readonly trendingKeywordsRepository: TrendingKeywordsRepository,
     private readonly articleRepository: ArticleRepository,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
   /**
@@ -92,39 +94,54 @@ export class TrendingService {
 
     const keywordValues = keywords.map((keyword) => keyword.keyword);
 
+    // Get articles with matched trending keywords.
     const quarterHourAgo = getLastQuarterHour();
-    const oneYearAgo = getYearsAgo(1);
-
     const filter: ArticleFilter = {
       page: 1,
       limit: 50,
       categoryKey: categoryKey,
       languageKey: languageKey,
       publishedBefore: quarterHourAgo,
-      publishedAfter: oneYearAgo,
       keywords: keywordValues,
     };
     const [articleDataList] = await this.articleRepository.getArticles(filter);
 
     // Get one article for every keyword.
-    const articleList: Article[] = [];
+    const articleList: { article: Article; totalScore: number }[] = [];
 
     // For each keyword, add matched article to list.
-    for (const keyword of keywordValues) {
-      for (const articleData of articleDataList) {
-        const keywords = articleData.article.keywords ?? [];
-        if (keywords.includes(keyword)) {
-          if (articleList.includes(articleData.article)) {
-            continue;
-          }
-
-          articleList.push(articleData.article);
+    for (const articleData of articleDataList) {
+      // 1. Calculate total keywords scores.
+      let baseScore = 0;
+      for (const keyword of keywords) {
+        const articleKeywords = articleData.article.keywords ?? [];
+        if (articleKeywords.includes(keyword.keyword)) {
+          baseScore += keyword.score;
         }
       }
+
+      // 2. Calculate freshness.
+      const now = Date.now();
+      const publishedAt = articleData.article.publishedAt ?? new Date();
+      const timeDiff = now - publishedAt.getTime();
+      const decayFactor = 0.000001; // Adjust decay sensitivity
+      const freshness = Math.exp(-decayFactor * timeDiff) + 0.01;
+
+      this.logger.log(`baseScore: ${baseScore}, freshness: ${freshness}`, TrendingService.name);
+
+      // 3. Calculate total score.
+      const totalScore = baseScore * freshness;
+      articleList.push({
+        article: articleData.article,
+        totalScore: totalScore,
+      });
     }
 
+    const sortedArticles = articleList.sort((a, b) => b.totalScore - a.totalScore);
+    const slicedArticles = sortedArticles.slice(0, 10);
+
     return new TrendingArticlesResponse(
-      articleList.map((article) => ArticleResponse.fromModel(article)),
+      slicedArticles.map((item) => ArticleResponse.fromModel(item.article)),
     );
   }
 }
