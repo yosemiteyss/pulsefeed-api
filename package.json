@@ -1,6 +1,6 @@
 {
   "name": "@yosemiteyss/pulsefeed-api",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "API service for pulsefeed frontend applications.",
   "author": "yosemiteyss",
   "license": "UNLICENSED",
