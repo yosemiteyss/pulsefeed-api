@@ -28,4 +28,8 @@ export const ApiResponseCacheKey = {
     prefix: 'pf:api:response:article:search',
     ttl: HALF_HOUR_IN_MS,
   },
+  TRENDING_KEYWORDS_LIST: {
+    prefix: 'pf:api:response:trending:keywords',
+    ttl: HALF_HOUR_IN_MS,
+  },
 };

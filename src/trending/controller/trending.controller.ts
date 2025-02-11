@@ -1,5 +1,3 @@
-import { TrendingArticlesResponse } from '../dto/trending-articles.response';
-import { TrendingArticlesRequest } from '../dto/trending-articles.request';
 import { TrendingKeywordsRequest, TrendingKeywordsResponse } from '../dto';
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { TrendingService } from '../service';
@@ -19,16 +17,5 @@ export class TrendingController {
     @Body() request: TrendingKeywordsRequest,
   ): Promise<TrendingKeywordsResponse> {
     return this.trendingService.getTrendingKeywords(request);
-  }
-
-  /**
-   * Get trending articles.
-   */
-  @Post('/articles')
-  @HttpCode(200)
-  async getTrendingArticles(
-    @Body() request: TrendingArticlesRequest,
-  ): Promise<TrendingArticlesResponse> {
-    return this.trendingService.getTrendingArticles(request);
   }
 }

@@ -1,16 +1,10 @@
-import { ArticleCategoryRepository, TrendingKeywordsRepository } from '@pulsefeed/common';
+import { TrendingKeywordsRepository } from '@pulsefeed/common';
 import { TrendingController } from './controller';
-import { ArticleRepository } from '../article';
 import { TrendingService } from './service';
 import { Module } from '@nestjs/common';
 
 @Module({
   controllers: [TrendingController],
-  providers: [
-    TrendingService,
-    TrendingKeywordsRepository,
-    ArticleRepository,
-    ArticleCategoryRepository,
-  ],
+  providers: [TrendingService, TrendingKeywordsRepository],
 })
 export class TrendingModule {}
