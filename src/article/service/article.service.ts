@@ -1,4 +1,12 @@
 import {
+  CategoryFeedRequest,
+  LatestFeedRequest,
+  SearchArticleRequest,
+  LatestFeedResponse,
+  ArticleResponse,
+  RelatedArticlesRequest,
+} from '../dto';
+import {
   ArticleCategoryRepository,
   CacheKeyBuilder,
   CacheService,
@@ -19,12 +27,6 @@ import {
   LoggerService,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  CategoryFeedRequest,
-  LatestFeedRequest,
-  SearchArticleRequest,
-  LatestFeedResponse,
-} from '../dto';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ArticleData, ArticleFilter } from '../model';
@@ -159,6 +161,21 @@ export class ArticleService {
       action,
       ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.ttl,
     );
+  }
+
+  /**
+   * Find related articles.
+   */
+  async getRelatedArticlesResponse({
+    articleId,
+  }: RelatedArticlesRequest): Promise<ArticleResponse[]> {
+    const article = await this.articleRepository.getArticle(articleId);
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+
+    const relatedArticles = await this.articleRepository.getArticlesWithSimilarKeywords(articleId);
+    return relatedArticles.map((article) => ArticleResponse.fromModel(article));
   }
 
   /**

@@ -1,7 +1,9 @@
 import {
+  ArticleResponse,
   CategoryFeedRequest,
   LatestFeedRequest,
   LatestFeedResponse,
+  RelatedArticlesRequest,
   SearchArticleRequest,
 } from '../dto';
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
@@ -33,6 +35,15 @@ export class ArticleController {
   @HttpCode(200)
   async getCategoryFeed(@Body() request: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
     return this.articleService.getCategoryFeedPageResponse(request);
+  }
+
+  /**
+   * Find related articles.
+   */
+  @Post('/related-articles')
+  @HttpCode(200)
+  async getRelatedArticles(@Body() request: RelatedArticlesRequest): Promise<ArticleResponse[]> {
+    return this.articleService.getRelatedArticlesResponse(request);
   }
 
   /**

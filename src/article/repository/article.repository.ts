@@ -1,8 +1,8 @@
+import { Prisma, Article as ArticleEntity } from '@prisma/client';
+import { Article, PrismaService } from '@pulsefeed/common';
 import { ArticleData, ArticleFilter } from '../model';
-import { PrismaService } from '@pulsefeed/common';
 import { ArticleMapper } from './article.mapper';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArticleRepository {
@@ -85,7 +85,7 @@ export class ArticleRepository {
       take: filter.limit,
     });
 
-    const models = entities.map((article) => this.articleMapper.entityToModel(article));
+    const models = entities.map((article) => this.articleMapper.payloadToModel(article));
     return [models, total];
   }
 
@@ -109,6 +109,41 @@ export class ArticleRepository {
       return undefined;
     }
 
-    return this.articleMapper.entityToModel(entity);
+    return this.articleMapper.payloadToModel(entity);
+  }
+
+  /**
+   * Given an article, find other articles with similar keywords.
+   * @param articleId the article id.
+   * @param limit number of similar articles.
+   * @param similarity cosine similarity score.
+   */
+  async getArticlesWithSimilarKeywords(
+    articleId: string,
+    limit: number = 10,
+    similarity: number = 0.7,
+  ): Promise<Article[]> {
+    const articleData = await this.getArticle(articleId);
+    const articleKeywords = articleData?.article?.keywords ?? [];
+
+    if (articleKeywords.length === 0) {
+      return [];
+    }
+
+    const entities = await this.prismaService.$queryRaw<ArticleEntity[]>`
+        SELECT *,
+               (
+                   array_length(array(SELECT unnest(keywords) INTERSECT SELECT unnest(${articleKeywords}::text[])), 1)
+                       /
+                   sqrt(array_length(keywords, 1) * ${articleKeywords.length})
+                   ) AS similarity_score
+        FROM articles
+        WHERE id != ${articleId}
+        HAVING similarity_score >= ${similarity}
+        ORDER BY similarity_score DESC
+            LIMIT ${limit}
+    `;
+
+    return entities.map((entity) => this.articleMapper.entityToModel(entity));
   }
 }
