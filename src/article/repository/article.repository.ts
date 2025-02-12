@@ -88,4 +88,27 @@ export class ArticleRepository {
     const models = entities.map((article) => this.articleMapper.entityToModel(article));
     return [models, total];
   }
+
+  /**
+   * Get article by id.
+   * @param articleId the article id.
+   */
+  async getArticle(articleId: string): Promise<ArticleData | undefined> {
+    const entity = await this.prismaService.article.findUnique({
+      where: {
+        id: articleId,
+      },
+      include: {
+        source: true,
+        category: true,
+        languages: true,
+      },
+    });
+
+    if (!entity) {
+      return undefined;
+    }
+
+    return this.articleMapper.entityToModel(entity);
+  }
 }
