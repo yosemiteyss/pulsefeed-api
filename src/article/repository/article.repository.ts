@@ -121,7 +121,7 @@ export class ArticleRepository {
   async getArticlesWithSimilarKeywords(
     articleId: string,
     limit: number = 10,
-    similarity: number = 0.7,
+    similarity: number = 0.4,
   ): Promise<Article[]> {
     const articleData = await this.getArticle(articleId);
     const articleKeywords = articleData?.article?.keywords ?? [];
@@ -131,15 +131,18 @@ export class ArticleRepository {
     }
 
     const entities = await this.prismaService.$queryRaw<ArticleEntity[]>`
-        SELECT *,
-               (
-                   array_length(array(SELECT unnest(keywords) INTERSECT SELECT unnest(${articleKeywords}::text[])), 1)
-                       /
-                   sqrt(array_length(keywords, 1) * ${articleKeywords.length})
-                   ) AS similarity_score
-        FROM articles
-        WHERE id != ${articleId}
-        HAVING similarity_score >= ${similarity}
+        WITH similarity_cte AS (SELECT *,
+                                       (
+                                           array_length(array(SELECT unnest(keywords) INTERSECT SELECT unnest(${articleKeywords}::text[])), 1)
+                                               /
+                                           sqrt(array_length(keywords, 1) * ${articleKeywords.length})
+                                           ) AS similarity_score
+                                FROM articles
+                                WHERE id != ${articleId}
+            )
+        SELECT *
+        FROM similarity_cte
+        WHERE similarity_score >= ${similarity}
         ORDER BY similarity_score DESC
             LIMIT ${limit}
     `;
