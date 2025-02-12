@@ -13,12 +13,18 @@ import {
   ShuffleService,
 } from '../../shared';
 import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  LoggerService,
+  NotFoundException,
+} from '@nestjs/common';
+import {
   CategoryFeedRequest,
   LatestFeedRequest,
   SearchArticleRequest,
   LatestFeedResponse,
 } from '../dto';
-import { Inject, Injectable, LoggerService, NotFoundException } from '@nestjs/common';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ArticleData, ArticleFilter } from '../model';
@@ -36,6 +42,8 @@ export class ArticleService {
     private readonly feedBuilder: ArticleFeedBuilder,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
+
+  private readonly CATEGORY_FEED_MAX_PAGE = 100;
 
   /**
    * Get latest feed.
@@ -111,6 +119,10 @@ export class ArticleService {
     languageKey,
     categoryKey,
   }: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
+    if (page > this.CATEGORY_FEED_MAX_PAGE) {
+      throw new BadRequestException('Invalid page number');
+    }
+
     const quarterHourAgo = getLastQuarterHour();
     const oneYearAgo = getYearsAgo(1);
 
@@ -134,7 +146,12 @@ export class ArticleService {
         categoryTitles[categoryKey],
         topSpacing,
       );
-      return new PageResponse(blockList, total, filter.page, filter.limit);
+
+      const isLastArticlePage = page * filter.limit >= total;
+      return {
+        data: blockList,
+        isLastPage: page === this.CATEGORY_FEED_MAX_PAGE || isLastArticlePage,
+      };
     };
 
     return this.cacheService.wrap(
