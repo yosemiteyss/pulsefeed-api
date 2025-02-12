@@ -1,8 +1,8 @@
 import {
   CategoryFeedRequest,
-  LatestFeedRequest,
+  HeadlineFeedRequest,
   SearchArticleRequest,
-  LatestFeedResponse,
+  HeadlineFeedResponse,
   ArticleResponse,
   RelatedArticlesRequest,
 } from '../dto';
@@ -48,14 +48,14 @@ export class ArticleService {
   private readonly CATEGORY_FEED_MAX_PAGE = 100;
 
   /**
-   * Get latest feed.
+   * Get headline feed.
    * @param languageKey the language key.
    * @param categoryKey the category key.
    */
-  async getLatestFeedPageResponse({
+  async getHeadlineFeedPageResponse({
     languageKey,
     feedSection,
-  }: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
+  }: HeadlineFeedRequest): Promise<HeadlineFeedResponse<NewsBlock>> {
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const categories = await this.categoryRepository.getEnabledCategories();
       const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
@@ -83,7 +83,7 @@ export class ArticleService {
       });
       articles = articles.slice(0, 10);
 
-      const blockList = this.feedBuilder.buildLatestFeedPage(
+      const blockList = this.feedBuilder.buildHeadlineFeedPage(
         articles,
         topCategories[categoryIndex],
         categoryTitles[topCategories[categoryIndex].key],
@@ -101,12 +101,12 @@ export class ArticleService {
     };
 
     return this.cacheService.wrap(
-      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_LATEST_FEED.prefix, {
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_HEADLINE_FEED.prefix, {
         languageKey: languageKey,
         feedSection: feedSection,
       }),
       action,
-      ApiResponseCacheKey.ARTICLE_LATEST_FEED.ttl,
+      ApiResponseCacheKey.ARTICLE_HEADLINE_FEED.ttl,
     );
   }
 

@@ -20,7 +20,7 @@ import { ArticleData } from '../model';
 
 @Injectable()
 export class ArticleFeedBuilder {
-  buildLatestFeedPage(
+  buildHeadlineFeedPage(
     articles: ArticleData[],
     category: ArticleCategory,
     categoryTitle: ArticleCategoryTitle,

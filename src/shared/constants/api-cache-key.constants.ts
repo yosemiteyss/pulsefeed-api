@@ -16,8 +16,8 @@ export const ApiResponseCacheKey = {
     prefix: 'pf:api:response:category:list',
     ttl: ONE_DAY_IN_MS,
   },
-  ARTICLE_LATEST_FEED: {
-    prefix: 'pf:api:response:article:latest-feed',
+  ARTICLE_HEADLINE_FEED: {
+    prefix: 'pf:api:response:article:headline-feed',
     ttl: HALF_HOUR_IN_MS,
   },
   ARTICLE_CATEGORY_FEED: {

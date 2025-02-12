@@ -1,8 +1,8 @@
 import {
   ArticleResponse,
   CategoryFeedRequest,
-  LatestFeedRequest,
-  LatestFeedResponse,
+  HeadlineFeedRequest,
+  HeadlineFeedResponse,
   RelatedArticlesRequest,
   SearchArticleRequest,
 } from '../dto';
@@ -18,13 +18,15 @@ export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   /**
-   * Get latest feed.
-   * @param request latest feed request.
+   * Get headline feed.
+   * @param request the headline feed request.
    */
-  @Post('/latest-feed')
+  @Post('/headline-feed')
   @HttpCode(200)
-  async getLatestFeed(@Body() request: LatestFeedRequest): Promise<LatestFeedResponse<NewsBlock>> {
-    return this.articleService.getLatestFeedPageResponse(request);
+  async getHeadlineFeed(
+    @Body() request: HeadlineFeedRequest,
+  ): Promise<HeadlineFeedResponse<NewsBlock>> {
+    return this.articleService.getHeadlineFeedPageResponse(request);
   }
 
   /**

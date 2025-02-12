@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class LatestFeedRequest {
+export class HeadlineFeedRequest {
   /**
    * Returns articles with the given language key.
    */
