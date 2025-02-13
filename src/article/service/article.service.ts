@@ -14,19 +14,18 @@ import {
   PageResponse,
 } from '@pulsefeed/common';
 import {
-  ApiResponseCacheKey,
-  DEFAULT_PAGE_SIZE,
-  getLastQuarterHour,
-  getYearsAgo,
-  ShuffleService,
-} from '../../shared';
-import {
   BadRequestException,
   Inject,
   Injectable,
   LoggerService,
   NotFoundException,
 } from '@nestjs/common';
+import {
+  ApiResponseCacheKey,
+  DEFAULT_PAGE_SIZE,
+  getLastQuarterHour,
+  ShuffleService,
+} from '../../shared';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { ArticleData, ArticleFilter } from '../model';
@@ -45,7 +44,7 @@ export class ArticleService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
   ) {}
 
-  private readonly CATEGORY_FEED_MAX_PAGE = 100;
+  private readonly CATEGORY_FEED_MAX_PAGE = 50;
 
   /**
    * Get headline feed.
@@ -70,17 +69,14 @@ export class ArticleService {
         }
       }
 
-      const quarterHourAgo = getLastQuarterHour();
-      const oneYearAgo = getYearsAgo(1);
-
       let [articles] = await this.getArticlesByFilter({
         page: 1,
         limit: 20,
         categoryKey: topCategories[categoryIndex].key,
         languageKey: languageKey,
-        publishedBefore: quarterHourAgo,
-        publishedAfter: oneYearAgo,
+        publishedBefore: getLastQuarterHour(),
       });
+
       articles = articles.slice(0, 10);
 
       const blockList = this.feedBuilder.buildHeadlineFeedPage(
@@ -125,16 +121,12 @@ export class ArticleService {
       throw new BadRequestException('Invalid page number');
     }
 
-    const quarterHourAgo = getLastQuarterHour();
-    const oneYearAgo = getYearsAgo(1);
-
     const filter: ArticleFilter = {
       page: page,
       limit: DEFAULT_PAGE_SIZE,
       categoryKey: categoryKey,
       languageKey: languageKey,
-      publishedBefore: quarterHourAgo,
-      publishedAfter: oneYearAgo,
+      publishedBefore: getLastQuarterHour(),
     };
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
@@ -189,15 +181,11 @@ export class ArticleService {
     languageKey,
     term,
   }: SearchArticleRequest): Promise<PageResponse<NewsBlock>> {
-    const quarterHourAgo = getLastQuarterHour();
-    const oneYearAgo = getYearsAgo(1);
-
     const filter: ArticleFilter = {
       page: page,
       limit: DEFAULT_PAGE_SIZE,
       languageKey: languageKey,
-      publishedBefore: quarterHourAgo,
-      publishedAfter: oneYearAgo,
+      publishedBefore: getLastQuarterHour(),
       searchTerm: term,
     };
 
