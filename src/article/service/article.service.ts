@@ -58,7 +58,7 @@ export class ArticleService {
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const categories = await this.categoryRepository.getEnabledCategories();
       const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
-      const topCategories = categories.sort((a, b) => b.priority! - a.priority!).slice(0, 5);
+      const topCategories = categories.sort((a, b) => b.priority - a.priority).slice(0, 5);
 
       // Resolve category index.
       let categoryIndex = 0;
@@ -69,15 +69,14 @@ export class ArticleService {
         }
       }
 
-      let [articles] = await this.getArticlesByFilter({
+      // Get latest articles of category.
+      const [articles] = await this.getArticlesByFilter({
         page: 1,
-        limit: 20,
+        limit: 10,
         categoryKey: topCategories[categoryIndex].key,
         languageKey: languageKey,
         publishedBefore: getLastQuarterHour(),
       });
-
-      articles = articles.slice(0, 10);
 
       const blockList = this.feedBuilder.buildHeadlineFeedPage(
         articles,
@@ -86,6 +85,7 @@ export class ArticleService {
         categoryIndex === 0,
       );
 
+      // End at last category page.
       const isLastPage = categoryIndex + 1 >= topCategories.length;
       const nextCategory = isLastPage ? undefined : topCategories[categoryIndex + 1];
 
