@@ -12,6 +12,7 @@ import {
   CacheService,
   LanguageRepository,
   PageResponse,
+  RemoteConfigService,
 } from '@pulsefeed/common';
 import {
   BadRequestException,
@@ -42,6 +43,7 @@ export class ArticleService {
     private readonly shuffleService: ShuffleService,
     private readonly feedBuilder: ArticleFeedBuilder,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
+    private readonly remoteConfigService: RemoteConfigService,
   ) {}
 
   private readonly CATEGORY_FEED_MAX_PAGE = 50;
@@ -166,7 +168,16 @@ export class ArticleService {
       throw new NotFoundException('Article not found');
     }
 
-    const relatedArticles = await this.articleRepository.getArticlesWithSimilarKeywords(articleId);
+    const relatedArticlesSimilarity = await this.remoteConfigService.get<number>(
+      'RELATED_ARTICLES_SIMILARITY',
+      0.7,
+    );
+    const relatedArticles = await this.articleRepository.getArticlesWithSimilarKeywords(
+      articleId,
+      10,
+      getLastQuarterHour(),
+      relatedArticlesSimilarity,
+    );
     return relatedArticles.map((article) => ArticleResponse.fromModel(article));
   }
 

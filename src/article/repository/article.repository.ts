@@ -116,12 +116,14 @@ export class ArticleRepository {
    * Given an article, find other articles with similar keywords.
    * @param articleId the article id.
    * @param limit number of similar articles.
+   * @param publishedBefore articles published before date.
    * @param similarity cosine similarity score.
    */
   async getArticlesWithSimilarKeywords(
     articleId: string,
-    limit: number = 10,
-    similarity: number = 0.4,
+    limit: number,
+    publishedBefore: Date,
+    similarity: number,
   ): Promise<Article[]> {
     const articleData = await this.getArticle(articleId);
     const articleKeywords = articleData?.article?.keywords ?? [];
@@ -143,6 +145,7 @@ export class ArticleRepository {
         SELECT *
         FROM similarity_cte
         WHERE similarity_score >= ${similarity}
+          AND "publishedAt" <= ${publishedBefore.toISOString()}:: timestamp
         ORDER BY similarity_score DESC
             LIMIT ${limit}
     `;

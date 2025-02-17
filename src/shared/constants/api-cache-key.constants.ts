@@ -32,4 +32,8 @@ export const ApiResponseCacheKey = {
     prefix: 'pf:api:response:trending:keywords',
     ttl: HALF_HOUR_IN_MS,
   },
+  TRENDING_ARTICLES_LIST: {
+    prefix: 'pf:api:response:trending:articles',
+    ttl: HALF_HOUR_IN_MS,
+  },
 };

@@ -3,6 +3,7 @@ import {
   CacheItem,
   CacheService,
   LanguageEnum,
+  RemoteConfigService,
   TrendingKeyword,
   TrendingKeywordsRepository,
 } from '@pulsefeed/common';
@@ -10,18 +11,23 @@ import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { TrendingService } from '../trending.service';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ArticleRepository } from '../../../article';
 import { LoggerService } from '@nestjs/common';
 
 describe('TrendingService', () => {
   let trendingService: TrendingService;
   let trendingKeywordsRepository: DeepMockProxy<TrendingKeywordsRepository>;
+  let articleRepository: DeepMockProxy<ArticleRepository>;
   let cacheService: DeepMockProxy<CacheService>;
   let loggerService: DeepMockProxy<LoggerService>;
+  let remoteConfigService: DeepMockProxy<RemoteConfigService>;
 
   beforeEach(async () => {
     trendingKeywordsRepository = mockDeep<TrendingKeywordsRepository>();
+    articleRepository = mockDeep<ArticleRepository>();
     cacheService = mockDeep<CacheService>();
     loggerService = mockDeep<LoggerService>();
+    remoteConfigService = mockDeep<RemoteConfigService>();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,12 +37,20 @@ describe('TrendingService', () => {
           useValue: trendingKeywordsRepository,
         },
         {
+          provide: ArticleRepository,
+          useValue: articleRepository,
+        },
+        {
           provide: CacheService,
           useValue: cacheService,
         },
         {
           provide: WINSTON_MODULE_NEST_PROVIDER,
           useValue: loggerService,
+        },
+        {
+          provide: RemoteConfigService,
+          useValue: remoteConfigService,
         },
       ],
     }).compile();

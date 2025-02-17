@@ -1,4 +1,8 @@
-import { ArticleCategoryRepository, LanguageRepository } from '@pulsefeed/common';
+import {
+  ArticleCategoryRepository,
+  LanguageRepository,
+  RemoteConfigService,
+} from '@pulsefeed/common';
 import { ArticleFeedBuilder, ArticleService } from './service';
 import { ArticleRepository } from './repository';
 import { ArticleController } from './controller';
@@ -14,6 +18,7 @@ import { Module } from '@nestjs/common';
     LanguageRepository,
     ShuffleService,
     ArticleFeedBuilder,
+    RemoteConfigService,
   ],
 })
 export class ArticleModule {}

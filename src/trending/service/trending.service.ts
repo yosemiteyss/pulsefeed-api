@@ -1,20 +1,27 @@
 import {
   CacheKeyBuilder,
   CacheService,
+  RemoteConfigService,
   TrendingKeyword,
   TrendingKeywordsRepository,
 } from '@pulsefeed/common';
+import { TrendingArticlesResponse } from '../dto/trending-articles.response';
+import { TrendingArticlesRequest } from '../dto/trending-articles.request';
 import { TrendingKeywordsRequest, TrendingKeywordsResponse } from '../dto';
+import { ApiResponseCacheKey, getLastQuarterHour } from '../../shared';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import { ArticleRepository, ArticleResponse } from '../../article';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { ApiResponseCacheKey } from '../../shared';
+import moment from 'moment/moment';
 
 @Injectable()
 export class TrendingService {
   constructor(
     private readonly trendingKeywordsRepository: TrendingKeywordsRepository,
+    private readonly articleRepository: ArticleRepository,
     private readonly cacheService: CacheService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
+    private readonly remoteConfigService: RemoteConfigService,
   ) {}
 
   /**
@@ -93,5 +100,101 @@ export class TrendingService {
     }
 
     return Array.from(keywordMap.values());
+  }
+
+  /**
+   * Get trending articles.
+   * @param languageKey the language key.
+   * @param categoryKey the category key.
+   */
+  async getTrendingArticles({
+    languageKey,
+    categoryKey,
+  }: TrendingArticlesRequest): Promise<TrendingArticlesResponse> {
+    const action: () => Promise<TrendingArticlesResponse> = async () => {
+      const trendingKeywords = await this.getTrendingKeywordsOrdered(languageKey, categoryKey);
+      if (trendingKeywords.length === 0) {
+        return {
+          articles: [],
+        };
+      }
+
+      const trendingKeywordsList = trendingKeywords.map((item) => item.keyword);
+      this.logger.debug!(
+        `getTrendingArticles, trending keywords: ${trendingKeywordsList}`,
+        TrendingService.name,
+      );
+
+      // Get articles from db up to one week.
+      const oneWeekAgo = moment.utc().subtract('1', 'week').startOf('day').toDate();
+      const publishedBefore = getLastQuarterHour();
+
+      const [articleDataList] = await this.articleRepository.getArticles({
+        page: 1,
+        limit: 200,
+        categoryKey: categoryKey,
+        languageKey: languageKey,
+        publishedBefore: publishedBefore,
+        publishedAfter: oneWeekAgo,
+      });
+
+      // Sort articles by number of matched trending keywords.
+      let sortedDataList = articleDataList.sort((a, b) => {
+        const aKeywords = a.article.keywords ?? [];
+        const bKeywords = b.article.keywords ?? [];
+
+        const aMatchedKeywords = aKeywords.filter((keyword) =>
+          trendingKeywordsList.includes(keyword),
+        );
+        const bMatchedKeywords = bKeywords.filter((keyword) =>
+          trendingKeywordsList.includes(keyword),
+        );
+
+        return bMatchedKeywords.length - aMatchedKeywords.length;
+      });
+
+      const TRENDING_ARTICLES_COUNT = 10;
+      const result: ArticleResponse[] = [];
+
+      // For each trending keyword, add one article.
+      for (const trendingKeyword of trendingKeywordsList) {
+        if (result.length > TRENDING_ARTICLES_COUNT) {
+          break;
+        }
+
+        let i = 0;
+        while (i < sortedDataList.length) {
+          const currentArticle = sortedDataList[i].article;
+
+          if (currentArticle.keywords?.includes(trendingKeyword)) {
+            // Remove added article.
+            result.push(ArticleResponse.fromModel(currentArticle));
+            sortedDataList.splice(i, 1);
+
+            // Remove articles containing the same trending keyword.
+            sortedDataList = sortedDataList.filter((item) => {
+              return !item.article.keywords?.includes(trendingKeyword);
+            });
+
+            break;
+          }
+
+          i++;
+        }
+      }
+
+      return {
+        articles: result,
+      };
+    };
+
+    return this.cacheService.wrap(
+      CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.TRENDING_ARTICLES_LIST.prefix, {
+        languageKey: languageKey,
+        categoryKey: categoryKey,
+      }),
+      action,
+      ApiResponseCacheKey.TRENDING_ARTICLES_LIST.ttl,
+    );
   }
 }
