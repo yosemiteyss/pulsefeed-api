@@ -1,6 +1,6 @@
 import { Article, ArticleCategoryEnum, LanguageEnum } from '@pulsefeed/common';
 import { Prisma, Article as ArticleEntity } from '@prisma/client';
-import { ArticleData } from '../model';
+import { ArticleData } from '../../article';
 
 export class ArticleMapper {
   entityToModel(entity: ArticleEntity, languages?: LanguageEnum[]): Article {

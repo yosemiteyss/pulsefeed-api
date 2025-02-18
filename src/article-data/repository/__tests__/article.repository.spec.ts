@@ -1,7 +1,7 @@
 import { Article, ArticleCategoryEnum, LanguageEnum, PrismaService } from '@pulsefeed/common';
+import { ArticleData, ArticleFilter } from '../../../article';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { ArticleRepository } from '../article.repository';
-import { ArticleData, ArticleFilter } from '../../model';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@prisma/client';
 
@@ -206,6 +206,48 @@ describe('ArticleRepository', () => {
       const result = await articleRepository.getArticle(articleEntity.id);
 
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe('getArticlesWithSimilarKeywords', () => {
+    it('should return articles with similar keywords', async () => {
+      const articleId = 'articleId';
+      const limit = 5;
+      const publishedBefore = new Date();
+      const similarity = 0.5;
+
+      prismaService.article.findUnique.mockResolvedValue(articleEntity);
+      prismaService.$queryRaw.mockResolvedValue([articleEntity]);
+
+      const result = await articleRepository.getArticlesWithSimilarKeywords(
+        articleId,
+        limit,
+        publishedBefore,
+        similarity,
+      );
+
+      expect(prismaService.$queryRaw).toHaveBeenCalled();
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(articleEntity.id);
+    });
+
+    it('should return empty array if no similar articles are found', async () => {
+      const articleId = 'articleId';
+      const limit = 5;
+      const publishedBefore = new Date();
+      const similarity = 0.5;
+
+      prismaService.article.findUnique.mockResolvedValue(articleEntity);
+      prismaService.$queryRaw.mockResolvedValue([]);
+
+      const result = await articleRepository.getArticlesWithSimilarKeywords(
+        articleId,
+        limit,
+        publishedBefore,
+        similarity,
+      );
+
+      expect(result).toEqual([]);
     });
   });
 });

@@ -1,6 +1,6 @@
 import { Prisma, Article as ArticleEntity } from '@prisma/client';
 import { Article, PrismaService } from '@pulsefeed/common';
-import { ArticleData, ArticleFilter } from '../model';
+import { ArticleData, ArticleFilter } from '../../article';
 import { ArticleMapper } from './article.mapper';
 import { Injectable } from '@nestjs/common';
 
