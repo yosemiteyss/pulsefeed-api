@@ -19,7 +19,7 @@ import { ArticleResponse } from '../dto';
 import { ArticleData } from '../model';
 
 @Injectable()
-export class ArticleFeedBuilder {
+export class FeedBuilderService {
   buildHeadlineFeedPage(
     articles: ArticleData[],
     category: ArticleCategory,

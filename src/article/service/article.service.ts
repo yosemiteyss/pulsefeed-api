@@ -27,7 +27,7 @@ import {
   getLastQuarterHour,
   ShuffleService,
 } from '../../shared';
-import { ArticleFeedBuilder } from './article-feed-builder.service';
+import { FeedBuilderService } from './feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { TrendingDataService } from '../../trending-data';
 import { ArticleRepository } from '../../article-data';
@@ -40,7 +40,7 @@ export class ArticleService {
     private readonly articleRepository: ArticleRepository,
     private readonly categoryRepository: ArticleCategoryRepository,
     private readonly languageRepository: LanguageRepository,
-    private readonly feedBuilder: ArticleFeedBuilder,
+    private readonly feedBuilder: FeedBuilderService,
     private readonly cacheService: CacheService,
     private readonly shuffleService: ShuffleService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,

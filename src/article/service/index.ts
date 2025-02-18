@@ -1,2 +1,2 @@
 export * from './article.service';
-export * from './article-feed-builder.service';
+export * from './feed-builder.service';
