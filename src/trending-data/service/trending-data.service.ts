@@ -88,6 +88,7 @@ export class TrendingDataService {
       languageKey: languageKey,
       publishedBefore: publishedBefore,
       publishedAfter: oneWeekAgo,
+      hasImage: true,
     });
 
     // Sort articles by number of matched trending keywords.
