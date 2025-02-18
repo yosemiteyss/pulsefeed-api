@@ -26,7 +26,7 @@ export class ArticleController {
   async getHeadlineFeed(
     @Body() request: HeadlineFeedRequest,
   ): Promise<HeadlineFeedResponse<NewsBlock>> {
-    return this.articleService.getHeadlineFeedPageResponse(request);
+    return this.articleService.getHeadlineFeedPage(request);
   }
 
   /**
@@ -36,7 +36,7 @@ export class ArticleController {
   @Post('/category-feed')
   @HttpCode(200)
   async getCategoryFeed(@Body() request: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
-    return this.articleService.getCategoryFeedPageResponse(request);
+    return this.articleService.getCategoryFeedPage(request);
   }
 
   /**
@@ -45,7 +45,7 @@ export class ArticleController {
   @Post('/related-articles')
   @HttpCode(200)
   async getRelatedArticles(@Body() request: RelatedArticlesRequest): Promise<ArticleResponse[]> {
-    return this.articleService.getRelatedArticlesResponse(request);
+    return this.articleService.getRelatedArticles(request);
   }
 
   /**

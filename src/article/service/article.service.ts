@@ -29,8 +29,9 @@ import {
 } from '../../shared';
 import { ArticleFeedBuilder } from './article-feed-builder.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { TrendingDataService } from '../../trending-data';
+import { ArticleRepository } from '../../article-data';
 import { ArticleData, ArticleFilter } from '../model';
-import { ArticleRepository } from '../repository';
 import { NewsBlock } from '../../news-block';
 
 @Injectable()
@@ -39,13 +40,18 @@ export class ArticleService {
     private readonly articleRepository: ArticleRepository,
     private readonly categoryRepository: ArticleCategoryRepository,
     private readonly languageRepository: LanguageRepository,
+    private readonly feedBuilder: ArticleFeedBuilder,
     private readonly cacheService: CacheService,
     private readonly shuffleService: ShuffleService,
-    private readonly feedBuilder: ArticleFeedBuilder,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private readonly logger: LoggerService,
     private readonly remoteConfigService: RemoteConfigService,
+    private readonly trendingDataService: TrendingDataService,
   ) {}
 
+  /**
+   * Maximum request pages for category feed.
+   * @private
+   */
   private readonly CATEGORY_FEED_MAX_PAGE = 50;
 
   /**
@@ -53,7 +59,7 @@ export class ArticleService {
    * @param languageKey the language key.
    * @param categoryKey the category key.
    */
-  async getHeadlineFeedPageResponse({
+  async getHeadlineFeedPage({
     languageKey,
     feedSection,
   }: HeadlineFeedRequest): Promise<HeadlineFeedResponse<NewsBlock>> {
@@ -114,7 +120,7 @@ export class ArticleService {
    * @param languageKey the language key.
    * @param categoryKey the category key.
    */
-  async getCategoryFeedPageResponse({
+  async getCategoryFeedPage({
     page,
     languageKey,
     categoryKey,
@@ -135,11 +141,21 @@ export class ArticleService {
       const [articles, total] = await this.getArticlesByFilter(filter);
       const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
 
+      // Show trending articles on first page.
+      let trendingArticles: ArticleData[] = [];
+      if (page === 1) {
+        trendingArticles = await this.trendingDataService.getTrendingArticles(
+          languageKey,
+          categoryKey,
+        );
+      }
+
       // Add top spacing for first page.
       const topSpacing = filter.page === 0;
       const blockList = this.feedBuilder.buildCategoryFeedPage(
         articles,
         categoryTitles[categoryKey],
+        trendingArticles,
         topSpacing,
       );
 
@@ -160,9 +176,7 @@ export class ArticleService {
   /**
    * Find related articles.
    */
-  async getRelatedArticlesResponse({
-    articleId,
-  }: RelatedArticlesRequest): Promise<ArticleResponse[]> {
+  async getRelatedArticles({ articleId }: RelatedArticlesRequest): Promise<ArticleResponse[]> {
     const article = await this.articleRepository.getArticle(articleId);
     if (!article) {
       throw new NotFoundException('Article not found');

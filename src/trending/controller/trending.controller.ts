@@ -18,7 +18,7 @@ export class TrendingController {
   async getTrendingKeywords(
     @Body() request: TrendingKeywordsRequest,
   ): Promise<TrendingKeywordsResponse> {
-    return this.trendingService.getTrendingKeywords(request);
+    return this.trendingService.getTrendingKeywordsResponse(request);
   }
 
   /**
@@ -29,6 +29,6 @@ export class TrendingController {
   async getTrendingArticles(
     @Body() request: TrendingArticlesRequest,
   ): Promise<TrendingArticlesResponse> {
-    return this.trendingService.getTrendingArticles(request);
+    return this.trendingService.getTrendingArticlesResponse(request);
   }
 }

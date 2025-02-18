@@ -87,6 +87,7 @@ export class ArticleFeedBuilder {
   buildCategoryFeedPage(
     articles: ArticleData[],
     categoryTitle: ArticleCategoryTitle,
+    trendingArticles: ArticleData[],
     includeTopSpacing: boolean = false,
     includeAds: boolean = true,
   ): NewsBlock[] {
@@ -95,6 +96,25 @@ export class ArticleFeedBuilder {
     // Insert top spacing.
     if (includeTopSpacing) {
       blockList.push(new SpacerBlock(Spacing.Small));
+    }
+
+    // Insert trending articles.
+    if (trendingArticles.length > 0) {
+      const trendingArticleBlocks = trendingArticles.map((item) => {
+        return new PostGridTileBlock(
+          ArticleResponse.fromModel(item.article),
+          CategoryResponse.fromModel(item.category, categoryTitle),
+          SourceResponse.fromModel(item.source),
+          new NavigateToArticleAction(item.article.id, item.article.link),
+        );
+      });
+
+      blockList.push(
+        new PostGridGroupBlock(
+          CategoryResponse.fromModel(trendingArticles[0].category, categoryTitle),
+          trendingArticleBlocks,
+        ),
+      );
     }
 
     for (let i = 0; i < articles.length; i++) {
