@@ -1,11 +1,12 @@
-import { ArticleCategoryRepository } from '@pulsefeed/common';
+import { RepositoryModule } from '@pulsefeed/common';
 import { CategoryController } from './controller';
 import { CategoryService } from './service';
 import { Module } from '@nestjs/common';
 
 @Module({
+  imports: [RepositoryModule],
   controllers: [CategoryController],
-  providers: [CategoryService, ArticleCategoryRepository],
+  providers: [CategoryService],
   exports: [CategoryService],
 })
 export class CategoryModule {}
