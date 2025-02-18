@@ -51,10 +51,9 @@ export class ArticleRepository {
 
     // Search by title or description
     if (filter.searchTerm && filter.searchTerm.length > 0) {
-      whereClause.OR = [
-        { title: { contains: filter.searchTerm } },
-        { description: { contains: filter.searchTerm } },
-      ];
+      whereClause.title = {
+        contains: filter.searchTerm,
+      };
     }
 
     // Exclude articles with the given ids.
@@ -68,6 +67,13 @@ export class ArticleRepository {
     if (filter.keywords) {
       whereClause.keywords = {
         hasSome: filter.keywords,
+      };
+    }
+
+    // Filter articles with image.
+    if (filter.hasImage) {
+      whereClause.image = {
+        not: null,
       };
     }
 

@@ -52,4 +52,9 @@ export interface ArticleFilter {
    * (Optional): return articles with the given keywords.
    */
   readonly keywords?: string[];
+
+  /**
+   * (Optional): return articles with image.
+   */
+  readonly hasImage?: boolean;
 }

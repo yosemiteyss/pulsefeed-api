@@ -128,6 +128,7 @@ describe('ArticleRepository', () => {
         sourceId: 'source',
         excludeIds: ['1', '2'],
         searchTerm: 'term',
+        hasImage: true,
       };
 
       prismaService.article.findManyAndCount.mockResolvedValue([[], 0]);
@@ -155,12 +156,14 @@ describe('ArticleRepository', () => {
             id: filter.sourceId,
             enabled: true,
           },
-          OR: [
-            { title: { contains: filter.searchTerm } },
-            { description: { contains: filter.searchTerm } },
-          ],
+          title: {
+            contains: filter.searchTerm,
+          },
           id: {
             notIn: filter.excludeIds,
+          },
+          image: {
+            not: null,
           },
         },
         orderBy: {
