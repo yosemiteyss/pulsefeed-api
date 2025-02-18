@@ -1,37 +1,31 @@
 import {
   ArticleCategoryEnum,
   CacheItem,
-  CacheService,
   LanguageEnum,
-  RemoteConfigService,
   TrendingKeyword,
   TrendingKeywordsRepository,
 } from '@pulsefeed/common';
+import { TrendingDataService } from '../trending-data.service';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { TrendingService } from '../trending.service';
+import { ArticleRepository } from '../../../article-data';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ArticleRepository } from '../../../article';
 import { LoggerService } from '@nestjs/common';
 
 describe('TrendingService', () => {
-  let trendingService: TrendingService;
+  let trendingDataService: TrendingDataService;
   let trendingKeywordsRepository: DeepMockProxy<TrendingKeywordsRepository>;
   let articleRepository: DeepMockProxy<ArticleRepository>;
-  let cacheService: DeepMockProxy<CacheService>;
   let loggerService: DeepMockProxy<LoggerService>;
-  let remoteConfigService: DeepMockProxy<RemoteConfigService>;
 
   beforeEach(async () => {
     trendingKeywordsRepository = mockDeep<TrendingKeywordsRepository>();
     articleRepository = mockDeep<ArticleRepository>();
-    cacheService = mockDeep<CacheService>();
     loggerService = mockDeep<LoggerService>();
-    remoteConfigService = mockDeep<RemoteConfigService>();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TrendingService,
+        TrendingDataService,
         {
           provide: TrendingKeywordsRepository,
           useValue: trendingKeywordsRepository,
@@ -41,21 +35,13 @@ describe('TrendingService', () => {
           useValue: articleRepository,
         },
         {
-          provide: CacheService,
-          useValue: cacheService,
-        },
-        {
           provide: WINSTON_MODULE_NEST_PROVIDER,
           useValue: loggerService,
-        },
-        {
-          provide: RemoteConfigService,
-          useValue: remoteConfigService,
         },
       ],
     }).compile();
 
-    trendingService = module.get(TrendingService);
+    trendingDataService = module.get(TrendingDataService);
   });
 
   describe('getTrendingKeywordsOrdered', () => {
@@ -65,7 +51,7 @@ describe('TrendingService', () => {
           key: 'key-1',
           value: {
             keyword: 'keyword-1',
-            score: TrendingService.KEYWORD_TRENDING_MIN_SCORE,
+            score: TrendingDataService.KEYWORD_TRENDING_MIN_SCORE,
             lastUpdated: new Date(),
           },
         },
@@ -73,7 +59,7 @@ describe('TrendingService', () => {
           key: 'key-2',
           value: {
             keyword: 'keyword-2',
-            score: TrendingService.KEYWORD_TRENDING_MIN_SCORE + 1,
+            score: TrendingDataService.KEYWORD_TRENDING_MIN_SCORE + 1,
             lastUpdated: new Date(),
           },
         },
@@ -81,7 +67,7 @@ describe('TrendingService', () => {
 
       trendingKeywordsRepository.getKeywords.mockResolvedValue(keywordItems);
 
-      const result = await trendingService.getTrendingKeywordsOrdered(
+      const result = await trendingDataService.getTrendingKeywordsOrdered(
         LanguageEnum.en_us,
         ArticleCategoryEnum.LOCAL,
       );
@@ -95,7 +81,7 @@ describe('TrendingService', () => {
           key: 'key-1',
           value: {
             keyword: 'keyword-1',
-            score: TrendingService.KEYWORD_TRENDING_MIN_SCORE - 1,
+            score: TrendingDataService.KEYWORD_TRENDING_MIN_SCORE - 1,
             lastUpdated: new Date(),
           },
         },
@@ -103,7 +89,7 @@ describe('TrendingService', () => {
           key: 'key-2',
           value: {
             keyword: 'keyword-2',
-            score: TrendingService.KEYWORD_TRENDING_MIN_SCORE,
+            score: TrendingDataService.KEYWORD_TRENDING_MIN_SCORE,
             lastUpdated: new Date(),
           },
         },
@@ -111,7 +97,7 @@ describe('TrendingService', () => {
 
       trendingKeywordsRepository.getKeywords.mockResolvedValue(keywordItems);
 
-      const result = await trendingService.getTrendingKeywordsOrdered(
+      const result = await trendingDataService.getTrendingKeywordsOrdered(
         LanguageEnum.en_us,
         ArticleCategoryEnum.LOCAL,
       );
@@ -125,14 +111,14 @@ describe('TrendingService', () => {
         key: `key-${index}`,
         value: {
           keyword: `keyword-${index}`,
-          score: TrendingService.KEYWORD_TRENDING_MIN_SCORE,
+          score: TrendingDataService.KEYWORD_TRENDING_MIN_SCORE,
           lastUpdated: new Date(),
         },
       }));
 
       trendingKeywordsRepository.getKeywords.mockResolvedValue(keywordItems);
 
-      const result = await trendingService.getTrendingKeywordsOrdered(
+      const result = await trendingDataService.getTrendingKeywordsOrdered(
         LanguageEnum.en_us,
         ArticleCategoryEnum.LOCAL,
       );
