@@ -1,5 +1,5 @@
-import { AdminController } from './admin.controller';
 import { TerminusModule } from '@nestjs/terminus';
+import { AdminController } from './controller';
 import { CategoryModule } from '../category';
 import { LanguageModule } from '../language';
 import { SourceModule } from '../source';

@@ -6,11 +6,11 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { EnableLanguageRequest, LanguageService } from '../language';
-import { EnableCategoryRequest, CategoryService } from '../category';
-import { EnableSourceRequest, SourceService } from '../source';
-import { AdminGuard } from './admin.guard';
+import { CategoryService, EnableCategoryRequest } from '../../category';
+import { EnableLanguageRequest, LanguageService } from '../../language';
+import { EnableSourceRequest, SourceService } from '../../source';
 import { ApiTags } from '@nestjs/swagger';
+import { AdminGuard } from '../guard';
 
 @ApiTags('admin')
 @Controller('admin')

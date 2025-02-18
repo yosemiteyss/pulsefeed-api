@@ -1,3 +1,3 @@
-export * from './admin.guard';
+export * from './controller';
+export * from './guard';
 export * from './admin.module';
-export * from './admin.controller';
