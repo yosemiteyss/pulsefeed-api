@@ -147,6 +147,7 @@ export class ArticleService {
         trendingArticles = await this.trendingDataService.getTrendingArticles(
           languageKey,
           categoryKey,
+          5,
         );
       }
 

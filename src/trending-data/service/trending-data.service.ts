@@ -69,7 +69,17 @@ export class TrendingDataService {
     return Array.from(keywordMap.values());
   }
 
-  async getTrendingArticles(languageKey: string, categoryKey: string): Promise<ArticleData[]> {
+  /**
+   * Returns trending articles.
+   * @param languageKey the language key.
+   * @param categoryKey the category key.
+   * @param limit number of trending articles.
+   */
+  async getTrendingArticles(
+    languageKey: string,
+    categoryKey: string,
+    limit: number = 5,
+  ): Promise<ArticleData[]> {
     const trendingKeywords = await this.getTrendingKeywordsOrdered(languageKey, categoryKey);
     if (trendingKeywords.length === 0) {
       return [];
@@ -106,12 +116,11 @@ export class TrendingDataService {
       return bMatchedKeywords.length - aMatchedKeywords.length;
     });
 
-    const TRENDING_ARTICLES_COUNT = 10;
     const result: ArticleData[] = [];
 
     // For each trending keyword, add one article.
     for (const trendingKeyword of trendingKeywordsList) {
-      if (result.length > TRENDING_ARTICLES_COUNT) {
+      if (result.length > limit) {
         break;
       }
 
