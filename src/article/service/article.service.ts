@@ -144,10 +144,14 @@ export class ArticleService {
       // Show trending articles on first page.
       let trendingArticles: ArticleData[] = [];
       if (page === 1) {
+        const trendingArticlesCount = await this.remoteConfigService.get<number>(
+          'TRENDING_ARTICLES_COUNT',
+          5,
+        );
         trendingArticles = await this.trendingDataService.getTrendingArticles(
           languageKey,
           categoryKey,
-          5,
+          trendingArticlesCount,
         );
       }
 
