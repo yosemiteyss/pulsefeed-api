@@ -4,22 +4,46 @@ import {
   NavigateToArticleAction,
   NavigateToFeedCategoryAction,
   NewsBlock,
+  PostBlock,
   PostGridGroupBlock,
   PostGridTileBlock,
+  PostLargeBlock,
+  PostMediumBlock,
   PostSmallBlock,
   SectionHeaderBlock,
   SpacerBlock,
   Spacing,
 } from '../../news-block';
-import { ArticleCategory, ArticleCategoryTitle } from '@pulsefeed/common';
+import { ArticleCategory, ArticleCategoryTitle, RemoteConfigService } from '@pulsefeed/common';
+import { ArticleData, isPostBlockStyle, PostBlockStyle } from '../model';
 import { CategoryResponse } from '../../category';
 import { SourceResponse } from '../../source';
 import { Injectable } from '@nestjs/common';
 import { ArticleResponse } from '../dto';
-import { ArticleData } from '../model';
 
 @Injectable()
 export class FeedBuilderService {
+  constructor(private readonly remoteConfigService: RemoteConfigService) {}
+
+  buildPostBlock(
+    articleData: ArticleData,
+    categoryTitle: ArticleCategoryTitle,
+    style: PostBlockStyle,
+  ): PostBlock {
+    const article = ArticleResponse.fromModel(articleData.article);
+    const category = CategoryResponse.fromModel(articleData.category, categoryTitle);
+    const source = SourceResponse.fromModel(articleData.source);
+    const action = new NavigateToArticleAction(articleData.article.id, articleData.article.link);
+
+    if (style === PostBlockStyle.Medium) {
+      return new PostMediumBlock(article, category, source, action);
+    } else if (style === PostBlockStyle.Large) {
+      return new PostLargeBlock(article, category, source, action);
+    } else {
+      return new PostSmallBlock(article, category, source, action);
+    }
+  }
+
   buildHeadlineFeedPage(
     articles: ArticleData[],
     category: ArticleCategory,
@@ -65,12 +89,7 @@ export class FeedBuilderService {
     const listItems = articles.filter((data) => !gridItemIds.includes(data.article.id));
     for (let i = 0; i < listItems.length; i++) {
       const item = listItems[i];
-      const block = new PostSmallBlock(
-        ArticleResponse.fromModel(item.article),
-        CategoryResponse.fromModel(item.category, categoryTitle),
-        SourceResponse.fromModel(item.source),
-        new NavigateToArticleAction(item.article.id, item.article.link),
-      );
+      const block = this.buildPostBlock(item, categoryTitle, PostBlockStyle.Small);
       blockList.push(block);
 
       // Insert ads for between every 10 articles.
@@ -84,14 +103,15 @@ export class FeedBuilderService {
     return blockList;
   }
 
-  buildCategoryFeedPage(
+  async buildCategoryFeedPage(
     articles: ArticleData[],
     categoryTitle: ArticleCategoryTitle,
     trendingArticles: ArticleData[],
     includeTopSpacing: boolean = false,
     includeAds: boolean = true,
-  ): NewsBlock[] {
+  ): Promise<NewsBlock[]> {
     const blockList: NewsBlock[] = [];
+    const blockStyle = await this.getCategoryFeedBlockStyle();
 
     // Insert top spacing.
     if (includeTopSpacing) {
@@ -119,12 +139,7 @@ export class FeedBuilderService {
 
     for (let i = 0; i < articles.length; i++) {
       const item = articles[i];
-      const block = new PostSmallBlock(
-        ArticleResponse.fromModel(item.article),
-        CategoryResponse.fromModel(item.category, categoryTitle),
-        SourceResponse.fromModel(item.source),
-        new NavigateToArticleAction(item.article.id, item.article.link),
-      );
+      const block = this.buildPostBlock(item, categoryTitle, blockStyle);
       blockList.push(block);
 
       // Insert ads for between every 10 articles.
@@ -170,5 +185,20 @@ export class FeedBuilderService {
     }
 
     return blockList;
+  }
+
+  private async getCategoryFeedBlockStyle(): Promise<PostBlockStyle> {
+    let blockStyle = PostBlockStyle.Small;
+
+    const blockStyleConfig = await this.remoteConfigService.get<string>(
+      'CATEGORY_FEED_BLOCK_STYLE',
+      PostBlockStyle.Small,
+    );
+
+    if (isPostBlockStyle(blockStyleConfig)) {
+      blockStyle = blockStyleConfig as PostBlockStyle;
+    }
+
+    return blockStyle;
   }
 }

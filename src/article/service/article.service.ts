@@ -157,7 +157,7 @@ export class ArticleService {
 
       // Add top spacing for first page.
       const topSpacing = filter.page === 0;
-      const blockList = this.feedBuilder.buildCategoryFeedPage(
+      const blockList = await this.feedBuilder.buildCategoryFeedPage(
         articles,
         categoryTitles[categoryKey],
         trendingArticles,
