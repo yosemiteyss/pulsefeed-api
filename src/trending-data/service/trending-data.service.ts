@@ -120,7 +120,7 @@ export class TrendingDataService {
 
     // For each trending keyword, add one article.
     for (const trendingKeyword of trendingKeywordsList) {
-      if (result.length > limit) {
+      if (result.length >= limit) {
         break;
       }
 
