@@ -1,4 +1,13 @@
 import {
+  ArticleCategoryRepository,
+  ArticleCategoryTitle,
+  CacheKeyBuilder,
+  CacheService,
+  LanguageRepository,
+  PageResponse,
+  RemoteConfigService,
+} from '@pulsefeed/common';
+import {
   CategoryFeedRequest,
   HeadlineFeedRequest,
   SearchArticleRequest,
@@ -7,19 +16,12 @@ import {
   RelatedArticlesRequest,
 } from '../dto';
 import {
-  ArticleCategoryRepository,
-  CacheKeyBuilder,
-  CacheService,
-  LanguageRepository,
-  PageResponse,
-  RemoteConfigService,
-} from '@pulsefeed/common';
-import {
   BadRequestException,
   Inject,
   Injectable,
   LoggerService,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import {
   ApiResponseCacheKey,
@@ -33,9 +35,10 @@ import { TrendingDataService } from '../../trending-data';
 import { ArticleRepository } from '../../article-data';
 import { ArticleData, ArticleFilter } from '../model';
 import { NewsBlock } from '../../news-block';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
-export class ArticleService {
+export class ArticleService implements OnModuleInit {
   constructor(
     private readonly articleRepository: ArticleRepository,
     private readonly categoryRepository: ArticleCategoryRepository,
@@ -53,6 +56,10 @@ export class ArticleService {
    * @private
    */
   private readonly CATEGORY_FEED_MAX_PAGE = 50;
+
+  onModuleInit() {
+    this.scheduleRefreshFeeds().then();
+  }
 
   /**
    * Get headline feed.
@@ -116,66 +123,91 @@ export class ArticleService {
 
   /**
    * Get category feed.
-   * @param page the page number.
-   * @param languageKey the language key.
-   * @param categoryKey the category key.
+   * @param request the category feed request.
+   * @param isUpdateCache should store result to cache or not.
    */
-  async getCategoryFeedPage({
-    page,
-    languageKey,
-    categoryKey,
-  }: CategoryFeedRequest): Promise<PageResponse<NewsBlock>> {
-    if (page > this.CATEGORY_FEED_MAX_PAGE) {
+  async getCategoryFeedPage(
+    request: CategoryFeedRequest,
+    isUpdateCache: boolean = false,
+  ): Promise<PageResponse<NewsBlock>> {
+    if (request.page > this.CATEGORY_FEED_MAX_PAGE) {
       throw new BadRequestException('Invalid page number');
     }
 
     const filter: ArticleFilter = {
-      page: page,
+      page: request.page,
       limit: DEFAULT_PAGE_SIZE,
-      categoryKey: categoryKey,
-      languageKey: languageKey,
+      categoryKey: request.categoryKey,
+      languageKey: request.languageKey,
       publishedBefore: getLastQuarterHour(),
     };
 
     const action: () => Promise<PageResponse<NewsBlock>> = async () => {
       const [articles, total] = await this.getArticlesByFilter(filter);
-      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(languageKey);
+      const categoryTitles = await this.categoryRepository.getLocalizedCategoryTitles(
+        request.languageKey,
+      );
 
       // Show trending articles on first page.
       let trendingArticles: ArticleData[] = [];
-      if (page === 1) {
+      if (request.page === 1) {
         const trendingArticlesCount = await this.remoteConfigService.get<number>(
           'TRENDING_ARTICLES_COUNT',
           5,
         );
         trendingArticles = await this.trendingDataService.getTrendingArticles(
-          languageKey,
-          categoryKey,
+          request.languageKey,
+          request.categoryKey,
           trendingArticlesCount,
         );
+      }
+
+      const categoryTitle = categoryTitles[request.categoryKey];
+      if (!categoryTitle) {
+        return {
+          data: [],
+          isLastPage: true,
+        };
       }
 
       // Add top spacing for first page.
       const topSpacing = filter.page === 0;
       const blockList = await this.feedBuilder.buildCategoryFeedPage(
         articles,
-        categoryTitles[categoryKey],
+        categoryTitle,
         trendingArticles,
         topSpacing,
       );
 
-      const isLastArticlePage = page * filter.limit >= total;
+      const isLastArticlePage = request.page * filter.limit >= total;
       return {
         data: blockList,
-        isLastPage: page === this.CATEGORY_FEED_MAX_PAGE || isLastArticlePage,
+        isLastPage: request.page === this.CATEGORY_FEED_MAX_PAGE || isLastArticlePage,
       };
     };
 
-    return this.cacheService.wrap(
+    // Load and store result to cache.
+    if (isUpdateCache) {
+      return this.cacheService.wrap(
+        CacheKeyBuilder.buildKeyWithParams(
+          ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.prefix,
+          filter,
+        ),
+        action,
+        ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.ttl,
+      );
+    }
+
+    // Load stored result from cache.
+    const result = await this.cacheService.get<PageResponse<NewsBlock>>(
       CacheKeyBuilder.buildKeyWithParams(ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.prefix, filter),
-      action,
-      ApiResponseCacheKey.ARTICLE_CATEGORY_FEED.ttl,
     );
+
+    if (!result) {
+      return { data: [], isLastPage: true };
+    }
+
+    return result;
   }
 
   /**
@@ -235,6 +267,33 @@ export class ArticleService {
       action,
       ApiResponseCacheKey.ARTICLE_SEARCH.ttl,
     );
+  }
+
+  @Cron('15,45 * * * *')
+  async scheduleRefreshFeeds() {
+    const languages = await this.languageRepository.getEnabledLanguages();
+    const categories = await this.categoryRepository.getEnabledCategories();
+
+    //const requests: CategoryFeedRequest[] = [];
+
+    for (const language of languages) {
+      for (const category of categories) {
+        for (let page = 1; page <= this.CATEGORY_FEED_MAX_PAGE; page++) {
+          await this.getCategoryFeedPage(
+            {
+              page: page,
+              languageKey: language.key,
+              categoryKey: category.key,
+            },
+            true,
+          );
+          this.logger.debug!(
+            `Refreshed category feed page: [${language.key}, ${category.key}, ${page}]`,
+            ArticleService.name,
+          );
+        }
+      }
+    }
   }
 
   private async getArticlesByFilter(filter: ArticleFilter): Promise<[ArticleData[], number]> {
